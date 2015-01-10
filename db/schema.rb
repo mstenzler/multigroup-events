@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141022000951) do
+ActiveRecord::Schema.define(version: 20150110212102) do
 
   create_table "authentications", force: true do |t|
     t.integer  "user_id"
@@ -26,6 +26,23 @@ ActiveRecord::Schema.define(version: 20141022000951) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "events", force: true do |t|
+    t.integer  "user_id",             null: false
+    t.string   "type"
+    t.string   "title",               null: false
+    t.string   "slug",                null: false
+    t.text     "description"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.integer  "location_id"
+    t.string   "remote_event_api_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "events", ["slug"], name: "slug_opt", unique: true, using: :btree
+  add_index "events", ["user_id"], name: "user_opt", using: :btree
 
   create_table "geo_areas", force: true do |t|
     t.integer  "geo_country_id"
