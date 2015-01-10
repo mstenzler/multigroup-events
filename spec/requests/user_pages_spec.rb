@@ -197,15 +197,16 @@ describe "User pages" do
         fill_in EMAIL_LABEL,            with: "user@example.com"
         fill_in PASSWORD_LABEL,         with: "foobar"
         fill_in CONFIRM_PASSWORD_LABEL, with: "foobar"
-        select 'Male',           from: "Gender"
-        select BIRTHDATE.year, from: 'user_birthdate_1i'
-        select 'January', from: 'user_birthdate_2i'
-        select BIRTHDATE.day, from: 'user_birthdate_3i'
-        select "Number", from: AGE_DISPLAY_TYPE_LABEL
-#        save_and_open_page
-        select USA_COUNTRY, from: COUNTRY_LABEL
-        fill_in ZIP_CODE_LABEL, with: EXAMPLE_ZIP_CODE
-        select "Eastern Time (US & Canada)", from: 'time-zone-select'
+        select 'Male',           from: "Gender" if CONFIG[:require_gender?] 
+        if CONFIG[:require_birthdate?] 
+          select BIRTHDATE.year, from: 'user_birthdate_1i'
+          select 'January', from: 'user_birthdate_2i'
+          select BIRTHDATE.day, from: 'user_birthdate_3i'
+          select "Number", from: AGE_DISPLAY_TYPE_LABEL
+        end
+        select USA_COUNTRY, from: COUNTRY_LABEL if CONFIG[:require_country?]
+        fill_in ZIP_CODE_LABEL, with: EXAMPLE_ZIP_CODE if CONFIG[:require_zip_code?]
+        select "Eastern Time (US & Canada)", from: 'time-zone-select' if CONFIG[:require_time_zone?]
 #        save_and_open_page
       end
 
@@ -309,9 +310,9 @@ describe "User pages" do
       before do
 #        save_and_open_page
         fill_in NAME_LABEL,             with: new_name
-        select_date(Date.new(1990,1,1), { from: 'user_birthdate'} )
-        select 'Female',                 from: GENDER_LABEL
-        select UTC_TIME_ZONE_VALUE,      from: TIME_ZONE_LABEL
+        select_date(Date.new(1990,1,1), { from: 'user_birthdate'} ) if CONFIG[:require_birthdate?] 
+        select 'Female',                 from: GENDER_LABEL if CONFIG[:require_gender?] 
+        select UTC_TIME_ZONE_VALUE,      from: TIME_ZONE_LABEL if CONFIG[:require_time_zone?]
         click_button "Save changes"
         user
         @updated_user = reload_obj(user)
@@ -321,9 +322,15 @@ describe "User pages" do
       it { should have_selector('div.alert.alert-success') }
       it { should have_link('Sign out', href: signout_path) }
       specify { expect(@updated_user.name).to  eq new_name }
-      specify { expect(@updated_user.birthdate).to eq Date.new(1990,1,1) }
-      specify { expect(@updated_user.gender).to eq 'Female' }
-      specify { expect(@updated_user.time_zone).to eq UTC_TIME_ZONE_VALUE }
+      if CONFIG[:require_birthdate?] 
+        specify { expect(@updated_user.birthdate).to eq Date.new(1990,1,1) }
+      end
+      if CONFIG[:require_gender?] 
+        specify { expect(@updated_user.gender).to eq 'Female' }
+      end
+      if CONFIG[:require_time_zone?]
+        specify { expect(@updated_user.time_zone).to eq UTC_TIME_ZONE_VALUE }
+      end
     end
 
     describe "forbidden attributes" do
