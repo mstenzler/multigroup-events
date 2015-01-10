@@ -15,7 +15,7 @@ CONFIG.symbolize_keys!
 class ConfigError < StandardError
 end
 
-module RailsTemplate
+module MultigroupEvents
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

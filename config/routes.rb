@@ -1,4 +1,4 @@
-RailsTemplate::Application.routes.draw do
+MultigroupEvents::Application.routes.draw do
 
   match '/auth/:provider/callback', to: 'authentications#create', via: 'get'
 

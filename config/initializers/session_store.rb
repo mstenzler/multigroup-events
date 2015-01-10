@@ -1,3 +1,3 @@
 # Be sure to restart your server when you modify this file.
 
-RailsTemplate::Application.config.session_store :cookie_store, key: '_railstemplate_session'
+MultigroupEvents::Application.config.session_store :cookie_store, key: '_multigroupevents_session'

@@ -1,5 +1,5 @@
-title: Rails 4 Template
-display_name: Rails 4 Template
+title: Multigroup Events
+display_name: Multigroup Events
 min_age: 
 max_age: 
 omniauth_providers: ['meetup', 'twitter', 'facebook', 'google_apps']
@@ -8,18 +8,18 @@ enable_name?: true
 require_name?: true
 enable_username?: true
 require_username?: true
-enable_gender?: true
-require_gender?: true
-enable_birthdate?: true
-require_birthdate?: true
-enable_time_zone?: true
-require_time_zone?: true
-enable_country?: true
-require_country?: true
-enable_zip_code?: true
-require_zip_code?: true
-enable_geo_area?: true
-require_geo_area?: true
+enable_gender?: false
+require_gender?: false
+enable_birthdate?: false
+require_birthdate?: false
+enable_time_zone?: false
+require_time_zone?: false
+enable_country?: false
+require_country?: false
+enable_zip_code?: false
+require_zip_code?: false
+enable_geo_area?: false
+require_geo_area?: fasle
 verify_email?: true
 user_name_field: email
 user_identity_field: username
