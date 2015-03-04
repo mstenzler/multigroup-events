@@ -36,12 +36,17 @@ group :doc do
   gem 'sdoc', require: false
 end
 
+#group :assets do
+#  gem 'ejs'
+#end
+
 group :development do
   gem 'nifty-generators'
   gem 'populator'
   gem 'faker'
   gem 'rename'
   gem 'random_data'
+  gem 'rails-erd'
 end
 
 group :test do

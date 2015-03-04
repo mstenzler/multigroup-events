@@ -1,6 +1,8 @@
 class RemoteEvent < Event
   require 'uri'
-  require 'remote_event_api_builder'
+ # require 'remote_event_api_builder'
+ require 'ccmeetup'
+ require 'ccremote_event'
 
   attr_accessor :remote_api_key, :remember_api_key
 
@@ -22,11 +24,12 @@ class RemoteEvent < Event
   } 
 
   has_one :remote_event_api
-  has_many :remote_event_api_details
+#  has_many :remote_event_api_details
 
-  before_validation :populate_remote_event_api, on: :create
-  
-  validates :remote_event_api, presence: true
+ # before_validation :populate_remote_event_api, on: :create
+   after_create  :populate_remote_event_api, on: :create
+
+#  validates :remote_event_api, presence: true
   validate :must_have_linked_events
   validate :must_have_remote_api_key
 
@@ -52,11 +55,17 @@ class RemoteEvent < Event
 
   def populate_remote_event_api
     re_api = RemoteEventApi.new
-    re_api.event_id = self.id
+    re_api.remote_event_id = self.id
     if remember_api_key == 1
       re_api.api_key = remote_api_key
     end
+    event_urls = []
+    linked_events.map { |e| event_urls << e.url  }
 
-    rclient = CCMeetup::Client.new({ api_key: remote_api_key })
+    rclient = CCMeetup::Client.new({ auth_method: :api_key, api_key: remote_api_key })
+    re = CCRemoteEvent::ApiBuilder.new(rclient)
+    api = re.build(:meetup, { get_signed_url: true, url_list: event_urls, remember_api_key: remember_api_key })
+    self.remote_event_api = api
   end
+
 end

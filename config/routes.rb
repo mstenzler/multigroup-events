@@ -9,10 +9,10 @@ MultigroupEvents::Application.routes.draw do
   resources :users, except: [:show] do
     resources :verify_emails, only: [:new, :create]
     resources :reset_verify_emails, only: [:new, :create]
-#    resources :change_usernames, only: [:edit, :update], shallow: true
-#    resources :change_emails, only: [:edit, :update], shallow: true
-#    resources :change_avatars, only: [:edit, :update], shallow: true
   end
+
+  resources :events 
+  get 'events/new_type/:type', to: 'events#new', as: 'new_event_type'
 
   get '/users/:id', to: "profiles#show"
 
@@ -53,6 +53,8 @@ MultigroupEvents::Application.routes.draw do
   match '/about', to: 'static_pages#about', via: 'get'
   match '/contact', to: 'static_pages#contact', via: 'get'
   match '/error', to: 'static_pages#error', via: 'get'
+
+  get '/events/templates/:page', to: 'static_pages#event_js'
 
   match '~:id' => 'profiles#show', :as => :show_profile, via: 'get', :constraints => { :username => /[A-Za-z0-9_\.]+/ }
 

@@ -38,6 +38,10 @@ class Event < ActiveRecord::Base
     return EVENT_TYPES
   end
 
+  def num_linked_events
+    linked_events ? linked_events.size : 0
+  end
+
   def type_title
     self.class.name.underscore.humanize.titleize
   end

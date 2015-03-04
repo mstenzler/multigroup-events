@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150110212102) do
+ActiveRecord::Schema.define(version: 20150111032039) do
 
   create_table "authentications", force: true do |t|
     t.integer  "user_id"
@@ -105,6 +105,16 @@ ActiveRecord::Schema.define(version: 20150110212102) do
 
   add_index "geo_regions", ["geo_country_id"], name: "regions_country_code_opt", using: :btree
 
+  create_table "linked_events", force: true do |t|
+    t.integer  "event_id",        null: false
+    t.string   "url",             null: false
+    t.string   "remote_event_id"
+    t.string   "source"
+    t.integer  "rank"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "locations", force: true do |t|
     t.integer  "user_id"
     t.string   "name",                 limit: 70
@@ -136,6 +146,32 @@ ActiveRecord::Schema.define(version: 20150110212102) do
   end
 
   add_index "profiles", ["user_id"], name: "profile_user_id_opt", using: :btree
+
+  create_table "remote_event_api_details", force: true do |t|
+    t.integer  "remote_event_api_id"
+    t.integer  "rank"
+    t.string   "event_url"
+    t.string   "event_api_url"
+    t.string   "rsvp_api_url"
+    t.string   "remote_event_id"
+    t.string   "title"
+    t.text     "description"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "remote_event_apis", force: true do |t|
+    t.integer  "remote_event_id"
+    t.text     "options"
+    t.integer  "primary_remote_event_info_id"
+    t.string   "all_events_api_url"
+    t.string   "all_rsvps_api_url"
+    t.string   "api_key"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "users", force: true do |t|
     t.string   "name",                     limit: 32
