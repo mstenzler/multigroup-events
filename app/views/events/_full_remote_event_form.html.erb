@@ -1,0 +1,14 @@
+<%= f.text_field :remote_api_key %>
+
+<%= f.check_box :remember_api_key %>
+
+<%= f.text_field :title %>
+
+<hr/>
+<h3>Linked Events: </h3>
+
+<%= f.fields_for :linked_events do |builder| %>
+  <%= render 'linked_event_fields', f: builder %>
+<% end %>
+<%= link_to_add_fields "Add Linked Event", f, :linked_events %>
+<br/>

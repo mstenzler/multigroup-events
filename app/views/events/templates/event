@@ -1,0 +1,45 @@
+<% if (data.displayTitle) { %>
+  <H1><%= data.name %></h1>
+<% } %>
+  <% var startDate = data.startDate(), endDate = data.endDate() %>
+  <% var venue = data.venue, 
+         description = data.description,
+         fee = data.fee %>
+  <% if (startDate) { %>
+    <div id="when" class="row"> 
+      <div class="event-icon">
+        <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+      </div>
+      <div class="event-data">
+        <span class="eventDate"><%= startDate %></span>
+      </div>
+    </div>
+  <% }; if (venue) { %>  
+    <div id="where" class="row"> 
+      <div class="event-icon">
+        <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
+      </div>
+      <div class="event-data">
+        <span class="venueName"><%= venue.name %> </span><br/>
+        <span class="venueAddress"><%= venue.location() %></span>
+      </div>
+    </div>
+  <% }; if (fee) { %>  
+    <div id="where" class="row"> 
+      <div class="event-icon">
+        <span class="glyphicon glyphicon-usd" aria-hidden="true"></span>
+      </div>
+      <div class="event-data">
+        <span class="venueFee"><%= fee.label %>: <%= fee.formatAmount() %> 
+          <% if (fee.description) { %>
+            /<%= fee.description %>
+            <% } %> 
+        </span>
+      </div>
+    </div>
+  <% }; if (description) { %>
+    <div id="event-description" class="row"> 
+      <hr/>
+      <%= description %>
+    </div>
+  <% } %>

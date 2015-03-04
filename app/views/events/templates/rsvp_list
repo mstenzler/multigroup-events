@@ -1,0 +1,61 @@
+<div class="row">
+  <% var rsvpList = data.rsvpList, countData = data.countData,
+         rsvpType = data.rsvpType, liClass = data.liClass,
+         toggleRsvp = data.toggleRsvp,
+         currentShowState = data.currentShowState %>
+  <hr/>
+  <% var liClassText = (liClass ? ' class="' + liClass + '"' : ""); 
+     if (typeof currentShowState == 'undefined') {
+      currentShowState = 'show';
+     }
+     if (typeof toggleRsvp == 'undefined') {
+      toggleRsvp = true;
+     }
+  %>
+
+
+  <div id="rsvp-<%= rsvpType %>-count">
+
+    <% if (countData) { %>
+      <span class="bold"><%= data.rsvpTypeLabel %> RSVPs: <%= countData.numRsvps %>
+      <% if (countData.numGuestRsvps) { %>
+        <% var guestLabel = (countData.numGuestRsvps > 1 ? "Guests" : "Guest") %>
+        (<%= countData.numIndividualRsvps %> + <%= countData.numGuestRsvps %> <%= guestLabel %>)
+      <% } %>
+      </span>
+    <% } %>
+    <% if (toggleRsvp) { %>
+      &nbsp;
+      <% if (currentShowState == 'show') { %>
+        <a href="javascript:void(0)" id="toggle-<%= rsvpType %>-rsvps">
+          <% if (currentShowState == 'show') { %>
+            <span id="rsvp-<%= rsvpType %>-toggle-icon" class="glyphicon glyphicon-minus-sign"></span>
+          <% } else { %>
+            <span id="rsvp-<%= rsvpType %>-toggle-icon" class="glyphicon glyphicon-plus-sign"></span>
+          <% } %>
+        </a>  
+      <% } %>
+    <% } %>
+  </div>
+
+  <ul id="event-<%= rsvpType %>-rsvp-list" class="rsvp-list">
+  <% for (var i=0, l=rsvpList.length; i<l; i++){ %>
+    <% var currRsvp = rsvpList[i];
+      var currMember = currRsvp.member;
+      var currMemberPic;
+      if (currMember.photo){
+        currMemberPic = currMember.photo.thumb_link;
+      }
+      else {
+        currMemberPic = data.noPhotoSrc;
+      }
+    %>
+     <li<%= liClassText %>><img src="<%= currMemberPic %>"><br/>
+         <%= currMember.name %> <% if (currRsvp.guests) { %> + <%= currRsvp.guests %> <% } %>
+         <% if (currRsvp.pay_status) { %>
+           <span class='paid'>Paid</span>
+         <% } %>
+     </li>
+  <% } %>
+  </ul>
+</div>

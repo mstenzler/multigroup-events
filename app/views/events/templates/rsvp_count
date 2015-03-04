@@ -1,0 +1,8 @@
+<hr/>
+<div id="rsvp-count">
+  <span class="bold">Num RSVPs: <%= data.numYesWithGuests %>
+    <% if (numGuests > 0) { %>
+     (<%= data.numYes %> + <%= data.numGuests %> Guests)
+    <% } %>
+  </span>
+</div>

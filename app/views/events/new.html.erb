@@ -1,0 +1,35 @@
+<% provide(:title, 'New Event') %>
+<h1>New <%= @event.type_title %></h1>
+<div id="info-div"></div>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <% if @event.type %>
+      <%= bootstrap_form_for(@event) do |f| %>
+        <%= render 'shared/error_messages', target: @event %>
+
+        <%= f.hidden_field :type %>
+
+        <%= render partial: "#{@event.type.underscore}_form", locals: { f: f, event: @event } %>
+
+        <%= f.submit "Create Event", class: "btn btn-lg btn-primary" %>
+      <% end %>
+    <% else %>
+      <% Event.get_event_types.each do |event_type| %>
+        <%= link_to "New #{event_type.title}", new_event_type_path(type: event_type.name) %><br/>
+        <% end %>
+
+    <% end %>
+  </div>
+</div>
+
+<script>
+
+$(document).ready( function() {
+
+    $('#event_type').selectSwitch({
+      baseSelector:          '#event-form'
+    });
+
+});
+</script>
