@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  rolify
   belongs_to :geo_country
   belongs_to :geo_area
   has_one :profile

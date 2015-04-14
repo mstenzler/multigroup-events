@@ -30,6 +30,9 @@ MultigroupEvents::Application.routes.draw do
   get 'user_email/edit', to: "change_emails#edit", as: :edit_user_email
   match 'user_email', to: "change_emails#update", as: :user_email, via: ['put', 'patch']
 
+  get 'user_roles/:id/edit', to: "change_user_roles#edit", as: :edit_user_roles
+  match ':id/user_roles', to: "change_user_roles#update", as: :user_roles, via: ['put', 'patch']
+
   post '/profiles/:id/enable_personal_on', to: "profiles#enable_personal_on",
   as: :enable_personal_profile_on
   resource :personal_profile, except: [:new, :create] do

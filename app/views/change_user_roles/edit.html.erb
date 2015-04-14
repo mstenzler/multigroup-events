@@ -1,0 +1,16 @@
+<% provide(:title, "Change Roles") %>
+<h1>Change Roles</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= bootstrap_form_for @user, :url => user_roles_path(@user) do |f| %>
+      <%= render 'shared/error_messages', target: @user %>
+      <% for role in User::ROLES %>
+        <%= check_box_tag "user[roles][#{role}]", role, @user.roles.include?(role), {:name => "user[roles][]"}%>
+        <%= label_tag "user_roles_#{role}", role.to_s.humanize %><br />
+      <% end %>
+      <%= hidden_field_tag "user[roles][]", "" %>
+      <%= f.submit "Update Roles", class: "btn btn-lg btn-primary" %></div>
+    <% end %>
+  </div>
+</div>
