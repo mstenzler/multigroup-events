@@ -22,6 +22,7 @@ enable_geo_area?: false
 require_geo_area?: fasle
 verify_email?: true
 user_name_field: email
+use_friendly_name_id?: true
 user_identity_field: username
 check_remember_me?: true
 use_avatar_gender_default?: true

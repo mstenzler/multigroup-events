@@ -23,6 +23,10 @@ class User < ActiveRecord::Base
 
   PASSWORD_RESET_TTL_HOURS = CONFIG[:password_reset_ttl_hours] || 2
 
+  DEFAULT_FRIENDLY_ID_COLUMN = :username
+
+  ROLES = %i[admin organizer member banned]
+
   NAME_MAX_LENGTH = 32
   NAME_MIN_LENGTH = 2
   USERNAME_MAX_LENGTH = 24
@@ -154,13 +158,22 @@ class User < ActiveRecord::Base
     validates_date :birthdate,  date_hash
   end
 
-  if CONFIG[:user_identity_field] == 'username'
+  if CONFIG[:use_friendly_name_id?]
+    extend FriendlyId
+    friendly_id_column = CONFIG[:user_identity_field] ? CONFIG[:user_identity_field].to_sym : DEFAULT_FRIENDLY_ID_COLUMN
+    friendly_id friendly_id_column
+
+    def self.fetch_user(id)
+      User.friendly.find(id)
+    end
+  elsif CONFIG[:user_identity_field] == 'username'
     def to_param
       self.username
     end
 
-    def self.find(identifier)
-      self.find_by_username(identifier)
+#    def self.find(identifier)
+    def self.fetch_user(id)
+      self.find_by_username(id)
     end
   end
 
@@ -214,6 +227,33 @@ class User < ActiveRecord::Base
       logger.warn("WARNING! Age not specified in display_age_range")
     end
     ret
+  end
+
+  def roles=(roles)
+    roles = [*roles].map { |r| r.to_sym }
+    self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.inject(0, :+)
+  end
+
+  def roles
+    ROLES.reject do |r|
+      ((roles_mask.to_i || 0) & 2**ROLES.index(r)).zero?
+    end
+  end
+
+  
+  def roles_list_for_print(sep = ', ')
+    l_roles = roles
+    ret = nil
+    if (l_roles && l_roles.size > 0)
+      ret = l_roles.map { |r| r.to_s.titleize }.join(sep)
+    else
+      ret = "None"
+    end
+    ret
+  end
+
+  def has_role?(role)
+    roles.include?(role)
   end
 
   def has_local_authentication?

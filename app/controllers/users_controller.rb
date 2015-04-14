@@ -1,8 +1,13 @@
 class UsersController < ApplicationController
+  #redirect if user is not signed in
 	before_action :signed_in_user, only: [:index, :edit, :update, :destroy]
-	before_action :correct_user,   only: [:edit, :update]
-  before_action :admin_user,     only: :destroy
-  before_action :is_signed_in,   only: [:new, :create]
+  #redirectif user is signed in
+	before_action :is_signed_in,   only: [:new, :create]
+  before_action :load_user, :only => [:show, :edit, :update, :destroy]
+  load_and_authorize_resource
+  #before_action :correct_user,   only: [:edit, :update]
+  #before_action :admin_user,     only: :destroy
+  #before_action :is_signed_in,   only: [:new, :create]
 
   def index
   	@users = User.paginate(page: params[:page])
@@ -11,7 +16,7 @@ class UsersController < ApplicationController
 	def show
     puts 'IN SHOW!!!'
     logger.debug("IN user show")
-    @user = User.find(params[:id])
+    #@user = User.find(params[:id])
     logger.debug("Got user = #{@user.inspect}")
   end
 
@@ -47,12 +52,15 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = current_user
+    #@user = User.fetch_user(params[:id])
+    #@user = current_user
     load_new_user_info
   end
 
   def update
-    @user = current_user
+    #@user = User.fetch_user(params[:id])
+    @curr_user = current_user
+    authorize! :assign_roles, @user if params[:user][:assign_roles]
     if @user.update_attributes(user_params)
     	flash[:success] = "Profile updated"
       redirect_to @user
@@ -64,7 +72,8 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    user = User.find(params[:id])
+    #user = User.find(params[:id])
+    #user = User.fetch_user(params[:id])
     if (current_user == user) && (current_user.admin?)
     	flash[:error] = "Can not delete own admin acount!"
     else
@@ -105,6 +114,10 @@ class UsersController < ApplicationController
                                    :age_display_type, :time_zone)
     end
 
+    def load_user
+      @user ||= User.fetch_user(params[:id])
+    end
+
     def load_new_user_info
       if CONFIG[:enable_country?]
         @countries = GeoCountry.get_country_list({default_country: CONFIG[:default_country],
@@ -122,7 +135,8 @@ class UsersController < ApplicationController
 #    end
 
     def correct_user
-      user = User.find(params[:id])
+#      user = User.find(params[:id])
+      user = User.fetch_user(params[:id])
       redirect_to(root_url) unless current_user?(user)
     end
     
