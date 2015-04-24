@@ -1,4 +1,5 @@
 require 'yaml'
+#example call: rake db:load_seed_table["nav_items"]
 
 namespace :db do
   desc "Loads in one of the seed data tables"

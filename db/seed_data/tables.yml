@@ -1,4 +1,14 @@
 ---
+roles:
+  enabled: true
+  data_file_type: csv
+  delimiter: "\t"
+  fields:
+    - id
+    - name
+  reset_auto_increment: false
+  terminated_by: "\n"
+  update_time: true
 geo_areas:
   enabled: true
   data_file_type: csv

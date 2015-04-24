@@ -26,7 +26,7 @@ class User < ActiveRecord::Base
 
   DEFAULT_FRIENDLY_ID_COLUMN = :username
 
-  ROLES = %i[admin organizer member banned]
+#  ROLES = %i[admin organizer member banned]
 
   NAME_MAX_LENGTH = 32
   NAME_MIN_LENGTH = 2
@@ -230,6 +230,33 @@ class User < ActiveRecord::Base
     ret
   end
 
+  def role_names(cast_to = nil)
+    cast_func = nil
+    if cast_to
+      case cast_to.to_sym
+      when :symbol
+        cast_func = "to_sym"
+      when :string
+        cast_func = "to_s"
+      else
+        raise "Invalid cast_to param: #{cast_to} in role_names"
+      end
+    end
+    roles.map { |r| cast_func ? r.name.send(cast_func) : r.name }
+  end
+
+  def roles_list_for_print(sep = ', ')
+    l_roles = roles
+    ret = nil
+    if (l_roles && l_roles.size > 0)
+      ret = l_roles.map { |r| r.name.to_s.titleize }.join(sep)
+    else
+      ret = "None"
+    end
+    ret
+  end
+
+=begin
   def roles=(roles)
     roles = [*roles].map { |r| r.to_sym }
     self.roles_mask = (roles & ROLES).map { |r| 2**ROLES.index(r) }.inject(0, :+)
@@ -256,6 +283,7 @@ class User < ActiveRecord::Base
   def has_role?(role)
     roles.include?(role)
   end
+=end
 
   def has_local_authentication?
     !password_digest.blank?

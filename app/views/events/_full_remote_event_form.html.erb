@@ -4,6 +4,10 @@
 
 <%= f.text_field :title %>
 
+<%= f.select :display_privacy, Event.display_privacy_options, { label: "Privacy Type:" }, { class: "selectpicker auto-width" } %>
+
+<%= f.check_box :display_listing %>
+
 <hr/>
 <h3>Linked Events: </h3>
 

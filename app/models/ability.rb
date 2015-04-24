@@ -6,7 +6,7 @@ class Ability
         can [:update, :edit], User do |l_user|
             user.id == @user.id
         end
-        @user.roles.each { |role| send(role) }
+        @user.roles.each { |role| send(role.name) }
 
 #    can :assign_roles, User if user.admin?
     # Define abilities for the passed in user here. For example:
@@ -39,7 +39,7 @@ class Ability
 
   def admin
     can :manage, :all
-#    can :assign_roles, User
+    can :assign_roles, User
   end
 
   def organizer

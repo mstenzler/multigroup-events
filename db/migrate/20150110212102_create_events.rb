@@ -6,6 +6,8 @@ class CreateEvents < ActiveRecord::Migration
       t.string :title, null: false
       t.string :slug, null: false
       t.text :description
+      t.string :display_privacy, default "public"
+      t.boolean :display_listing, default: true
       t.datetime :start_date
       t.datetime :end_date
       t.integer :location_id

@@ -80,7 +80,7 @@ class EventsController < ApplicationController
     end
 
     def event_params
-      params.require(:event).permit(:type, :remote_api_key, :remember_api_key, :title, :description, :start_date, :end_date, :location_id, linked_events_attributes: [:url])
+      params.require(:event).permit(:type, :remote_api_key, :remember_api_key, :display_privacy, :display_list, :title, :description, :start_date, :end_date, :location_id, linked_events_attributes: [:url])
     end
     
 end
