@@ -20,6 +20,8 @@ module CCRemoteEvent
 
     class Meetup < Base
 
+      DEFAULT_EVENT_STATUS = "upcoming,past"
+
       def build(options={})
         use_signed_url = options.has_key?(:get_signed_url) ? options[:signed_url] : false
         url_list = options[:url_list]
@@ -52,6 +54,11 @@ module CCRemoteEvent
           rank = 1
           remote_event_id_arr = []
           api_detail_hash = {}
+          event_status = options.has_key?("event_status") ? 
+            options[:event_status] : DEFAULT_EVENT_STATUS
+          ret.primary_remote_event_index = 
+           options.has_key?(:primary_remote_event_index) ? 
+           options[:primary_remote_event_index] : RemoteEventApi::DEFAULT_PRIMARY_REMOTE_EVENT_INDEX
 
           url_list.each do |url|
             remote_event_id = getEventId(url)
@@ -69,7 +76,7 @@ module CCRemoteEvent
           id_list = remote_event_id_arr.join(',')
           puts("id_list = '#{id_list}'")
           puts("api_detail_hash = '#{api_detail_hash.inspect}'")
-          all_events_info = loc_api_client.fetch(:events, { event_id: id_list, get_signed_url: true })
+          all_events_info = loc_api_client.fetch(:events, { event_id: id_list, status: event_status, get_signed_url: true })
           all_rsvps_info =  loc_api_client.fetch(:rsvps, { event_id: id_list, get_signed_url: true })
           puts("all_events_info = '#{all_events_info}'")
           puts("all_rsvps_info = '#{all_rsvps_info}'")

@@ -13,6 +13,12 @@ MultigroupEvents::Application.routes.draw do
 
   resources :events 
   get 'events/new_type/:type', to: 'events#new', as: 'new_event_type'
+  get 'events/:id/rsvp_print', to: 'events#rsvp_print', as: 'show_event_rsvp_print'
+  get 'events/:tab', to: 'events#index_tab', as: 'events_tab'
+
+ # get 'events/upcomming', to: 'events#list', as: 'show_upcomming_events'
+ # get 'events/past', to: 'events#list', as: 'show_past_events'
+ # get 'events/calendar', to: 'events#list', as: 'show_event_calendar'
 
   get '/users/:id', to: "profiles#show"
 

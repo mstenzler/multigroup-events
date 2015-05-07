@@ -1,0 +1,12 @@
+<% provide(:title, "Change Username") %>
+<h1>Update API Key</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+		<%= bootstrap_form_for @authentication do |f| %>
+		  <%= render 'shared/error_messages', target: @authentication %>
+		    <%= f.text_field :api_key %>
+		    <%= f.submit "Change Api key", class: "btn btn-lg btn-primary" %></div>
+		<% end %>
+	</div>
+</div>

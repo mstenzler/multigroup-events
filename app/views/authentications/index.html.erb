@@ -14,6 +14,18 @@
               <div class="provider">
                 <%= authentication.provider_name %>
                 <p class="uid"><%= authentication.uid %></p>
+                <% if authentication.can_edit_api_key? %>
+                  <p>
+                    API Key: <br/>
+                    <% if authentication.has_api_key? %>
+                      <%= authentication.api_key %>
+                    <% else %>
+                       Not Provided
+                    <% end %>
+                    <br/>
+                    <%= link_to "Update Api Key", edit_authentication_path(authentication) %>
+                  </p>
+                <% end %>
               </div>
               <div class="dismiss">
                 <% if is_last_auth %>

@@ -1,5 +1,17 @@
 <%= f.text_field :remote_api_key %>
 
+<% if @api_keys %>
+  <div class="form-group radio_button_list">
+    <label class="control-label">Use Api Key:</label><br/>
+    <%  @api_keys.each do |user_key| %>
+      <%= radio_button_tag :api_key_option, user_key[:provider], false, { 'data-api_token' => user_key[:key] } %>
+      <%= label_tag(:api_key_option, " #{user_key[:provider]}  : #{user_key[:key] }") %><br/>
+    <% end %>
+    <%= radio_button_tag(:api_key_option, "clear") %>
+    <%= label_tag(:api_key_option, "Clear") %>
+  </div>
+<% end %>
+
 <%= f.check_box :remember_api_key %>
 
 <%= f.text_field :title %>
@@ -16,3 +28,6 @@
 <% end %>
 <%= link_to_add_fields "Add Linked Event", f, :linked_events %>
 <br/>
+<script type='text/javascript'>
+  $(document).ready( $("input[name='event[remote_api_key]']").updateFromRadioButton("input[name='api_key_option']") )
+</script>

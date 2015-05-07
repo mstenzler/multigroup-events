@@ -2,7 +2,13 @@
   <% var rsvpList = data.rsvpList, countData = data.countData,
          rsvpType = data.rsvpType, liClass = data.liClass,
          toggleRsvp = data.toggleRsvp,
-         currentShowState = data.currentShowState %>
+         displayPayStatus = data.getPayStatus,
+         paidIdentifier = data.paidIdentifier,
+         currentShowState = data.currentShowState;
+    if ( (!typeof displayPayStatus == 'undefined') && displayPayStatus) {
+      liClass = (liClass ? liClass + ' ' + add_height : liClass);
+    }
+  %>
   <hr/>
   <% var liClassText = (liClass ? ' class="' + liClass + '"' : ""); 
      if (typeof currentShowState == 'undefined') {
@@ -17,7 +23,7 @@
   <div id="rsvp-<%= rsvpType %>-count">
 
     <% if (countData) { %>
-      <span class="bold"><%= data.rsvpTypeLabel %> RSVPs: <%= countData.numRsvps %>
+      <span class="yes-no-header"><%= data.rsvpTypeLabel %> RSVPs: <%= countData.numRsvps %>
       <% if (countData.numGuestRsvps) { %>
         <% var guestLabel = (countData.numGuestRsvps > 1 ? "Guests" : "Guest") %>
         (<%= countData.numIndividualRsvps %> + <%= countData.numGuestRsvps %> <%= guestLabel %>)
@@ -49,10 +55,13 @@
       else {
         currMemberPic = data.noPhotoSrc;
       }
+      var curr_is_paid = 
+      (displayPayStatus && currRsvp.pay_status === paidIdentifier) ?
+        true : false;
     %>
      <li<%= liClassText %>><img src="<%= currMemberPic %>"><br/>
          <%= currMember.name %> <% if (currRsvp.guests) { %> + <%= currRsvp.guests %> <% } %>
-         <% if (currRsvp.pay_status) { %>
+         <% if (curr_is_paid) { %>
            <span class='paid'>Paid</span>
          <% } %>
      </li>

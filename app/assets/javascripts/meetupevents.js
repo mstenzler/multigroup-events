@@ -5,11 +5,11 @@
   var MEETUP_API_EVENTS_URL =  MEETUP_API_BASE_URL +"events";
   var MEETUP_API_RSVP_URL = MEETUP_API_BASE_URL + "rsvps";
  
-  var DEFAULT_EVENT_TEMPLATE = 'templates/event.erb';
-  var DEFAULT_YES_RSVP_TEMPLATE = 'templates/rsvp_list.erb';
-  var DEFAULT_NO_RSVP_TEMPLATE = 'templates/rsvp_list.erb';
-  var DEFAULT_EVENT_LIST_TEMPLATE = 'templates/event_list.erb';
-  var DEFAULT_RSVP_COUNT_TEMPLATE = 'templates/rsvp_count.erb';
+  var DEFAULT_EVENT_TEMPLATE = '/events/templates/event.erb';
+  var DEFAULT_YES_RSVP_TEMPLATE = '/events/templates/rsvp_list.erb';
+  var DEFAULT_NO_RSVP_TEMPLATE = '/events/templates/rsvp_list.erb';
+  var DEFAULT_EVENT_LIST_TEMPLATE = '/events/templates/event_list.erb';
+  var DEFAULT_RSVP_COUNT_TEMPLATE = '/events/templates/rsvp_count.erb';
   var DEFAULT_PRIMARY_EVENT_DISPLAY_TAG = '#primaryEvent';
   var DEFAULT_RSVP_COUNT_DISPLAY_TAG = '#rsvpCount';
   var DEFAULT_YES_RSVP_DISPLAY_TAG = '#yesRsvpList';
@@ -979,6 +979,10 @@
     if (typeof template == 'undefined' || 
         typeof displayTag == 'undefined') {
       throw "showTemplate requires a parameter hash containing 'template' and 'displayTag'";
+    }
+    if (globalArgs.getPayStatus) {
+      data.getPayStatus = true;
+      data.paidIdentifier = PAID;
     }
     debug("In showTemplate: tempate = " + template, 2);
     debug("displayTag = " + displayTag, 2);

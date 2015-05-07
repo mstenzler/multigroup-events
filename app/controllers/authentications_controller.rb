@@ -1,4 +1,7 @@
 class AuthenticationsController < ApplicationController
+  before_action :signed_in_user, except: [:create]
+  before_action :init_form, only: [:edit, :update]
+
   def index
     @authentications = current_user.authentications if current_user
     @authentications ||= []
@@ -34,10 +37,31 @@ class AuthenticationsController < ApplicationController
   
   end
 
+  def edit
+  end
+
+  def update
+    if @authentication.update_attributes(auth_params)
+      redirect_to authentications_url, :notice => "Api key has been updated."
+    else
+      render :edit
+    end
+  end
+
   def destroy
     @authentication = current_user.authentications.find(params[:id])
     puts "About to destroy authentication #{@authentication.inspect}"
     @authentication.destroy
     redirect_to authentications_url, :notice => "Successfully destroyed authentication."
   end
+
+  private
+    def init_form
+      @authentication = current_user.authentications.find(params[:id])
+      authorize! :manage, @authentication
+    end
+
+    def auth_params
+      params.require(:authentication).permit(:api_key)
+    end
 end

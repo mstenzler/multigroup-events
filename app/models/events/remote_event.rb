@@ -27,7 +27,7 @@ class RemoteEvent < Event
 #  has_many :remote_event_api_details
 
  # before_validation :populate_remote_event_api, on: :create
-   after_create  :populate_remote_event_api, on: :create
+   before_save  :populate_remote_event_api
 
 #  validates :remote_event_api, presence: true
   validate :must_have_linked_events
@@ -65,6 +65,19 @@ class RemoteEvent < Event
     rclient = CCMeetup::Client.new({ auth_method: :api_key, api_key: remote_api_key })
     re = CCRemoteEvent::ApiBuilder.new(rclient)
     api = re.build(:meetup, { get_signed_url: true, url_list: event_urls, remember_api_key: remember_api_key })
+    primary_event_index = api.primary_remote_event_index
+    primary_event = api.remote_event_api_details[primary_event_index]
+    logger.debug("primary_event =")
+    logger.debug(primary_event)
+    primary_start_date = api.remote_event_api_details[primary_event_index].start_date
+    #logger.debug("primary_start_date = " + primary_start_date)
+    if (primary_start_date)
+      logger.debug("!! Setting start date!!!")
+      self.start_date = primary_start_date
+    end
+    if (primary_end_date = api.remote_event_api_details[primary_event_index].end_date)
+      self.end_date = primary_end_date
+    end
     self.remote_event_api = api
   end
 

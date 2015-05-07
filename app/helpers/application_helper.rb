@@ -59,4 +59,8 @@ module ApplicationHelper
     link_to(name, '#', class: "add_fields", data: {id: id, fields: fields.gsub("\n", "")})
   end
 
+  def add_active_if_current(args = {})
+    current_page?(args) ? " class=\"active\" ".html_safe : ""
+  end
+
 end

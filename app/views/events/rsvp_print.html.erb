@@ -1,34 +1,11 @@
     <div class="row">
-      <div class="col-sm-8 col-sm-push-2">
+      <div class="col-sm-12">
         <h1 id="pageTitle"></h1>
         <h2 id="errorMessage"></h2>
-        <% if can? :manage, @event %>
-          <hr/>
-          <%= link_to "Admin Print View", 
-          show_event_rsvp_print_path(@event), target: "_blank" %><br/>
-          <%= link_to "Edit", edit_event_path(@event) %>
-          <hr/>
-        <% end %>
+        <hr/>
         <div id="multigroupEvent">
           <div id="eventList">
             <p>Event List</p>
-          </div>
-          <div id="primaryEvent">
-            <p>Event Description:</p>
-          </div>
-          <div id="RsvpIntro">
-            <hr/>
-            <h3>Current RSVPS sorted by: 
-              <select id="sort_by">
-                <option value="last_rsvp" selected>Last Rsvp</option>
-                <option value="first_rsvp">First Rsvp</option>
-                <option value="name">Name</option>
-              </select>
- 
-              <a href="javascript:void(0)" id="refresh-rsvp-list">
-                <span id="refresh-icon" class="glyphicon glyphicon-refresh"></span>
-              </a>
-            </h3>
           </div>
           <div id="yesRsvps">
           </div>
@@ -42,27 +19,29 @@
                          LAST_RSVP: 'last_rsvp', 
                          FIRST_RSVP: 'first_rsvp'
                        };
-      var defaultSortType = sortTypes['LAST_RSVP'];
+      var defaultSortType = sortTypes['NAME'];
       var loadArgs = {
    //       eventIdList: ['206685992', '218131942','206685292'],
 //        meetupKey: '5e7e4f791557b5f3843303f103d4',      
         pageTitle: '<%= @event.title %>',
-        displayPrimaryEvent  : true,
+        displayPrimaryEvent  : false,
         displayPrimaryEventTitle : false,
         displayEventList     : true,
         displayYesRsvps      : true,
-        displayNoRsvps       : true,
+        displayNoRsvps       : false,
         defaultShowYesRsvps  : true,
         defaultShowNoRsvps   : false,
         fetchAllEventsAtOnce : true,
         useGeneralErrorMessage : false,
         sortYesRsvpsBy       : defaultSortType,
         sortNoRsvpsBy        : defaultSortType,
-        primaryEventDisplayTag: '#primaryEvent',
+    //    primaryEventDisplayTag: '#primaryEvent',
         eventListDisplayTag: '#eventList',
         rsvpCountDisplayTag: '#rsvpCount',
         yesRsvpDisplayTag: '#yesRsvps',
         noRsvpDisplayTag:  '#noRsvps',
+      //  eventListTemplate: '/events/templates/event_list.erb',
+      //  yesRsvpTemplate:  '/events/templates/rsvp_list.erb',
         allEventsApiUrl: '<%= @event.remote_event_api.all_events_api_url.html_safe %>',
         allRsvpsApiUrl: '<%= @event.remote_event_api.all_rsvps_api_url.html_safe %>'       
       };

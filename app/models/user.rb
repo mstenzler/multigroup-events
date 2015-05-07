@@ -230,6 +230,14 @@ class User < ActiveRecord::Base
     ret
   end
 
+  def auth_api_keys
+    ret = nil
+    if authentications
+      ret = authentications.map { |auth| { provider: auth.provider_name, key: auth.api_key } if auth.api_key.present? }
+    end
+    ret
+  end
+  
   def role_names(cast_to = nil)
     cast_func = nil
     if cast_to

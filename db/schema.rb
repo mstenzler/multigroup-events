@@ -28,10 +28,10 @@ ActiveRecord::Schema.define(version: 20150414020656) do
   end
 
   create_table "events", force: true do |t|
-    t.integer  "user_id",             null: false
+    t.integer  "user_id",                                            null: false
     t.string   "type"
-    t.string   "title",               null: false
-    t.string   "slug",                null: false
+    t.string   "title",                                              null: false
+    t.string   "slug",                                               null: false
     t.text     "description"
     t.datetime "start_date"
     t.datetime "end_date"
@@ -39,6 +39,8 @@ ActiveRecord::Schema.define(version: 20150414020656) do
     t.string   "remote_event_api_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "display_listing",                 default: true
+    t.string   "display_privacy",     limit: 128, default: "public"
   end
 
   add_index "events", ["slug"], name: "slug_opt", unique: true, using: :btree

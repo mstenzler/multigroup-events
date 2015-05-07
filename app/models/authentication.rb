@@ -2,12 +2,22 @@ require 'rest-client'
 class Authentication < ActiveRecord::Base
 	belongs_to :user
 
+  scope :by_provider, -> provider { where(provider_name: provider) if provider.present? }
+
   def provider_name
   	provider.titleize
   end
 
   def is_last_auth?
   	(!user.has_local_authentication? && (user.num_authentications <= 1)) ? true : false
+  end
+
+  def can_edit_api_key?
+    CONFIG[:omniauth_providers_with_key].include? provider
+  end
+
+  def has_api_key?
+    !api_key.blank?
   end
 
   def update_credentials(omniauth)

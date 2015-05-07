@@ -3,6 +3,7 @@ display_name: Multigroup Events
 min_age: 
 max_age: 
 omniauth_providers: ['meetup', 'twitter', 'facebook', 'google_apps']
+omniauth_providers_with_key: ['meetup', 'twitter', 'facebook']
 user_form_options: ['name?', 'username?', 'gender?', 'birthdate?', 'time_zone?', 'country?', 'zip_code?', 'geo_area?']
 enable_name?: true
 require_name?: true

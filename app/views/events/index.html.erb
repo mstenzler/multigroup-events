@@ -1,5 +1,16 @@
  
-<h1>Listing events</h1>
+<h1>Events</h1>
+
+    <ul class="nav nav-tabs">
+
+        <li <%= add_active_if_current(action: 'index') %>><%= link_to("Upcoming", events_path) %></li>
+
+        <li <%= add_active_if_current(action: 'index_tab', tab: 'past') %>><%= link_to("Past", events_tab_path(tab: "past")) %></li>
+        <li <%= add_active_if_current(action: 'index_tab', tab: 'calendar') %>><%= link_to("Calendar", events_tab_path(tab: "calendar")) %></li>
+        
+
+    </ul>
+
 
 <table>
   <tr>
