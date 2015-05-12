@@ -90,6 +90,7 @@ gem 'rest-client'
 gem 'friendly_id', '~> 5.0.0'
 gem 'cancancan', '~> 1.10'
 gem "rolify"
+gem 'google-webfonts-rails', '~> 0.0.4'
 
 group :development, :test do
   gem 'rspec-rails', '>= 2.13.1'
