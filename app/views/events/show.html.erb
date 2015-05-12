@@ -2,11 +2,24 @@
       <div class="col-sm-8 col-sm-push-2">
         <h1 id="pageTitle"></h1>
         <h2 id="errorMessage"></h2>
+         <hr/>
         <% if can? :manage, @event %>
-          <hr/>
-          <%= link_to "Admin Print View", 
-          show_event_rsvp_print_path(@event), target: "_blank" %><br/>
-          <%= link_to "Edit", edit_event_path(@event) %>
+
+          <div class="btn-group" role="group" aria-label="admin links">
+
+            <%= link_to edit_event_path(@event), class: "btn btn-default" do %>
+              <span class="glyphicon glyphicon-pencil"></span> Edit
+            <% end %>
+
+            <%= link_to @event, :method => :delete, class: "btn btn-default", data: { confirm: 'Are you sure you want to delete this event?' } do %>
+              <span class="glyphicon glyphicon-remove"></span> Delete
+            <% end %>
+        
+            <%= link_to show_event_rsvp_print_path(@event), class: "btn btn-default", target: "_blank" do %>
+              <span class="glyphicon glyphicon-print"></span> Print Rsvps
+            <% end %>
+
+          </div>
           <hr/>
         <% end %>
         <div id="multigroupEvent">

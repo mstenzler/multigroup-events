@@ -11,10 +11,12 @@ MultigroupEvents::Application.routes.draw do
     resources :reset_verify_emails, only: [:new, :create]
   end
 
-  resources :events 
   get 'events/new_type/:type', to: 'events#new', as: 'new_event_type'
   get 'events/:id/rsvp_print', to: 'events#rsvp_print', as: 'show_event_rsvp_print'
-  get 'events/:tab', to: 'events#index_tab', as: 'events_tab'
+  get 'events/list/:tab', to: 'events#index_tab', as: 'events_tab', 
+       constraints: { tab: Regexp.new("#{Event.event_tab_regex}", true) }
+   #    constraints: lambda{ |request| request.parms[:tab].match('foo.bar')}
+  resources :events 
 
  # get 'events/upcomming', to: 'events#list', as: 'show_upcomming_events'
  # get 'events/past', to: 'events#list', as: 'show_past_events'

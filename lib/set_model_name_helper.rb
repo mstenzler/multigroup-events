@@ -12,7 +12,7 @@ module SetModelNameHelper
     # of it's super class specified in sti_base_class method 
     # which is set in class including SetModelNameHelper
     def model_name
-      puts "self = #{self}, class= #{self.class}, class_name = #{self.class.name}"
+#      puts "self = #{self}, class= #{self.class}, class_name = #{self.class.name}"
       if self.methods.include? :sti_base_class
         base_class = self.sti_base_class
 #        puts "Base class = #{base_class}"

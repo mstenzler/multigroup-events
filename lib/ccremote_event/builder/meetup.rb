@@ -21,6 +21,7 @@ module CCRemoteEvent
     class Meetup < Base
 
       DEFAULT_EVENT_STATUS = "upcoming,past"
+      BASE_MEETUP_URL = "http://www.meetup.com"
 
       def build(options={})
         use_signed_url = options.has_key?(:get_signed_url) ? options[:signed_url] : false
@@ -78,8 +79,8 @@ module CCRemoteEvent
           puts("api_detail_hash = '#{api_detail_hash.inspect}'")
           all_events_info = loc_api_client.fetch(:events, { event_id: id_list, status: event_status, get_signed_url: true })
           all_rsvps_info =  loc_api_client.fetch(:rsvps, { event_id: id_list, get_signed_url: true })
-          puts("all_events_info = '#{all_events_info}'")
-          puts("all_rsvps_info = '#{all_rsvps_info}'")
+#          puts("all_events_info = '#{all_events_info}'")
+#          puts("all_rsvps_info = '#{all_rsvps_info}'")
 
           add_all_events_info_to_ret(ret, all_events_info, all_rsvps_info, api_detail_hash, remote_event_id_arr)
           puts "*** About to Return obj ***"
@@ -108,6 +109,12 @@ module CCRemoteEvent
             if (curr_api_detail)
               curr_api_detail.event_url = event_info.event_url
               curr_api_detail.title = event_info.name
+              event_group = event_info.group
+              puts "event_group = #{event_group.inspect}"
+              if (event_group)
+                curr_api_detail.group_name = event_group["name"]
+                curr_api_detail.group_url = construct_meetup_group_url(event_group["urlname"])
+              end
               curr_api_detail.description = event_info.description
               if (event_info.time) 
                 puts "event_info.time = #{event_info.time}"
@@ -147,6 +154,10 @@ module CCRemoteEvent
             ret = res[1]
           end
           ret
+        end
+
+        def construct_meetup_group_url(url_name="")
+          BASE_MEETUP_URL + "/" + url_name
         end
 
     end

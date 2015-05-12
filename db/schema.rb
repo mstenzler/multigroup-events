@@ -162,6 +162,8 @@ ActiveRecord::Schema.define(version: 20150414020656) do
     t.datetime "end_date"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "group_name"
+    t.string   "group_url"
   end
 
   create_table "remote_event_apis", force: true do |t|
@@ -173,6 +175,8 @@ ActiveRecord::Schema.define(version: 20150414020656) do
     t.string   "api_key"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "primary_remote_event_index",   default: 0
+    t.boolean  "remember_api_key",             default: false
   end
 
   create_table "roles", force: true do |t|

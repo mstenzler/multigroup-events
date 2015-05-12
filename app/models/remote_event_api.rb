@@ -1,6 +1,6 @@
 class RemoteEventApi < ActiveRecord::Base
   belongs_to :remote_event
-  has_many :remote_event_api_details
+  has_many :remote_event_api_details, :dependent => :delete_all
 
   DEFAULT_PRIMARY_REMOTE_EVENT_INDEX = 0
 end

@@ -4,7 +4,7 @@ class RemoteEvent < Event
  require 'ccmeetup'
  require 'ccremote_event'
 
-  attr_accessor :remote_api_key, :remember_api_key
+#  attr_accessor :remote_api_key, :remember_api_key
 
   REMOTE_EVENT_API_URL_TYPES = ["event", "rsvp"]
   EVENT_API_URL_TYPE = REMOTE_EVENT_API_URL_TYPES[0]
@@ -23,7 +23,8 @@ class RemoteEvent < Event
     FACEBOOK_URI_HOST => FACEBOOK_NAME
   } 
 
-  has_one :remote_event_api
+  has_one :remote_event_api, :dependent => :destroy
+  accepts_nested_attributes_for :remote_event_api, update_only: true
 #  has_many :remote_event_api_details
 
  # before_validation :populate_remote_event_api, on: :create
@@ -48,23 +49,25 @@ class RemoteEvent < Event
   end
 
   def must_have_remote_api_key
-    unless (remote_api_key) 
-      errors.add(:base, 'Must have a remote api key')
+    unless (remote_event_api.api_key) 
+      errors.add(:base, 'Must have an api key')
     end
   end
 
   def populate_remote_event_api
-    re_api = RemoteEventApi.new
-    re_api.remote_event_id = self.id
-    if remember_api_key == 1
-      re_api.api_key = remote_api_key
-    end
+    logger.debug("****IN populate_remote_event_api. current remote_event_api=")
+    logger.debug(remote_event_api)
+    re_api = remote_event_api || RemoteEventApi.new
+#    re_api.remote_event_id = self.id
+#    if remember_api_key == 1
+#      re_api.api_key = remote_api_key
+#    end
     event_urls = []
     linked_events.map { |e| event_urls << e.url  }
 
-    rclient = CCMeetup::Client.new({ auth_method: :api_key, api_key: remote_api_key })
+    rclient = CCMeetup::Client.new({ auth_method: :api_key, api_key: remote_event_api.api_key })
     re = CCRemoteEvent::ApiBuilder.new(rclient)
-    api = re.build(:meetup, { get_signed_url: true, url_list: event_urls, remember_api_key: remember_api_key })
+    api = re.build(:meetup, { get_signed_url: true, url_list: event_urls, remember_api_key: remote_event_api.remember_api_key })
     primary_event_index = api.primary_remote_event_index
     primary_event = api.remote_event_api_details[primary_event_index]
     logger.debug("primary_event =")

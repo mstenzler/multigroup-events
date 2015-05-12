@@ -10,6 +10,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <%= csrf_meta_tags %>
     <%= render 'layouts/shim' %>
+    <%= google_webfonts_init({
+      google: ['Fredoka One']
+      }) %>
+      
   </head>
   <body class="pad-top">
     <%= render 'layouts/header' %>

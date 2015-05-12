@@ -9,6 +9,8 @@ class CreateRemoteEventApiDetails < ActiveRecord::Migration
       t.string :remote_event_id
       t.string :title
       t.text :description
+      t.string :group_name
+      t.string :group_url
       t.datetime :start_date
       t.datetime :end_date
 

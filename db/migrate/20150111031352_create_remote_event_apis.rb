@@ -8,7 +8,7 @@ class CreateRemoteEventApis < ActiveRecord::Migration
       t.string :all_events_api_url
       t.string :all_rsvps_api_url
       t.string :api_key
-
+      t.boolean :remember_api_key, default: false
       t.timestamps
     end
   end

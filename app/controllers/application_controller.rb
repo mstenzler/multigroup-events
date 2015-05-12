@@ -6,7 +6,8 @@ class ApplicationController < ActionController::Base
   helper_method :gravatar_for
 
   include SessionsHelper
-
+  include ControllerFormatDate
+  
   DEFAULT_ERROR_MESSAGE = "A Error has occured"
 
   #For each of the user_form_options define require_#{option_name} and

@@ -1,12 +1,35 @@
 class EventsController < ApplicationController
-  before_filter :signed_in_user, :except => [:index, :show]
-  before_filter :load_event, :only => [:show, :rsvp_print, :edit, :update]
+  before_filter :signed_in_user, :except => [:index, :index_tab, :show]
+  before_filter :load_event, :only => [:show, :rsvp_print, :edit, :update, :destroy]
   layout "minimal", only: [:rsvp_print]
 
   class InvalidEventTypeError  < StandardError; end
 
   def index
-    @events = Event.all
+    @events = Event.listed.upcoming
+   #render :index_tab, tab: 'upcoming'
+  end
+
+  def index_tab
+    tab = params[:tab]
+    unless tab
+      display_error("No Tab Specified")
+      return
+    end
+
+    case tab.downcase
+    when Event::EVENT_TAB_UPCOMING
+      @events = Event.listed.upcoming
+    when Event::EVENT_TAB_PAST
+      @events = Event.listed.past
+    when Event::EVENT_TAB_MINE
+      signed_in_user
+      @events = Event.by_user(current_user)
+    else
+      display_error("Invalid event tab")
+      return
+    end
+    render :index
   end
 
   def show
@@ -44,12 +67,14 @@ class EventsController < ApplicationController
   end
 
   def edit
+    authorize! :edit, @event
 #    @event = Event.friendly.find(params[:id])
     @user = current_user
     @api_keys = get_api_keys
   end
 
   def update
+    authorize! :update, @event
   #  @event = Event.friendly.find(params[:id])
     @user = current_user
 
@@ -62,6 +87,14 @@ class EventsController < ApplicationController
       @api_keys = get_api_keys
       render :edit
     end
+  end
+
+  def destroy
+    authorize! :destroy, @event
+    logger.debug("About to desroy event: ")
+    logger.debug(@event)
+    @event.destroy
+    redirect_to events_url, :notice => "Successfully deleted event."
   end
 
   private
@@ -89,6 +122,9 @@ class EventsController < ApplicationController
       # blank field to start
       ret.linked_events << LinkedEvent.new
       ret.user_id = current_user.id
+      if ret.event_type.is_remote?
+        ret.build_remote_event_api
+      end
       ret
     end
 
@@ -107,7 +143,11 @@ class EventsController < ApplicationController
     end
 
     def event_params
-      params.require(:event).permit(:type, :remote_api_key, :display_listing, :remember_api_key, :display_privacy, :display_list, :title, :description, :start_date, :end_date, :location_id, linked_events_attributes: [:url, :id])
+      params.require(:event).permit(:type, :remote_api_key, :display_listing, 
+             :remember_api_key, :display_privacy, :display_list, :title, 
+             :description, :start_date, :end_date, :location_id, 
+             linked_events_attributes: [:url, :id],
+             remote_event_api_attributes: [:api_key, :remember_api_key, :id])
     end
     
 end
