@@ -1,0 +1,40 @@
+<%= f.text_field :title %>
+
+<%= f.select :display_privacy, Event.display_privacy_options, { label: "Privacy Type:" }, { class: "selectpicker auto-width" } %>
+
+<%= f.check_box :display_listing %>
+
+<%= f.fields_for :remote_event_api do |event_api_form| %>
+  <%= event_api_form.hidden_field :last_rank %>
+   <%= event_api_form.hidden_field :remote_source %>
+  <%= event_api_form.text_field :api_key %>
+
+  <% if @api_keys %>
+    <div class="form-group radio_button_list">
+      <label class="control-label">Use Api Key:</label><br/>
+      <%  @api_keys.each do |user_key| %>
+        <%= radio_button_tag :api_key_option, user_key[:provider], false, { 'data-api_token' => user_key[:key] } %>
+        <%= label_tag(:api_key_option, " #{user_key[:provider]}  : #{user_key[:key] }") %><br/>
+      <% end %>
+      <%= radio_button_tag(:api_key_option, "clear") %>
+      <%= label_tag(:api_key_option, "Clear") %>
+    </div>
+  <% end %>
+
+  <%= event_api_form.check_box :remember_api_key %>
+
+  <hr/>
+  <h3>Linked Meetup Events: </h3>
+
+  <%= event_api_form.fields_for :remote_event_api_sources do |source_builder| %>
+    <% curr_rank = source_builder.object.try("rank") || 0 %>
+    <%= render 'remote_event_api_source_fields', f: source_builder, curr_rank: curr_rank %>
+  <% end %>
+  <%= link_to_add_fields "Add Another Event", event_api_form, :remote_event_api_sources, { last_rank_input: "input[name$='[rank]']",
+                                new_rank_marker: RemoteEventApiSource::NEW_RANK_MARKER } %>
+  <br/>
+<% end %>
+
+<script type='text/javascript'>
+    $(document).ready( $("input[name='event[remote_event_api_attributes][api_key]']").updateFromRadioButton("input[name='api_key_option']") )
+  </script>

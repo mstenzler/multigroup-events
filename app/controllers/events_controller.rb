@@ -44,6 +44,7 @@ class EventsController < ApplicationController
 
   def new
 #    flash.delete(:error) if flash[:error]
+    authorize! :create, Event
     begin
       @event = new_event(params[:type])
       @api_keys = get_api_keys
@@ -55,6 +56,7 @@ class EventsController < ApplicationController
 
   def create
     puts "event params = #{event_params}"
+    authorize! :create, Event
     @event = Event.new(event_params)
     @event.user_id = current_user.id
     if @event.save
@@ -100,6 +102,7 @@ class EventsController < ApplicationController
   private
     def load_event
       @event = Event.friendly.find(params[:id])
+      logger.debug("*** Loaded event = #{@event.inspect}")
     end
 
     def new_event(type=nil)
@@ -120,10 +123,11 @@ class EventsController < ApplicationController
       end
       # create a blank linked event so that the form shows a 
       # blank field to start
-      ret.linked_events << LinkedEvent.new
+#      ret.linked_events << LinkedEvent.new
       ret.user_id = current_user.id
       if ret.event_type.is_remote?
-        ret.build_remote_event_api
+        ret.build_remote_event_api(remote_source: RemoteEvent::MEETUP_NAME)
+        ret.remote_event_api.remote_event_api_sources << RemoteEventApiSource.new(is_primary_event: true, rank: 1)
       end
       ret
     end
@@ -145,9 +149,11 @@ class EventsController < ApplicationController
     def event_params
       params.require(:event).permit(:type, :remote_api_key, :display_listing, 
              :remember_api_key, :display_privacy, :display_list, :title, 
-             :description, :start_date, :end_date, :location_id, 
+             :description, :start_date, :end_date, :location_id,
              linked_events_attributes: [:url, :id],
-             remote_event_api_attributes: [:api_key, :remember_api_key, :id])
+             remote_event_api_attributes: [:api_key, :remember_api_key, 
+              :remote_source,:id, 
+              remote_event_api_sources_attributes: [:url, :is_primary_event, :id, :_destroy, :rank]])
     end
     
 end

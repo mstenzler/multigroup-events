@@ -1,8 +1,9 @@
 class Event < ActiveRecord::Base
+  resourcify
   belongs_to :user
 #  has_one :remote_event_api
-  has_many :linked_events, :dependent => :delete_all
-  accepts_nested_attributes_for :linked_events
+#  has_many :linked_events, :dependent => :delete_all
+#  accepts_nested_attributes_for :linked_events
 
   require 'friendly_title_helper'
   include FriendlyTitleHelper

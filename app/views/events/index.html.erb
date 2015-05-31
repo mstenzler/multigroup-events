@@ -27,33 +27,6 @@
   <% end %>
 <% end %>
 
-<table>
-  <tr>
-    <th>User</th>
-    <th>Title</th>
-    <th>Description</th>
-    <th>Num Linked Events</th>
-    <th>Start date</th>
-    <th>End date</th>
-    <th>Show</th>
-    <th>Edit</th>
-    <th>Destroy</th>
-  </tr>
-
-<% @events.each do |event| %>
-  <tr>
-    <td><%=h event.user.name %></td>
-    <td><%=h event.title %></td>
-    <td><%=h event.description %></td>
-    <td><%=h event.num_linked_events %></td>
-    <td><%=h american_date_time(event.start_date) %></td>
-    <td><%=h american_date_time(event.end_date) %></td>
-    <td><%= link_to 'Show', event %></td>
-    <td><%= link_to 'Edit', edit_event_path(event) %></td>
-    <td><%= link_to 'Destroy', event, :method => :delete, data: { confirm: 'Are you sure you want to delete this event?' } %></td>
-  </tr>
-<% end %>
-</table>
 
 <br />
 

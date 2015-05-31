@@ -2,6 +2,7 @@ class CreateRemoteEventApis < ActiveRecord::Migration
   def change
     create_table :remote_event_apis do |t|
       t.integer :remote_event_id
+      t.string :remote_source, :limit => 126
       t.text :options
       t.integer :primary_remote_event_info_id
       t.integer :primary_remote_event_index, default: 0

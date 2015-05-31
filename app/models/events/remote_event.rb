@@ -1,8 +1,14 @@
 class RemoteEvent < Event
   require 'uri'
- # require 'remote_event_api_builder'
- require 'ccmeetup'
- require 'ccremote_event'
+  require 'ccmeetup'
+  require 'ccremote_event'
+
+  def self.sti_base_class
+    Event
+  end
+
+  include FriendlyTitleHelper
+  include SetModelNameHelper
 
 #  attr_accessor :remote_api_key, :remember_api_key
 
@@ -28,11 +34,12 @@ class RemoteEvent < Event
 #  has_many :remote_event_api_details
 
  # before_validation :populate_remote_event_api, on: :create
-   before_save  :populate_remote_event_api
+ #  before_save  :populate_remote_event_api
 
 #  validates :remote_event_api, presence: true
-  validate :must_have_linked_events
-  validate :must_have_remote_api_key
+  validates_associated :remote_event_api
+ # validate :must_have_linked_events
+#  validate :must_have_remote_api_key
 
   def self.determine_url_source(url)
     uri = URI(url)

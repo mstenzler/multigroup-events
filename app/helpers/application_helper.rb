@@ -50,13 +50,23 @@ module ApplicationHelper
     link_to "#{label} #{name}", edit_polymorphic_path(obj)
   end
   
-  def link_to_add_fields(name, f, association)
+  def link_to_add_fields(name, f, association, options = {})
+    last_rank = f.object.try("last_rank") || 0
+    last_rank_input = options[:last_rank_input]
+    new_rank_marker = options[:new_rank_marker]
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
-      render(association.to_s.singularize + "_fields", f: builder)
+      render(association.to_s.singularize + "_fields", f: builder, loc_rank: last_rank+1)
     end
-    link_to(name, '#', class: "add_fields", data: {id: id, fields: fields.gsub("\n", "")})
+    data_h = {id: id, fields: fields.gsub("\n", "")}
+    if last_rank_input
+      data_h[:last_rank_input] = last_rank_input
+    end
+    if new_rank_marker
+      data_h[:new_rank_marker] = new_rank_marker
+    end
+    link_to(name, '#', class: "add_fields", data: data_h)
   end
 
   def add_active_if_current(args = {})

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150414020656) do
+ActiveRecord::Schema.define(version: 20150519173152) do
 
   create_table "authentications", force: true do |t|
     t.integer  "user_id"
@@ -107,16 +107,6 @@ ActiveRecord::Schema.define(version: 20150414020656) do
 
   add_index "geo_regions", ["geo_country_id"], name: "regions_country_code_opt", using: :btree
 
-  create_table "linked_events", force: true do |t|
-    t.integer  "event_id",        null: false
-    t.string   "url",             null: false
-    t.string   "remote_event_id"
-    t.string   "source"
-    t.integer  "rank"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "locations", force: true do |t|
     t.integer  "user_id"
     t.string   "name",                 limit: 70
@@ -158,25 +148,45 @@ ActiveRecord::Schema.define(version: 20150414020656) do
     t.string   "remote_event_id"
     t.string   "title"
     t.text     "description"
+    t.string   "group_name"
+    t.string   "group_url"
     t.datetime "start_date"
     t.datetime "end_date"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "remote_event_api_sources", force: true do |t|
+    t.integer  "remote_event_api_id",                 null: false
+    t.integer  "rank"
+    t.string   "url",                                 null: false
+    t.text     "event_api_url"
+    t.text     "rsvp_api_url"
+    t.string   "event_source_id"
+    t.string   "title"
+    t.text     "description"
+    t.datetime "start_date"
+    t.datetime "end_date"
     t.string   "group_name"
     t.string   "group_url"
+    t.integer  "remote_group_id"
+    t.boolean  "is_primary_event",    default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "remote_event_apis", force: true do |t|
     t.integer  "remote_event_id"
     t.text     "options"
     t.integer  "primary_remote_event_info_id"
+    t.integer  "primary_remote_event_index",               default: 0
     t.string   "all_events_api_url"
     t.string   "all_rsvps_api_url"
     t.string   "api_key"
+    t.boolean  "remember_api_key",                         default: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "primary_remote_event_index",   default: 0
-    t.boolean  "remember_api_key",             default: false
+    t.string   "remote_source",                limit: 126
   end
 
   create_table "roles", force: true do |t|

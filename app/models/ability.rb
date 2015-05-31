@@ -2,6 +2,7 @@ class Ability
     include CanCan::Ability
 
     def initialize(user)
+        p "***__** in Ability.initialize. user = #{user.inspect}"
         @user = user || User.new #for guest
         can [:update, :edit], User do |l_user|
             user.id == @user.id
@@ -43,8 +44,9 @@ class Ability
   end
 
   def organizer
+    p "** In ability.organizer. @event = #{@event.inspect}"
     can :manage, Event do |event|
-        (event.try(:id) == @event.user_id) || event.new_record?
+        (event.try(:user_id) == @user.id) || event.new_record?
     end
   end
 
