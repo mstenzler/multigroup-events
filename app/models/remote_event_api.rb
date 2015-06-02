@@ -16,7 +16,8 @@ class RemoteEventApi < ActiveRecord::Base
   validates_associated :remote_event_api_sources
 
   def event_id_list
-    remote_event_api_sources.map { |rs| rs.event_source_id }
+    remote_event_api_sources.map { |rs| p "**rs** destroyed? = #{rs._destroy}"}
+    remote_event_api_sources.reject { |rs| rs._destroy == true }.map { |rs| rs.event_source_id }
   end
 
   #returns the highest rank in the list of remote_event_api_sources
