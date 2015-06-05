@@ -539,6 +539,19 @@ div.answer-display-block {
   border-radius: 0 10px;
   padding: 10px;
 }
+#event-group-list li {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.event-header {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.event-sub-header {
+  font-size: 1em;
+}
 
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) { 

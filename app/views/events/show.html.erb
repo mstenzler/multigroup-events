@@ -2,7 +2,9 @@
       <div class="col-sm-8 col-sm-push-2">
         <h1 id="pageTitle"></h1>
         <h2 id="errorMessage"></h2>
-         <hr/>
+        <hr/>
+        <H1><%= @event.title %></h1> 
+        <hr/>
         <% if can? :manage, @event %>
 
           <div class="btn-group" role="group" aria-label="admin links">
@@ -24,25 +26,32 @@
           </div>
           <hr/>
         <% end %>
+
         <div id="multigroupEvent">
           <div id="eventList">
             <h3>Participating Groups:</h3>
             <ul id="event-group-list">
               <% @event.remote_event_api.event_group_list.each do |curr_group| %>
-                <li><%= link_to(curr_group[:group_name], curr_group[:url]) %></li>
+                <li><%= link_to(curr_group[:group_name], curr_group[:url]) %> (<%= curr_group[:yes_rsvp_count] %> RSVPs)</li>
             <% end %>
             </ul>           
           </div>
 
-          <div id="primaryEvent">
-            <H1><%= @event.title %></h1>           
+          <div id="primaryEvent">          
             <% if (@event.start_date)  %>
               <div id="when" class="row"> 
                 <div class="event-icon">
                   <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
                 </div>
                 <div class="event-data">
-                  <span class="eventDate"><%= display_start_and_end_date(@event.start_date, @event.end_date) %></span>
+              
+                  <span class="event-header"><%= word_date(@event.start_date) %></span></br>
+                  <span class="event-sub-header"><%= clock_time(@event.start_date) %>
+                    <% if @event.end_date %>
+                      to <%= clock_time(@event.end_date) %>
+                    <% end %>
+                  </span>
+                    
                 </div>
               </div>
             <% end %>
@@ -52,8 +61,8 @@
                   <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
                 </div>
                 <div class="event-data">
-                  <span class="venueName"><%= venue.name %> </span><br/>
-                  <span class="venueAddress"><%= venue.location %></span>
+                  <span class="event-header"><%= venue.name %> </span><br/>
+                  <span class="event-sub-header"><%= venue.location %></span>
                 </div>
               </div>
             <% end %>
