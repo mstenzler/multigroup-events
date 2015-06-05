@@ -1,6 +1,6 @@
 module ControllerFormatDate
   def self.included(controller)
-    controller.send :helper_method, :sdatetime, :s_date_time, :word_date_time, :american_date, :american_date_time, :day_of_week, :month_name, :clock_time, :seconds_to_hours
+    controller.send :helper_method, :sdatetime, :s_date_time, :word_date_time, :word_date, :american_date, :american_date_time, :day_of_week, :month_name, :clock_time, :seconds_to_hours
   end
 
   def sdatetime(d)
@@ -14,11 +14,15 @@ module ControllerFormatDate
   end
 
   def s_date_time(d)
-     convert_date(d, '%m-%d-%Y %I:%M %p')
+     convert_date(d, '%m-%d-%Y %l:%M %p')
   end
 
   def word_date_time(d)
-     convert_date(d, '%A, %B %d, %Y %I:%M %p')
+     convert_date(d, '%A, %B %d, %Y %l:%M %p')
+  end
+
+  def word_date(d)
+     convert_date(d, '%A, %B %d, %Y')
   end
 
   def american_date(d)
@@ -26,7 +30,7 @@ module ControllerFormatDate
   end
 
   def american_date_time(d)
-     convert_date(d, '%d/%m/%y %I:%M %p')
+     convert_date(d, '%d/%m/%y %l:%M %p')
   end
 
   def day_of_week(d)
@@ -38,7 +42,7 @@ module ControllerFormatDate
   end
 
   def clock_time(d)
-     convert_date(d, '%I:%M %p')
+     convert_date(d, '%l:%M %p')
   end
 
   def seconds_to_hours(secs)
