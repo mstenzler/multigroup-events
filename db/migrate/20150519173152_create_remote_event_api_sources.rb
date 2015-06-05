@@ -23,7 +23,7 @@ class CreateRemoteEventApiSources < ActiveRecord::Migration
       t.string :publish_status, :limit => 24
       t.string :venue_visiblity, :limit => 24
       t.string :visibilty, :limit => 24
-      t.integer :yes_rsvp_count
+      t.integer :yes_rsvp_count, default: 0
       t.string :fee_accepts, :limit => 16
       t.float  :fee_amount
       t.string :fee_currency, :limit => 16
