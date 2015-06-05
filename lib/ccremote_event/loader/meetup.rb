@@ -93,7 +93,7 @@ module CCRemoteEvent
           remote_event_api.all_rsvps_api_url = all_rsvps_info.signed_url
 
           #Iterate through the events returned by the API and
-          #create add the details to the RemoteEventAPIDetail objs
+          #create add the details to the RemoteEventAPISource objs
           all_events_info.each do |event_info|
             curr_event_id = event_info.id.to_s.to_sym
             puts("curr_event_id = '#{curr_event_id}'. class_name = '#{curr_event_id.class.name}'")
@@ -101,7 +101,15 @@ module CCRemoteEvent
             if (curr_api_source)
               curr_api_source.url = event_info.event_url
               curr_api_source.title = event_info.name
+              curr_api_source.how_to_find_us = event_info.how_to_find_us
+              curr_api_source.publish_status = event_info.publish_status
+              curr_api_source.venue_visiblity = event_info.venue_visiblity
+              curr_api_source.visibilty = event_info.visibilty
+              curr_api_source.yes_rsvp_count = (event_info.yes_rsvp_count ? event_info.yes_rsvp_count : 0)
+              curr_api_source.announced = event_info.announced 
+              curr_api_source.announced_at = event_info.announced_at if event_info.announced_at
               event_fee = event_info.event_fee
+              puts "*=*=*= yes_rsvp_count = #{curr_api_source.yes_rsvp_count}"
               if (event_fee)
                 curr_api_source.fee_accepts = event_fee.accepts
                 curr_api_source.fee_amount = event_fee.amount

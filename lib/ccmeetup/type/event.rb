@@ -43,8 +43,11 @@ module CCMeetup
       def lon
         self.event['lon'].to_f
       end
-      def rsvpcount
-        self.event['rsvpcount'].to_i
+      def yes_rsvp_count
+        self.event['yes_rsvp_count'].to_i
+      end
+      def announced_at
+        self.event['announced_at'] ? Time.at(self.event['announced_at'] / 1000).to_datetime : nil
       end
       def updated
         #DateTime.parse(self.event['updated'])
