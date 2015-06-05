@@ -1,3 +1,6 @@
+#require "venue"
+#require "fee"
+
 module CCMeetup
   module Type
     
@@ -13,10 +16,17 @@ module CCMeetup
     
     class Event
       
-      attr_accessor :event
+      attr_accessor :event, :venue, :fee
       
       def initialize(event = {})
         self.event = event
+        if (loc_venue = event['venue'])
+          self.venue = Venue.new(loc_venue)
+        end
+        if (loc_fee = event['fee'])
+          self.fee = Fee.new(loc_fee)
+        end
+
       end
       
       def method_missing(id, *args)

@@ -1,6 +1,7 @@
 class Event < ActiveRecord::Base
   resourcify
   belongs_to :user
+  belongs_to :event_venue
 #  has_one :remote_event_api
 #  has_many :linked_events, :dependent => :delete_all
 #  accepts_nested_attributes_for :linked_events

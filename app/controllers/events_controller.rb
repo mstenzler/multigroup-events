@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   before_filter :signed_in_user, :except => [:index, :index_tab, :show]
-  before_filter :load_event, :only => [:show, :rsvp_print, :edit, :update, :destroy]
+  before_filter :load_event, :only => [:show, :rsvp_print, :edit, :update, :reload_api, :destroy]
   layout "minimal", only: [:rsvp_print]
 
   class InvalidEventTypeError  < StandardError; end
@@ -91,6 +91,16 @@ class EventsController < ApplicationController
     end
   end
 
+  def reload_api
+    authorize! :update, @event
+    if (api = @event.try(:remote_event_api))
+      api.reload_api
+      @event.save!
+    end
+    redirect_to @event
+  end
+
+
   def destroy
     authorize! :destroy, @event
     logger.debug("About to desroy event: ")
@@ -126,8 +136,12 @@ class EventsController < ApplicationController
 #      ret.linked_events << LinkedEvent.new
       ret.user_id = current_user.id
       if ret.event_type.is_remote?
+        puts "event is remote!!!!"
+        api_source = RemoteEventApiSource.new(is_primary_event: true, rank: 1)
+        puts("api_source = #{api_source.inspect}")
         ret.build_remote_event_api(remote_source: RemoteEvent::MEETUP_NAME)
-        ret.remote_event_api.remote_event_api_sources << RemoteEventApiSource.new(is_primary_event: true, rank: 1)
+        #ret.remote_event_api.remote_event_api_sources << RemoteEventApiSource.new(is_primary_event: true, rank: 1)
+        ret.remote_event_api.remote_event_api_sources << api_source
       end
       ret
     end

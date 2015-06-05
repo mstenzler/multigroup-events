@@ -10,7 +10,9 @@
             <%= link_to edit_event_path(@event), class: "btn btn-default" do %>
               <span class="glyphicon glyphicon-pencil"></span> Edit
             <% end %>
-
+            <%= link_to reload_api_path(@event), :method => :post, class: "btn btn-default", data: { confirm: 'Are you sure you want to reload this event?' } do %>
+              <span class="glyphicon glyphicon-refresh"></span> Reload
+            <% end %>
             <%= link_to @event, :method => :delete, class: "btn btn-default", data: { confirm: 'Are you sure you want to delete this event?' } do %>
               <span class="glyphicon glyphicon-remove"></span> Delete
             <% end %>
@@ -24,10 +26,54 @@
         <% end %>
         <div id="multigroupEvent">
           <div id="eventList">
-            <p>Event List</p>
+            <h3>Participating Groups:</h3>
+            <ul id="event-group-list">
+              <% @event.remote_event_api.event_group_list.each do |curr_group| %>
+                <li><%= link_to(curr_group[:group_name], curr_group[:url]) %></li>
+            <% end %>
+            </ul>           
           </div>
+
           <div id="primaryEvent">
-            <p>Event Description:</p>
+            <H1><%= @event.title %></h1>           
+            <% if (@event.start_date)  %>
+              <div id="when" class="row"> 
+                <div class="event-icon">
+                  <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
+                </div>
+                <div class="event-data">
+                  <span class="eventDate"><%= display_start_and_end_date(@event.start_date, @event.end_date) %></span>
+                </div>
+              </div>
+            <% end %>
+            <%  if (venue = @event.remote_event_api.primary_venue)  %>  
+              <div id="where" class="row"> 
+                <div class="event-icon">
+                  <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
+                </div>
+                <div class="event-data">
+                  <span class="venueName"><%= venue.name %> </span><br/>
+                  <span class="venueAddress"><%= venue.location %></span>
+                </div>
+              </div>
+            <% end %>
+            <% if (@event.fee) %>  
+              <div id="where" class="row"> 
+                <div class="event-icon">
+                  <span class="glyphicon glyphicon-usd" aria-hidden="true"></span>
+                </div>
+                <div class="event-data">
+                  <span class="venueFee"><%= @event.fee %> 
+                  </span>
+                </div>
+              </div>
+            <% end %>
+            <% if (@event.description) %>
+              <div id="event-description" class="row"> 
+                <hr/>
+                <%= @event.description.html_safe %>
+              </div>
+            <% end %>
           </div>
           <div id="RsvpIntro">
             <hr/>
@@ -59,10 +105,10 @@
       var loadArgs = {
    //       eventIdList: ['206685992', '218131942','206685292'],
 //        meetupKey: '5e7e4f791557b5f3843303f103d4',      
-        pageTitle: '<%= @event.title %>',
-        displayPrimaryEvent  : true,
+//        pageTitle: '<%= @event.title %>',
+        displayPrimaryEvent  : false,
         displayPrimaryEventTitle : false,
-        displayEventList     : true,
+        displayEventList     : false,
         displayYesRsvps      : true,
         displayNoRsvps       : true,
         defaultShowYesRsvps  : true,

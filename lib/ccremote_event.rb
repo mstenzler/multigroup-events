@@ -19,6 +19,8 @@ module CCRemoteEvent
   class ApiBuilder
 
     BUILD_TYPES = [:meetup, :facebook]
+    MEETUP_SOURCE = BUILD_TYPES[0].to_s
+    FACEBOOK_SOURCE = BUILD_TYPES[1].to_s
 
     attr_accessor :url_list, :event_id_list, :api_client, :remote_event_api
 

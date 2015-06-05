@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150519173152) do
+ActiveRecord::Schema.define(version: 20150602220232) do
 
   create_table "authentications", force: true do |t|
     t.integer  "user_id"
@@ -27,23 +27,52 @@ ActiveRecord::Schema.define(version: 20150519173152) do
     t.datetime "updated_at"
   end
 
+  create_table "event_venues", force: true do |t|
+    t.string   "geo_area_id"
+    t.string   "remote_source",        limit: 64
+    t.integer  "remote_id"
+    t.string   "zip",                  limit: 10
+    t.string   "phone",                limit: 24
+    t.float    "lon",                  limit: 24
+    t.float    "lat",                  limit: 24
+    t.string   "name"
+    t.string   "state",                limit: 20
+    t.string   "city",                 limit: 80
+    t.string   "country",              limit: 2
+    t.string   "address_1",            limit: 128
+    t.string   "address_2",            limit: 128
+    t.string   "address_3",            limit: 128
+    t.string   "privacy",              limit: 24
+    t.boolean  "is_private_residence"
+    t.string   "editable_by",          limit: 24
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "events", force: true do |t|
     t.integer  "user_id",                                            null: false
     t.string   "type"
     t.string   "title",                                              null: false
     t.string   "slug",                                               null: false
+    t.string   "fee",                 limit: 124
     t.text     "description"
+    t.string   "display_privacy",                 default: "public"
+    t.boolean  "display_listing",                 default: true
     t.datetime "start_date"
     t.datetime "end_date"
-    t.integer  "location_id"
+    t.float    "fee_amount",          limit: 24
+    t.string   "fee_currency",        limit: 16
+    t.string   "fee_description",     limit: 24
+    t.string   "fee_label",           limit: 16
+    t.boolean  "fee_required"
+    t.integer  "event_venue_id"
     t.string   "remote_event_api_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "display_listing",                 default: true
-    t.string   "display_privacy",     limit: 128, default: "public"
   end
 
   add_index "events", ["slug"], name: "slug_opt", unique: true, using: :btree
+  add_index "events", ["start_date"], name: "start_date_opt", using: :btree
   add_index "events", ["user_id"], name: "user_opt", using: :btree
 
   create_table "geo_areas", force: true do |t|
@@ -139,54 +168,58 @@ ActiveRecord::Schema.define(version: 20150519173152) do
 
   add_index "profiles", ["user_id"], name: "profile_user_id_opt", using: :btree
 
-  create_table "remote_event_api_details", force: true do |t|
-    t.integer  "remote_event_api_id"
-    t.integer  "rank"
-    t.string   "event_url"
-    t.string   "event_api_url"
-    t.string   "rsvp_api_url"
-    t.string   "remote_event_id"
-    t.string   "title"
-    t.text     "description"
-    t.string   "group_name"
-    t.string   "group_url"
-    t.datetime "start_date"
-    t.datetime "end_date"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "remote_event_api_sources", force: true do |t|
-    t.integer  "remote_event_api_id",                 null: false
+    t.integer  "remote_event_api_id",                             null: false
     t.integer  "rank"
-    t.string   "url",                                 null: false
+    t.string   "url",                                             null: false
     t.text     "event_api_url"
     t.text     "rsvp_api_url"
-    t.string   "event_source_id"
+    t.string   "event_source_id",     limit: 56
     t.string   "title"
     t.text     "description"
     t.datetime "start_date"
     t.datetime "end_date"
+    t.datetime "last_modified"
+    t.integer  "utc_offset"
+    t.string   "timezone",            limit: 124
     t.string   "group_name"
     t.string   "group_url"
+    t.boolean  "is_primary_event",                default: false
+    t.boolean  "announced"
+    t.datetime "announced_at"
+    t.string   "how_to_find_us"
+    t.string   "publish_status",      limit: 24
+    t.string   "venue_visiblity",     limit: 24
+    t.string   "visibilty",           limit: 24
+    t.integer  "yes_rsvp_count"
+    t.string   "fee_accepts",         limit: 16
+    t.float    "fee_amount",          limit: 24
+    t.string   "fee_currency",        limit: 16
+    t.string   "fee_description",     limit: 24
+    t.string   "fee_label",           limit: 16
+    t.boolean  "fee_required"
     t.integer  "remote_group_id"
-    t.boolean  "is_primary_event",    default: false
+    t.integer  "event_venue_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "remote_event_apis", force: true do |t|
     t.integer  "remote_event_id"
+    t.string   "remote_source",                  limit: 126
     t.text     "options"
-    t.integer  "primary_remote_event_info_id"
-    t.integer  "primary_remote_event_index",               default: 0
+    t.string   "primary_remote_event_source_id", limit: 56
+    t.integer  "primary_remote_event_index",                 default: 0
     t.string   "all_events_api_url"
     t.string   "all_rsvps_api_url"
     t.string   "api_key"
-    t.boolean  "remember_api_key",                         default: false
+    t.boolean  "remember_api_key",                           default: false
+    t.boolean  "set_remote_date"
+    t.boolean  "set_remote_venue"
+    t.boolean  "set_remote_description"
+    t.boolean  "set_remote_fee"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "remote_source",                limit: 126
   end
 
   create_table "roles", force: true do |t|

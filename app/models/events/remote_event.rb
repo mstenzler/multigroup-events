@@ -29,7 +29,7 @@ class RemoteEvent < Event
     FACEBOOK_URI_HOST => FACEBOOK_NAME
   } 
 
-  has_one :remote_event_api, :dependent => :destroy
+  has_one :remote_event_api, :dependent => :destroy, inverse_of: :remote_event
   accepts_nested_attributes_for :remote_event_api, allow_destroy: true, update_only: true
 #  has_many :remote_event_api_details
 

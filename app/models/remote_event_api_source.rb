@@ -1,5 +1,6 @@
 class RemoteEventApiSource < ActiveRecord::Base
   belongs_to :remote_event_api, inverse_of: :remote_event_api_sources
+  belongs_to :event_venue
   before_validation :extract_event_source_id
 
 #  validates :url, presence: true

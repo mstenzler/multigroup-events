@@ -17,6 +17,7 @@ MultigroupEvents::Application.routes.draw do
        constraints: { tab: Regexp.new("#{Event.event_tab_regex}", true) }
    #    constraints: lambda{ |request| request.parms[:tab].match('foo.bar')}
   resources :events 
+  post 'events/:id/reload', to: 'events#reload_api', as: 'reload_api'
 
  # get 'events/upcomming', to: 'events#list', as: 'show_upcomming_events'
  # get 'events/past', to: 'events#list', as: 'show_past_events'

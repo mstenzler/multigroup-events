@@ -81,56 +81,6 @@ module CCRemoteEvent
         
         end
 
-        def build_remote_event_api(url_list, loc_api_client, options={})
-          if (loc_api_client.authenticator.respond_to?(:api_key))
-            api_key = loc_api_client.authenticator.api_key
-          else
-            raise BadApiClientError.new("api_client does not respond to api_key in #{self.class.name}.#{__method__}")
-          end
- 
-          ret = RemoteEventApi.new
-          if (options[:remember_api_key])
-            ret[:api_key] = api_key
-          end
-          ret.api_key = options[:api_key] if options.has_key?(:api_key)
-          event_api_details = []
-          rank = 1
-          remote_event_id_arr = []
-          api_detail_hash = {}
-          event_status = options.has_key?("event_status") ? 
-            options[:event_status] : DEFAULT_EVENT_STATUS
-          ret.primary_remote_event_index = 
-           options.has_key?(:primary_remote_event_index) ? 
-           options[:primary_remote_event_index] : RemoteEventApi::DEFAULT_PRIMARY_REMOTE_EVENT_INDEX
-
-          url_list.each do |url|
-            remote_event_id = getEventId(url)
-            unless (remote_event_id)
-              raise BadlyFormatedEventUrlError, "Could not get id from event url #{url}"
-            end
-            remote_event_id_arr << remote_event_id
-            detail = RemoteEventApiDetail.new
-            detail.rank = rank
-            rank += 1
-            detail.event_url = url
-            detail.remote_event_id = remote_event_id
-            api_detail_hash[remote_event_id.to_sym] = detail
-          end
-          id_list = remote_event_id_arr.join(',')
-          puts("id_list = '#{id_list}'")
-          puts("api_detail_hash = '#{api_detail_hash.inspect}'")
-          all_events_info = loc_api_client.fetch(:events, { event_id: id_list, status: event_status, get_signed_url: true })
-          all_rsvps_info =  loc_api_client.fetch(:rsvps, { event_id: id_list, get_signed_url: true })
-#          puts("all_events_info = '#{all_events_info}'")
-#          puts("all_rsvps_info = '#{all_rsvps_info}'")
-
-          add_all_events_info_to_ret(ret, all_events_info, all_rsvps_info, api_detail_hash, remote_event_id_arr)
-          puts "*** About to Return obj ***"
-          puts "ret = #{ret.inspect}"
-          puts "ret.remote_event_api_details = #{ret.remote_event_api_details.inspect}"
-          ret
-        end
-
         #note this function modifies remote_event_api
         def add_all_events_info_to_event_api(remote_event_api, all_events_info, all_rsvps_info)
           unless (all_events_info.signed_url)
@@ -151,6 +101,15 @@ module CCRemoteEvent
             if (curr_api_source)
               curr_api_source.url = event_info.event_url
               curr_api_source.title = event_info.name
+              event_fee = event_info.event_fee
+              if (event_fee)
+                curr_api_source.fee_accepts = event_fee.accepts
+                curr_api_source.fee_amount = event_fee.amount
+                curr_api_source.fee_currency = event_fee.currency
+                curr_api_source.fee_description = event_fee.description
+                curr_api_source.fee_label = event_fee.label
+                curr_api_source.fee_required = event_fee.reqired
+              end
               event_group = event_info.group
               puts "event_group = #{event_group.inspect}"
               if (event_group)
@@ -172,6 +131,14 @@ module CCRemoteEvent
                   curr_api_source.end_date = loc_end_time
                   puts "end_date = #{curr_api_source.end_date}"
                 end
+              end
+              if (venue = event_info.venue)
+                puts "About to find or create EventVenue. venue = #{venue.inspect}"
+                event_venue = EventVenue.find_or_create_for_meetup(venue)
+                puts("event_venue = #{event_venue.inspect}")
+                curr_api_source.event_venue_id = event_venue.id
+                puts "event_venue_id = curr_api_source.event_venue_id"
+#                curr_api_source.build_event_venue(event_venue.attributes)
               end
             else
               puts("ERROR! Did not have an api_source for '#{curr_event_id}'")
