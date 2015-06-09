@@ -66,6 +66,7 @@
         console.log("**$$** member" + currMember.name + " does not have url!!");
       }
 
+      var numMemberUrls = memberUrls.length;
       var firstMemberUrl = memberUrls[0];
       console.log("____****___***__** memberUrls =");
       console.log(memberUrls);
@@ -98,7 +99,11 @@
          <% if (curr_is_paid) { %>
            <span class='paid'>Paid</span>
          <% } %>
-         <br/><div class="popover-div" data-toggle="popover"  title="Meetup Link" data-placement="bottom" data-content="<%= linkDataContent %>"><span class="glyphicon glyphicon-user"></span></div>
+         <br/><div class="popover-div" data-toggle="popover"  title="Meetup Link" data-placement="bottom" data-content="<%= linkDataContent %>"><span class="glyphicon glyphicon-user"></span>
+         <% if (numMemberUrls > 1) { %>
+           (<%= numMemberUrls %>)
+         <% } %>
+         </div>
          <% if (currRsvp.guests) { %> + <%= currRsvp.guests %> <% } %>
      </li>
   <% } %>
