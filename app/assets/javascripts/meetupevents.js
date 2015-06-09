@@ -4,7 +4,8 @@
   var MEETUP_API_EVENT_URL = MEETUP_API_BASE_URL + "event";
   var MEETUP_API_EVENTS_URL =  MEETUP_API_BASE_URL +"events";
   var MEETUP_API_RSVP_URL = MEETUP_API_BASE_URL + "rsvps";
- 
+  var MEETUP_BASE_URL = "http://www.meetup.com/"
+
   var DEFAULT_EVENT_TEMPLATE = '/events/templates/event.erb';
   var DEFAULT_YES_RSVP_TEMPLATE = '/events/templates/rsvp_list.erb';
   var DEFAULT_NO_RSVP_TEMPLATE = '/events/templates/rsvp_list.erb';
@@ -462,6 +463,8 @@
     if (typeof args == 'undefined') { args = {}; }
     this.response = args.response;
     this.member = args.member;
+    this.group = args.group;
+    this.host = args.host;
     this.member_url = args.member_url;
     this.created = args.created;
     this.mtime = args.mtime;
@@ -469,6 +472,62 @@
     this.guests = args.guests;
     this.rsvp_id = args.rsvp_id;
     this.eventsRsvpdTo = args.eventsRsvpdTo || [];
+  };
+
+  Rsvp.prototype.memberUrl = function() {
+    return createMeetupMemberUrl(this.member, this.group);
+  }
+
+  //this can contain multiple RSVP's from one person in 
+  //different groups
+  var RsvpGroup = function(args) {
+    if (typeof args == 'undefined') { args = {}; }
+    this.rsvpArray = [];
+    this.member = null;
+    this.mtime = null;
+    this.pay_status = null;
+    this.guests = 0;
+    console.log("In new RsvpGroup. args.rsvp =");
+    console.log(args.rsvp);
+    if (args.rsvp) {
+      this.addRsvp(args.rsvp);
+    }
+  };
+
+  RsvpGroup.prototype.memberUrls = function() {
+    var ret = [];
+    for(var i=0, l=this.rsvpArray.length; i<l; i++){
+      var currRsvp = this.rsvpArray[i];
+      var currUrl = currRsvp.memberUrl();
+      if (currUrl !== 'undefined' && currUrl) {
+        ret.push(currUrl);
+      }
+    }
+    return ret;
+  }
+
+  RsvpGroup.prototype.addRsvp = function(rsvp) {
+    if (typeof rsvp == "undefined") {
+      throw "Must pass an Rsvp obj as first param to addRsvp";
+    }
+    this.rsvpArray.push(rsvp)
+    if ( (!this.member) || ( (!this.member.photo) && (rsvp.member.photo) ) ) {
+      //If no member is assigned OR a member is assigned to RsvpGroup without a 
+      //photo and the new RSVP has a photo make this the assigned member
+      this.member = rsvp.member;
+    }
+    if ((!this.mtime) || (this.mtime < rsvp.mtime) ) {
+      //if mtime is not set OR mtime is already set and the rsvp 
+      //has a later time then replace mtime with the new rsvp.mtime
+      this.mtime = rsvp.mtime
+    }
+    if (rsvp.pay_status && rsvp.pay_status == PAID) {
+      this.pay_satus = PAID;
+    }
+    if (rsvp.guests && (rsvp.guests > this.guests)) {
+      this.guests = rsvp.guests;
+    }
+
   };
 
   var RsvpList = function(){
@@ -521,7 +580,7 @@
         logWarning(sortBy + " is not a valid sort type");      
       }
       return ret;
-  }
+  };
 
   RsvpList.prototype.getYesRsvps = function(args){
     if (typeof args == 'undefined') { args = {}; }
@@ -550,8 +609,11 @@
   };
   RsvpList.prototype.getTotalNumGuests = function(){
     var ret = 0;
+    console.log("**+**++** IN getTotalNumGuests!!")
     for(var i=0, l=this.rsvpYesArray.length; i<l; i++){
        var currRsvp = this.rsvpYesArray[i];
+      // console.log("i = " + i + ". currRsvp = ");
+      // console.log(currRsvp);
        var excludeGuests = (EXCLUDE_GUESTS.indexOf(currRsvp.member.id) >= 0);
        if (currRsvp.guests && !excludeGuests ) {
           ret += parseInt(currRsvp.guests);
@@ -573,12 +635,27 @@
     if (typeof rsvp.member.id == 'undefined') {
       throw "Rsvp does not have valid member object"
     }
-    if (this.YesRsvpForUserIdExists(rsvp.member.id)) {
-      debug("Got Dup for id: " + rsvp.member.id);
+    var id = rsvp.member.id;
+    if (this.YesRsvpForUserIdExists(id)) {
+      debug("Got Dup for id: " + id);
+      var curr_rsvp = this.getYesRsvpForMember(id)
+      if (curr_rsvp && curr_rsvp instanceof RsvpGroup) {
+       // console.log("About to add rsvp to rsvpGroup");
+       // console.log("rsvpGroup =");
+       // console.log(curr_rsvp);
+       // console.log("rsvp = ");
+       // console.log(rsvp);
+        curr_rsvp.addRsvp(rsvp);
+       // console.log("After addRsvp. curr_rsvp =");
+       // console.log(curr_rsvp);
+      }
       this.numYesDups++;
     }
     else {
-      this.rsvpYesArray.push(rsvp);
+      var rsvpGroup = new RsvpGroup( { 'rsvp': rsvp });
+      //console.log("Adding new rsvpGroup = ");
+      //console.log(rsvpGroup);
+      this.rsvpYesArray.push(rsvpGroup);
       this.uniqueYesUserIds[rsvp.member.id] = this.rsvpYesArray.length - 1;
     }
 
@@ -639,13 +716,20 @@
     else {
       console.log("===== NO PHOTO for user ======");
     }
+    var currGroupData = rsvpData.group;
+    if (typeof currGroupData == 'undefined') {
+      throw "no group in rsvpData";
+    }
     var member = new Member(currMemberData);
+    var group = new Group(currGroupData);
     var excludeUser = (EXCLUDE_USERS.indexOf(member.id) >= 0);
 
     if (!excludeUser) {
       rsvpArgs['member'] = member;
       rsvpArgs['response'] = currResponse = rsvpData.response;
-      rsvpArgs['created'] = rsvpData.created
+      rsvpArgs['group'] = group;
+      rsvpArgs['created'] = rsvpData.created;
+      rsvpArgs['host'] = rsvpData.host;
       rsvpArgs['mtime'] = rsvpData.mtime;
       rsvpArgs['guests'] = rsvpData.guests;
       rsvpArgs['rsvp_id'] = rsvpData.rsvp_id;
@@ -675,6 +759,50 @@
     }
   }; 
 
+  RsvpList.prototype.getYesRsvpForMember = function(member_id) {
+     if (typeof member_id == 'undefined') {
+      throw "member_id not passed to getYesRsvpForMemeber";
+    }
+    ret = null;
+    var i = this.uniqueYesUserIds[member_id]
+    if (typeof i !== 'undefined' && i >= 0) {
+      ret = this.rsvpYesArray[i];
+    }
+    return ret;
+  };
+
+  RsvpList.prototype.getNoRsvpForMember = function(member_id) {
+     if (typeof member_id == 'undefined') {
+      throw "member_id not passed to getNoRsvpForMemeber";
+    }
+    ret = null;
+    var i = this.uniqueNoUserIds[member_id]
+    if (typeof i !== 'undefined' && i >= 0) {
+      ret = this.rsvpNoArray[i];
+    }
+    return ret;
+  };
+
+  RsvpList.prototype.getRsvpForMember = function(member_id, response) {
+    if (typeof member_id == 'undefined') {
+      throw "member_id not passed to getRsvpForMemeber";
+    }
+    if (typeof response == 'undefined') {
+      response = 'all';
+    }
+    var ret = null;
+    switch (response) {
+      case MEETUP_YES:
+        ret = this.getYesRsvpForMember(member_id);
+        break;
+      case MEETUP_NO:
+        ret = this.getNoRsvpForMember(member_id);
+        break;
+      default:
+        ret = [this.getYesRsvpForMember(member_id), this.getNoRsvpForMember(member_id)];      
+    }
+    return ret;
+  };
   function showRsvpInfo(rsvpList, args) {
     if (typeof rsvpList == 'undefined') {
       throw "first argument must be a rsvpList in showRsvpInfo";
@@ -1025,6 +1153,29 @@
       newId = currId.replace(matcher, '$1');
       idArray[i] = newId;
     }
+  }
+
+  function createMeetupMemberUrl(member, group) {
+    if (typeof member == 'undefined'){
+      throw "Must pass in a member to createMeetupMemberUrl";
+    }
+    var memberId = member.id
+    if (memberId == 'undefined') {
+      throw "No Member id in createMeetupMemberUrl";
+    }
+
+    var ret = null;
+    if (typeof group == 'undefined') {
+      ret = MEETUP_BASE_URL + "members/" + memberId + "/";
+    }
+    else {
+      var groupUrlName = group.urlname;
+      if (typeof groupUrlName == 'undefined') {
+        throw "no groupUrlNname in createMeetupMemberUrl";
+      }
+      ret = MEETUP_BASE_URL + groupUrlName + "/members/" + memberId + "/";
+    }
+    return ret;
   }
 
   function createEventsUrl(eventIdList, meetupKey, eventFields){

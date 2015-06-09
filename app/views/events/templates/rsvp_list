@@ -49,22 +49,67 @@
     <% var currRsvp = rsvpList[i];
       var currMember = currRsvp.member;
       var currMemberPic;
+      var memberUrls = [];
+      var memberLinkStart = "";
+      var memberLinkEnd = "";
+      var linkDataContent = "";
+
+      if (typeof currRsvp.memberUrls === 'function') {
+        console.log("*$$*Member " + currMember.name + " has memberUrls!");
+        memberUrls = currRsvp.memberUrls();
+      }
+      else if (typeof currRsvp.memberUrl === 'function') {
+        console.log("*$$*Member " + currMember.name + " has memberUrl!");
+        memberUrls = [currRsvp.memberUrl()];
+      }
+      else {
+        console.log("**$$** member" + currMember.name + " does not have url!!");
+      }
+
+      var firstMemberUrl = memberUrls[0];
+      console.log("____****___***__** memberUrls =");
+      console.log(memberUrls);
       if (currMember.photo){
         currMemberPic = currMember.photo.thumb_link;
       }
       else {
         currMemberPic = data.noPhotoSrc;
       }
+      if (typeof firstMemberUrl !== 'undefined') {
+        memberLinkStart = "<a href='" + firstMemberUrl +"'>";
+        memberLinkEnd = "</a>"
+        for (var j=0, len=memberUrls.length; j<len; j++) {
+          var currUrl = memberUrls[j];
+          if (j>0) {
+            linkDataContent += "<br/>";
+          }
+          linkDataContent += "<a href='"+currUrl+"'>" + currUrl + "</a>";
+        }
+      }
+      else {
+        linkDataContent = "No Links";
+      }
       var curr_is_paid = 
       (displayPayStatus && currRsvp.pay_status === paidIdentifier) ?
         true : false;
     %>
-     <li<%= liClassText %>><img src="<%= currMemberPic %>"><br/>
-         <%= currMember.name %> <% if (currRsvp.guests) { %> + <%= currRsvp.guests %> <% } %>
+     <li<%= liClassText %>><%= memberLinkStart %><img src="<%= currMemberPic %>"><br/>
+         <%= currMember.name %> <%= memberLinkEnd %>
          <% if (curr_is_paid) { %>
            <span class='paid'>Paid</span>
          <% } %>
+         <br/><div class="popover-div" data-toggle="popover"  title="Meetup Link" data-placement="bottom" data-content="<%= linkDataContent %>"><span class="glyphicon glyphicon-user"></span></div>
+         <% if (currRsvp.guests) { %> + <%= currRsvp.guests %> <% } %>
      </li>
   <% } %>
   </ul>
+  <script>
+     $(document).ready( function() {
+       $('[data-toggle="popover"]').popover({ 
+         html: true,
+         container: 'body' 
+       });
+       console.log("***____****____ called popover()!!!");
+     });
+  </script> 
 </div>

@@ -553,6 +553,25 @@ div.answer-display-block {
   font-size: 1em;
 }
 
+/* event popover */
+.popover-div {
+  display: inline;
+  color: #428bca;
+  &:hover, &:focus {
+    color: #2a6496;
+    text-decoration: underline;
+  }
+  &:focus {
+    outline: thin dotted;
+    outline-offset: -2px;
+  }
+}
+
+.popover {
+    max-width: 100%; 
+}
+
+
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) { 
     .event .panel-body {
