@@ -43,9 +43,9 @@ module CCMeetup
       def lon
         self.event['lon'].to_f
       end
-      def yes_rsvp_count
-        self.event['yes_rsvp_count'].to_i
-      end
+#      def yes_rsvp_count
+#        self.event['yes_rsvp_count'].to_i
+#      end
       def announced_at
         self.event['announced_at'] ? Time.at(self.event['announced_at'] / 1000).to_datetime : nil
       end
@@ -55,7 +55,12 @@ module CCMeetup
       end
       def time
         #DateTime.parse(self.event['time'])
-        Time.at(self.event['time'] / 1000).to_datetime
+        ltime = self.event['time']
+        puts "Original time = #{ltime}"
+#        offset = self.event['utc_offset'] || 0
+#        ltime += offset
+#        puts "Time + offset (#{offset}) = #{ltime}"
+        Time.at( ltime / 1000).to_datetime
       end
     end
   end

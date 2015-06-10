@@ -131,15 +131,17 @@ class RemoteEventApi < ActiveRecord::Base
     end
 
     def load_api
+      logger.debug("+=+=+=**+=+= in load_api")
       rclient = CCMeetup::Client.new({ auth_method: :api_key, api_key: api_key })
       re = CCRemoteEvent::ApiBuilder.new({ api_client: rclient, remote_event_api: self })
       re.load(:meetup, { get_signed_url: true})
       ps = self.primary_source
       set_values_from_remote_source(remote_event, ps)
-      logger.debug("primary source = #{ps.inspect}")
+      logger.debug("==**== primary source = #{ps.inspect}")
     end
 
     def set_values_from_remote_source(remote_event, source)
+      logger.debug("+=+=+=**+=+= in set_values_from_remote_source")
       logger.debug("primary source = #{source.inspect}")
       if (remote_event.nil?)
         raise "nil remote_event in #{self.class.name}.#{__method__}"
@@ -158,6 +160,14 @@ class RemoteEventApi < ActiveRecord::Base
         if (sd = source.start_date)
           logger.debug("Remote start date = #{sd}")
           remote_event.start_date = sd
+        end
+        if (timezone = source.timezone)
+          logger.debug("Remote timezone = #{timezone}")
+          remote_event.timezone = timezone
+        end
+        if (utc_offset = source.utc_offset)
+          logger.debug("Remote utc_offset = #{utc_offset}")
+          remote_event.utc_offset = utc_offset
         end
         if (ed = source.end_date)
           remote_event.end_date = ed

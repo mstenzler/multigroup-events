@@ -69,6 +69,8 @@ ActiveRecord::Schema.define(version: 20150602220232) do
     t.string   "remote_event_api_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "timezone",            limit: 124
+    t.integer  "utc_offset"
   end
 
   add_index "events", ["slug"], name: "slug_opt", unique: true, using: :btree
@@ -210,8 +212,8 @@ ActiveRecord::Schema.define(version: 20150602220232) do
     t.text     "options"
     t.string   "primary_remote_event_source_id", limit: 56
     t.integer  "primary_remote_event_index",                 default: 0
-    t.string   "all_events_api_url"
-    t.string   "all_rsvps_api_url"
+    t.text     "all_events_api_url"
+    t.text     "all_rsvps_api_url"
     t.string   "api_key"
     t.boolean  "remember_api_key",                           default: false
     t.boolean  "set_remote_date"

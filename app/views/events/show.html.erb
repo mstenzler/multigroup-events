@@ -37,18 +37,20 @@
             </ul>           
           </div>
 
-          <div id="primaryEvent">          
-            <% if (@event.start_date)  %>
+          <div id="primaryEvent">    
+            <% start_date = @event.start_date_local
+               end_date = @event.end_date_local %>      
+            <% if (start_date)  %>
               <div id="when" class="row"> 
                 <div class="event-icon">
                   <span class="glyphicon glyphicon-calendar" aria-hidden="true"></span>
                 </div>
                 <div class="event-data">
               
-                  <span class="event-header"><%= word_date(@event.start_date) %></span></br>
-                  <span class="event-sub-header"><%= clock_time(@event.start_date) %>
-                    <% if @event.end_date %>
-                      to <%= clock_time(@event.end_date) %>
+                  <span class="event-header"><%= word_date(start_date) %></span></br>
+                  <span class="event-sub-header"><%= clock_time(start_date) %>
+                    <% if end_date %>
+                      to <%= clock_time(end_date) %>
                     <% end %>
                   </span>
                     

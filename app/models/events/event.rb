@@ -82,4 +82,36 @@ class Event < ActiveRecord::Base
     @event_type ||= self.class.get_event_type(self.class.name)
   end
 
+  def utc_offset_in_hours
+    ret = nil
+    if (utc_offset)
+      ret = (utc_offset/1000)/3600
+    end
+    ret
+  end
+
+  def start_date_local
+    to_local_time(start_date)
+  end
+
+  def end_date_local
+    to_local_time(end_date)
+  end
+
+  def to_local_time(time)
+    ret = nil
+    if (time)
+ #     logger.debug("@@@--@@ in to_local_time. time = #{time}")
+      if (timezone)
+ #       logger.debug("Converting useing timezone: #{timezone}")
+        ret = time.in_time_zone(timezone)
+      elsif (utc_offset)
+ #       logger.debug("converting using utc_offset_in_hours: #{utc_offset_in_hours}")
+        ret = time.in_time_zone(utc_offset_in_hours)
+      end
+ #     logger.debug("returning time: #{ret}")
+    end
+    ret
+  end
+
 end

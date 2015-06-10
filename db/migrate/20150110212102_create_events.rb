@@ -6,6 +6,8 @@ class CreateEvents < ActiveRecord::Migration
       t.string :title, null: false
       t.string :slug, null: false
       t.string :fee, :limit => 124
+      t.string :timezone, :limit => 124
+      t.integer :utc_offset
       t.text :description
       t.string :display_privacy, default: "public"
       t.boolean :display_listing, default: true

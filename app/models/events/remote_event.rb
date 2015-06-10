@@ -80,17 +80,25 @@ class RemoteEvent < Event
       api = re.build(:meetup, { get_signed_url: true, url_list: event_urls, remember_api_key: remote_event_api.remember_api_key })
       primary_event_index = api.primary_remote_event_index
       primary_event = api.remote_event_api_details[primary_event_index]
-      logger.debug("primary_event =")
+      logger.debug("+=+=+=+=primary_event =")
       logger.debug(primary_event)
-      primary_start_date = api.remote_event_api_details[primary_event_index].start_date
-      #logger.debug("primary_start_date = " + primary_start_date)
-      if (primary_start_date)
-        logger.debug("!! Setting start date!!!")
+      if (primary_start_date = primary_event.start_date)
+        logger.debug("!! Setting start date!!! #{primary_start_date.inspect}")
         self.start_date = primary_start_date
       end
-      if (primary_end_date = api.remote_event_api_details[primary_event_index].end_date)
+      if (primary_end_date = primary_event.end_date)
+        logger.debug("!! Setting end date!!! #{primary_end_date.inspect}")
         self.end_date = primary_end_date
       end
+      if (primary_timezone = primary_event.primary_timezone)
+        logger.debug("!! Setting timezone!!! #{primary_timezone.inspect}")
+        self.timezone = primary_timezone
+      end
+      if (primary_utc_offset = primary_event.utc_offset)
+        logger.debug("!! Setting utc_offset!!! #{primary_utc_offset.inspect}")
+        self.utc_offset = primary_utc_offset
+      end
+      logger.debug("**** END OF populate_remote_event_api.")
       self.remote_event_api = api
     end
 

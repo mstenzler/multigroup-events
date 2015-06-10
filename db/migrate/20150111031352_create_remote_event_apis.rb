@@ -6,8 +6,8 @@ class CreateRemoteEventApis < ActiveRecord::Migration
       t.text :options
       t.string :primary_remote_event_source_id, :limit => 56
       t.integer :primary_remote_event_index, default: 0
-      t.string :all_events_api_url
-      t.string :all_rsvps_api_url
+      t.text :all_events_api_url
+      t.text :all_rsvps_api_url
       t.string :api_key
       t.boolean :remember_api_key, default: false
       t.boolean :set_remote_date

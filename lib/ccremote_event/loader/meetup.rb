@@ -29,12 +29,15 @@ module CCRemoteEvent
 
       DEFAULT_EVENT_STATUS = "upcoming,past"
       BASE_MEETUP_URL = "http://www.meetup.com"
+      TIMEZONE_FIELD = "timezone"
+      VENUE_VISBILITY_FIELD = "venue_visiblity"
 
       #this nakes the remote events and rsvps api calls and updates the remote_event_api
       #with the restulst from the calls. 
       #:remote_event_api and api_client must either be passed in when initialed or
       #passed as options to load
       def load(options={})
+        puts "**==**==* in CCRemoteEvent::Loader.load"
         use_signed_url = options.has_key?(:get_signed_url) ? options[:signed_url] : false
         loc_remote_event_api = options[:remote_event_api] || remote_event_api
         loc_api_client = options[:api_client] || api_client
@@ -67,14 +70,16 @@ module CCRemoteEvent
           unless (event_id_list.size > 0)
             raise BadArgumentError.new("event_id_list is empty in #{self.class.name}.#{__method__}")
           end
+          event_fields = add_fields(options[:event_fields] || "", [TIMEZONE_FIELD, VENUE_VISBILITY_FIELD])
+          rsvp_fields = options[:rsvp_fields] || ""
           event_status = options.has_key?("event_status") ? 
             options[:event_status] : DEFAULT_EVENT_STATUS
           id_list = event_id_list.join(',')
           puts("id_list = '#{id_list}'")
     #      puts("api_detail_hash = '#{api_detail_hash.inspect}'")
-          all_events_info = loc_api_client.fetch(:events, { event_id: id_list, status: event_status, get_signed_url: true })
-          all_rsvps_info =  loc_api_client.fetch(:rsvps, { event_id: id_list, get_signed_url: true })
-#          puts("all_events_info = '#{all_events_info}'")
+          all_events_info = loc_api_client.fetch(:events, { event_id: id_list, status: event_status, fields: event_fields, get_signed_url: true })
+          all_rsvps_info =  loc_api_client.fetch(:rsvps, { event_id: id_list, fields: rsvp_fields, get_signed_url: true })
+          puts("all_events_info = '#{all_events_info}'")
 #          puts("all_rsvps_info = '#{all_rsvps_info}'")
 
           add_all_events_info_to_event_api(loc_remote_event_api, all_events_info, all_rsvps_info)
@@ -92,6 +97,8 @@ module CCRemoteEvent
           remote_event_api.all_events_api_url = all_events_info.signed_url
           remote_event_api.all_rsvps_api_url = all_rsvps_info.signed_url
 
+          puts "**==**==* in CCRemoteEvent::Loader.add_all_events_info_to_event_api"
+
           #Iterate through the events returned by the API and
           #create add the details to the RemoteEventAPISource objs
           all_events_info.each do |event_info|
@@ -108,6 +115,8 @@ module CCRemoteEvent
               curr_api_source.yes_rsvp_count = (event_info.yes_rsvp_count ? event_info.yes_rsvp_count : 0)
               curr_api_source.announced = event_info.announced 
               curr_api_source.announced_at = event_info.announced_at if event_info.announced_at
+              curr_api_source.timezone = event_info.timezone if event_info.timezone
+              curr_api_source.utc_offset = event_info.utc_offset if event_info.utc_offset
               event_fee = event_info.event_fee
               puts "*=*=*= yes_rsvp_count = #{curr_api_source.yes_rsvp_count}"
               if (event_fee)
@@ -182,6 +191,29 @@ module CCRemoteEvent
 
         def construct_meetup_group_url(url_name="")
           BASE_MEETUP_URL + "/" + url_name
+        end
+
+        #list is the a string of fields seperated by commas
+        #field is either an array of firlds to add or a string
+        #of fields to add seperated by commas
+        #does not include any fields already in the list
+        def add_fields(list, field)
+          ret = ""
+          fields = field.is_a?(Array) ? field : field.split(',')
+          if (list.empty?)
+            ret = field.join(',')
+          else
+            list_items = list.split(',')
+
+            fields.each do |field_item|
+              if (!list_items.include?(field_item))
+                list_items.push(list_item)
+              end
+            end
+            ret = list_items.join(',')
+          end
+          puts "**==**==***88=== in add_fields. ret = #{ret}"
+          ret
         end
 
     end
