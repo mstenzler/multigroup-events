@@ -803,6 +803,12 @@
     }
     return ret;
   };
+
+  function isLoggedIn(userId) {
+    //change this
+    user_id ? true : false;
+  }
+
   function showRsvpInfo(rsvpList, args) {
     if (typeof rsvpList == 'undefined') {
       throw "first argument must be a rsvpList in showRsvpInfo";
@@ -812,7 +818,21 @@
     }
 
     var currTemplate, currDisplayTag, countData, showArgs, sortBy, yesList, noList;
-    var numYes, numNo, numGuests, numYesWithGuests, toggleRsvps;
+    var numYes, numNo, numGuests, numYesWithGuests, toggleRsvps, commonArgs;
+
+    commonArgs = {
+      displayRsvpLinks: false,
+      displayRsvpDuplicates: false
+    };
+
+    if (args.displayRsvpLinks) {
+      console.log("args.requireLoginDisplayRsvpLinks = " + args.requireLoginDisplayRsvpLinks);
+      if ( (!args.requireLoginDisplayRsvpLinks) || 
+        isLoggedIn(args.userId) ) {
+        commonArgs.displayRsvpLinks = true;
+        commonArgs.displayRsvpDuplicates = args.displayRsvpDuplicates;
+      }
+    }
 
     if (args.displayYesRsvps) {
      currTemplate = args.yesRsvpTemplate;
@@ -827,13 +847,14 @@
       yesList = rsvpList.getSortedRsvps(MEETUP_YES, sortBy);
       toggleRsvps = (typeof args.toggleYesRsvps == 'undefined') ? false : args.toggleYesRsvps;
 
-      showArgs = {
+      showArgs = $.extend({
         rsvpList: yesList,
         rsvpType: MEETUP_YES,
         rsvpTypeLabel: 'Yes',
         toggleRsvps: toggleRsvps,
         noPhotoSrc: DEFAULT_NO_PHOTO_SRC
-      }
+      }, commonArgs);
+
       if (args.displayYesRsvpCount) {
         numYes = rsvpList.getNumYesRsvps();
         numGuests = rsvpList.getTotalNumGuests();
@@ -867,13 +888,13 @@
       noList = rsvpList.getSortedRsvps(MEETUP_NO, sortBy);
       toggleRsvps = (typeof args.toggleYesRsvps == 'undefined') ? false : args.toggleYesRsvps;
 
-      showArgs = {
+      showArgs = $.extend({
         rsvpList: noList,
         rsvpType: MEETUP_NO,
         rsvpTypeLabel: 'No',
         toggleRsvps: toggleRsvps,
         noPhotoSrc: DEFAULT_NO_PHOTO_SRC
-      }
+      }, commonArgs);
 
       if (args.displayNoRsvpCount) {
         numNo = rsvpList.getNumNoRsvps();
@@ -1555,6 +1576,9 @@
       displayNoRsvpCount   : true,
       displayYesRsvps      : true,
       displayNoRsvps       : true,
+      displayRsvpLinks     : true,
+      displayRsvpDuplicates : true,
+      requireLoginDisplayRsvpLinks : false,
       defaultShowYesRsvps  : true,
       defaultShowNoRsvps   : false,
       toggleYesRsvps       : true,
@@ -1589,6 +1613,10 @@
     var displayPrimaryEvent = settings.displayPrimaryEvent;
     var displayYesRsvps = settings.displayYesRsvps;
     var displayNoRsvps = settings.displayNoRsvps;   
+//    var displayRsvpLinks = settings.displayRsvpLinks;
+//    var displayRsvpDuplicates  = settings.displayRsvpDuplicates;
+//    var requireLoginDisplayRsvpLinks  = settings.requireLoginDisplayRsvpLinks;
+
     var pageTitle = settings.pageTitle;
     var displayPrimaryEventTitle = settings.displayPrimaryEventTitle;
     var allRsvpsApiUrl = settings.allRsvpsApiUrl;
@@ -1602,7 +1630,6 @@
 
     globalArgs.getPayStatus = settings.getPayStatus;
     globalArgs.useGeneralErrorMessage = useGeneralErrorMessage;
-
 
     if (pageTitle) {
       $('title').html(pageTitle);

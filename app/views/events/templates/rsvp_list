@@ -4,9 +4,17 @@
          toggleRsvp = data.toggleRsvp,
          displayPayStatus = data.getPayStatus,
          paidIdentifier = data.paidIdentifier,
+         displayRsvpLinks = data.displayRsvpLinks,
+         displayRsvpDuplicates = data.displayRsvpDuplicates
          currentShowState = data.currentShowState;
     if ( (!typeof displayPayStatus == 'undefined') && displayPayStatus) {
       liClass = (liClass ? liClass + ' ' + add_height : liClass);
+    }
+    if (typeof displayRsvpLinks === 'undefined') {
+      displayRsvpLinks = false;
+    }
+    if (typeof displayRsvpDuplicates === 'undefined') {
+      displayRsvpDuplicates = false;
     }
   %>
   <hr/>
@@ -18,7 +26,6 @@
       toggleRsvp = true;
      }
   %>
-
 
   <div id="rsvp-<%= rsvpType %>-count">
 
@@ -76,15 +83,19 @@
       else {
         currMemberPic = data.noPhotoSrc;
       }
-      if (typeof firstMemberUrl !== 'undefined') {
+      if (displayRsvpLinks && typeof firstMemberUrl !== 'undefined') {
         memberLinkStart = "<a href='" + firstMemberUrl +"'>";
         memberLinkEnd = "</a>"
-        for (var j=0, len=memberUrls.length; j<len; j++) {
-          var currUrl = memberUrls[j];
-          if (j>0) {
-            linkDataContent += "<br/>";
+        if (displayRsvpDuplicates) {
+          for (var j=0, len=memberUrls.length; j<len; j++) {
+            var currUrl = memberUrls[j];
+            if (j>0) {
+              linkDataContent += "<br/>";
+            }
+            linkDataContent += "<a href='"+currUrl+"'>" + currUrl + "</a>";
           }
-          linkDataContent += "<a href='"+currUrl+"'>" + currUrl + "</a>";
+        } else {
+          linkDataContent = "<a href='"+firstMemberUrl+"'>" + firstMemberUrl + "</a>";
         }
       }
       else {
@@ -99,11 +110,13 @@
          <% if (curr_is_paid) { %>
            <span class='paid'>Paid</span>
          <% } %>
-         <br/><div class="popover-div" data-toggle="popover"  title="Meetup Link" data-placement="bottom" data-content="<%= linkDataContent %>"><span class="glyphicon glyphicon-user"></span>
-         <% if (numMemberUrls > 1) { %>
-           (<%= numMemberUrls %>)
-         <% } %>
-         </div>
+         <% if (displayRsvpLinks) { %>
+           <br/><div class="popover-div" data-toggle="popover"  title="Meetup Link" data-placement="bottom" data-content="<%= linkDataContent %>"><span class="glyphicon glyphicon-user"></span>
+           <% if (numMemberUrls > 1) { %>
+             (<%= numMemberUrls %>)
+           <% } %>
+           </div>
+        <% } %>
          <% if (currRsvp.guests) { %> + <%= currRsvp.guests %> <% } %>
      </li>
   <% } %>

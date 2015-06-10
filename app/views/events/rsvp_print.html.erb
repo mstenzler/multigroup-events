@@ -2,11 +2,8 @@
       <div class="col-sm-12">
         <h1 id="pageTitle"></h1>
         <h2 id="errorMessage"></h2>
-        <hr/>
+
         <div id="multigroupEvent">
-          <div id="eventList">
-            <p>Event List</p>
-          </div>
           <div id="yesRsvps">
           </div>
           <div id="noRsvps">
@@ -26,13 +23,14 @@
         pageTitle: '<%= @event.title %>',
         displayPrimaryEvent  : false,
         displayPrimaryEventTitle : false,
-        displayEventList     : true,
+        displayEventList     : false,
         displayYesRsvps      : true,
         displayNoRsvps       : false,
         defaultShowYesRsvps  : true,
         defaultShowNoRsvps   : false,
         fetchAllEventsAtOnce : true,
         useGeneralErrorMessage : false,
+        displayRsvpLinks     : false,
         sortYesRsvpsBy       : defaultSortType,
         sortNoRsvpsBy        : defaultSortType,
     //    primaryEventDisplayTag: '#primaryEvent',
