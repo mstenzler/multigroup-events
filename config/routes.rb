@@ -54,6 +54,7 @@ MultigroupEvents::Application.routes.draw do
        to: "verify_emails#create", as: 'verify_email_token'
  
   resources :sessions, only: [:new, :create, :destroy]
+  get '/user_login_status', to: "sessions#login_status", as: :login_status, :defaults => { :format => 'json' }
 
   root  'static_pages#home'
   match '/signup',  to: 'users#new', via: 'get'

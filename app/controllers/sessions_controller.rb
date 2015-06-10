@@ -39,6 +39,23 @@ class SessionsController < ApplicationController
     redirect_to root_url
   end
 
+  def login_status
+    status = nil
+    if signed_in?
+      curr_user = current_user
+      auths = []
+      curr_user.authentications.each do |auth|
+        auths << { provider: auth.provider, uid: auth.uid }
+      end
+      status = { signed_in: true, user_id: curr_user.id, authenticationsL: auths }
+    else
+      status = { signed_in: false }
+    end
+    respond_to do |format|
+      format.json { render json: status }
+    end
+  end
+
   private
 
     def init_form
