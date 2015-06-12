@@ -13,9 +13,9 @@ class RemoteEventApi < ActiveRecord::Base
   attr_accessor :sources_by_id_hash, :primary_source
 
 #  before_validate :populate_ranks
-  before_save :default_values
-  before_save :catalog_sources
-  before_save :load_api
+#  before_save :default_values
+#  before_save :catalog_sources
+#  before_save :load_api
 
   validates :api_key, presence: true
   validates_associated :remote_event_api_sources
@@ -96,6 +96,12 @@ class RemoteEventApi < ActiveRecord::Base
       id_hash = sources_by_id_hash
     end
     id_hash[event_id]
+  end
+
+  def init_and_load_api
+    default_values
+    catalog_sources
+    load_api
   end
 
   def reload_api

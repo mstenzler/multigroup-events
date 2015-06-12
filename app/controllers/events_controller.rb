@@ -6,22 +6,27 @@ class EventsController < ApplicationController
   class InvalidEventTypeError  < StandardError; end
 
   def index
-    @events = Event.listed.upcoming
+#    @events = Event.listed.upcoming
    #render :index_tab, tab: 'upcoming'
+   index_tab
   end
 
   def index_tab
-    tab = params[:tab]
+    tab = params[:tab] || EventView::DEFAULT_VIEW
     unless tab
       display_error("No Tab Specified")
       return
     end
+    @event_view = EventView.new(tab)
 
     case tab.downcase
     when Event::EVENT_TAB_UPCOMING
       @events = Event.listed.upcoming
     when Event::EVENT_TAB_PAST
       @events = Event.listed.past
+    when Event::EVENT_TAB_CALENDAR
+      @date = params[:date] ? Date.parse(params[:date]) : Date.today
+      @events_by_date = Event.by_month(@date).group_by { |i| i.start_date_local.to_date }
     when Event::EVENT_TAB_MINE
       signed_in_user
       @events = Event.by_user(current_user)

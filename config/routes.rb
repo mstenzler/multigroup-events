@@ -19,6 +19,8 @@ MultigroupEvents::Application.routes.draw do
   resources :events 
   post 'events/:id/reload', to: 'events#reload_api', as: 'reload_api'
 
+ # get 'calendar/show', to: 'calendar#show', as: 'calendar'
+
  # get 'events/upcomming', to: 'events#list', as: 'show_upcomming_events'
  # get 'events/past', to: 'events#list', as: 'show_past_events'
  # get 'events/calendar', to: 'events#list', as: 'show_event_calendar'

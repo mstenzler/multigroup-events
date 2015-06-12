@@ -15,6 +15,14 @@ class Event < ActiveRecord::Base
   scope :listed, -> { where(display_listing: true) }
   scope :upcoming, -> { where("start_date >= ?",  Time.zone.now) }
   scope :past, -> { where("start_date <= ?",  Time.zone.now) }
+  scope :by_month, -> date { 
+    if (date.present?)
+      unless (date.is_a?(Date))
+        date = date.to_date
+      end
+      where("start_date >= ? and start_date <= ? ", date.beginning_of_month, date.end_of_month )
+    end
+  }
   scope :by_user, -> user { where(user_id: user.id) if user.present? }
 
 
@@ -27,11 +35,12 @@ class Event < ActiveRecord::Base
   EVENT_TYPES_FILE = "#{Rails.root}/config/event_types.yml"
   EVENT_TYPES = YAML::load(File.open(EVENT_TYPES_FILE))
 
-  VALID_EVENT_TABS = ["upcoming", "past", "calendar", "mine"] 
-  EVENT_TAB_UPCOMING = VALID_EVENT_TABS[0]
-  EVENT_TAB_PAST = VALID_EVENT_TABS[1]
-  EVENT_TAB_CALENDAR = VALID_EVENT_TABS[2]
-  EVENT_TAB_MINE = VALID_EVENT_TABS[3]
+  VALID_EVENT_TABS = EventView::VALID_EVENT_VIEWS  
+  EVENT_TAB_UPCOMING = EventView::EVENT_VIEW_UPCOMING
+  EVENT_TAB_PAST = EventView::EVENT_VIEW_PAST 
+  EVENT_TAB_CALENDAR = EventView::EVENT_VIEW_CALENDAR
+  EVENT_TAB_MINE = EventView::EVENT_VIEW_MINE
+
 
   validates :title, presence: true, allow_blank: false
 

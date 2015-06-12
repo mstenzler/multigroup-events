@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="col-md-12 text-center">
+    <div class="well controls">
+      <%= link_to events_tab_path(tab: "calendar", date: date - 1.month), class: "btn btn-default" do %>
+        <i class="glyphicon glyphicon-backward"></i>
+      <% end %>
+      <%= "#{date.strftime("%B")} #{date.year}" %>
+      <%= link_to events_tab_path(tab: "calendar", date: date + 1.month), class: "btn btn-default" do %>
+        <i class="glyphicon glyphicon-forward"></i>
+      <% end %>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <% curr_month = date.month %>
+    <%= calendar date do |curr_date| %>
+      <% if curr_date.month == curr_month %>
+        <%= curr_date.day %>  
+        <% if events_by_date[curr_date] %>
+          <ul>
+            <% @events_by_date[curr_date].each do |event| %>
+              <li class="cal-item"><span class="cal-item-time"><%= clock_time(event.start_date_local) %></span><br/><%= link_to event.title, event_path(event), class: "url" %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

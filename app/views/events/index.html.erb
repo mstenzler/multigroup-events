@@ -19,14 +19,19 @@
 
     </ul>
 
-<% if @events.size <= 0 %>
- <div class="alert alert-info">There are no events to display!</div>
-<% else %>
-  <% @events.each do |event| %>
-    <%= render partial: "event_list_item", locals: { event: event } %>
-  <% end %>
-<% end %>
+    <% if @event_view.is_calendar? %>
+      <%= render partial: "#{@event_view.view}", locals: { events_by_date: @events_by_date, date: @date } %>
+    <% else %>
 
+      <% if @events.size <= 0 %>
+       <div class="alert alert-info">There are no events to display!</div>
+      <% else %>
+        <% @events.each do |event| %>
+          <%= render partial: "event_list_item", locals: { event: event } %>
+        <% end %>
+      <% end %>
+
+   <% end %>
 
 <br />
 

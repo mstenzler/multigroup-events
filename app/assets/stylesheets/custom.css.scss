@@ -6,6 +6,8 @@
 
 $grayMediumLight: #eaeaea;
 $grayLighter:     #eee;
+$blueMedium:      #3F73A1;
+$white:           #FFF;
 
 @mixin box_sizing {
   -moz-box-sizing: border-box;
@@ -519,6 +521,36 @@ div.answer-display-block {
 .event .author img {
     width:100%;
     border-radius:50%;
+}
+
+
+/* Calendar */
+
+.calendar tr td {
+  width: 14.28571428%;  
+}
+
+.calendar ul {
+  padding: 0;
+  list-style: none;
+}
+
+li.cal-item {
+  background: $blueMedium;
+  color: $white;
+  line-height: 1.1;
+  padding: 0.2em;
+  font-size: 1em;
+  text-align: left;
+  margin: 2px 0 0;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  a.url {
+    color:#EDF7FF;
+  }
+}
+li span.cal-item-time {
+  color:#EDF7FF;
 }
 
 /* Overwrites */

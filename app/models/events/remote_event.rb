@@ -35,6 +35,7 @@ class RemoteEvent < Event
 
  # before_validation :populate_remote_event_api, on: :create
  #  before_save  :populate_remote_event_api
+ before_save :init_and_load_remote_event_api
 
 #  validates :remote_event_api, presence: true
   validates_associated :remote_event_api
@@ -64,6 +65,11 @@ class RemoteEvent < Event
       end
     end
 
+    def init_and_load_remote_event_api
+      remote_event_api.init_and_load_api()
+    end
+
+=begin
     def populate_remote_event_api
       logger.debug("****IN populate_remote_event_api. current remote_event_api=")
       logger.debug(remote_event_api)
@@ -101,5 +107,6 @@ class RemoteEvent < Event
       logger.debug("**** END OF populate_remote_event_api.")
       self.remote_event_api = api
     end
+=end
 
 end
