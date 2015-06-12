@@ -534,6 +534,15 @@ div.answer-display-block {
   padding: 0;
   list-style: none;
 }
+.calendar  tbody td .day .day-head {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.calendar  tbody td .day {
+  height: auto;
+  min-height: 100px;
+}
 
 li.cal-item {
   background: $blueMedium;
