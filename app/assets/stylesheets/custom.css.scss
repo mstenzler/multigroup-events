@@ -414,14 +414,17 @@ div.answer-display-block {
 .rsvp-list {
   text-align: center;
   vertical-align: bottom;
+/*   display: flex;
+  flex-flow: row wrap; */
 }
 
 .rsvp-list li{
+/*     flex: 1 1 100%; */
     list-style-type: none;
     display: inline;
     padding-right: 5px;
     float: left;
-    height: 180px;
+    height: 200px;  
     width: 90px;
     padding-bottom: 10px;
     padding-top: 10px;
@@ -431,7 +434,7 @@ div.answer-display-block {
 }
 
 .rsvp-list li.add_height {
-  height: 200px;
+  height: 220px;
 }
 .rsvp-list img{
   vertical-align:bottom;
@@ -564,11 +567,6 @@ div.answer-display-block {
     }
     div.profile-name div.user-name {
       text-align: center;
-    }
-    div.options div.btn-group {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;    
     }
   }
   

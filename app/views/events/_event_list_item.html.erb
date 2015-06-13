@@ -1,6 +1,6 @@
 
 
-<div class="panel panel-default event-list-item">
+<div class="event-list-item panel panel-default">
   <div class="panel-body">
     <div class="date col-xs-2 col-sm-2">
       <% curr_date = event.start_date_local %>
@@ -34,7 +34,7 @@
         </div>
       </div>
 
-      <div class="options">
+      <div class="options center">
         <%= render partial: "manage_event_widget", 
               locals: { event: event } %>
       </div>
