@@ -73,8 +73,8 @@ module ApplicationHelper
     current_page?(args) ? " class=\"active\" ".html_safe : ""
   end
 
-  def display_start_and_end_date(start_date, end_date = nil)
-    ret = word_date_time(start_date)
+  def display_start_and_end_date(start_date, end_date = nil, minimal=false)
+    ret = minimal ? clock_time(start_date) : word_date_time(start_date)
     if (end_date)
       ret += " to #{clock_time(end_date)}"
     end

@@ -3,7 +3,7 @@ module ControllerFormatDate
     controller.send :helper_method, :sdatetime, :s_date_time, :word_date_time, 
                     :word_date, :american_date, :american_date_time, 
                     :day_of_week, :month_name, :clock_time, :month_day_year,
-                    :seconds_to_hours
+                    :short_word_date, :seconds_to_hours
   end
 
   def sdatetime(d)
@@ -26,6 +26,13 @@ module ControllerFormatDate
 
   def word_date(d)
      convert_date(d, '%A, %B %d, %Y')
+  end
+
+  def short_word_date(d, options={})
+    wday = options[:full_weekday] ? '%A' : '%a'
+    month = options[:full_month] ? '%B' : '%b'
+    year = options[:year] ? ', %Y' : ''
+    convert_date(d, "#{wday}, #{month} %d#{year}")
   end
 
   def american_date(d)

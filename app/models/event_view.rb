@@ -1,19 +1,19 @@
 class EventView < Struct.new(:view)
 
   VALID_EVENT_VIEWS = ["upcoming", "past", "calendar", "mine"] 
-  EVENT_VIEW_UPCOMING = VALID_EVENT_VIEWS[0]
-  EVENT_VIEW_PAST = VALID_EVENT_VIEWS[1]
-  EVENT_VIEW_CALENDAR = VALID_EVENT_VIEWS[2]
-  EVENT_VIEW_MINE = VALID_EVENT_VIEWS[3]
+  UPCOMING = VALID_EVENT_VIEWS[0]
+  PAST = VALID_EVENT_VIEWS[1]
+  CALENDAR = VALID_EVENT_VIEWS[2]
+ # EVENT_VIEW_MINE = VALID_EVENT_VIEWS[3]
 
-  DEFAULT_VIEW = EVENT_VIEW_UPCOMING
+  DEFAULT_VIEW = UPCOMING
 
   def self.all_views
     VALID_EVENT_VIEWS
   end
 
   def is_calendar?
-    view == EVENT_VIEW_CALENDAR
+    view == CALENDAR
   end
 
   def is_valid?

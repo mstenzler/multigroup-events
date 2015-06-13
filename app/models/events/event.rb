@@ -13,8 +13,8 @@ class Event < ActiveRecord::Base
   require 'event_type'
 
   scope :listed, -> { where(display_listing: true) }
-  scope :upcoming, -> { where("start_date >= ?",  Time.zone.now) }
-  scope :past, -> { where("start_date <= ?",  Time.zone.now) }
+  scope :upcoming, -> { where("start_date >= ?",  Time.zone.now).order(:start_date) }
+  scope :past, -> { where("start_date <= ?",  Time.zone.now).order(start_date: :desc) }
   scope :by_month, -> date { 
     if (date.present?)
       unless (date.is_a?(Date))
@@ -36,11 +36,10 @@ class Event < ActiveRecord::Base
   EVENT_TYPES = YAML::load(File.open(EVENT_TYPES_FILE))
 
   VALID_EVENT_TABS = EventView::VALID_EVENT_VIEWS  
-  EVENT_TAB_UPCOMING = EventView::EVENT_VIEW_UPCOMING
-  EVENT_TAB_PAST = EventView::EVENT_VIEW_PAST 
-  EVENT_TAB_CALENDAR = EventView::EVENT_VIEW_CALENDAR
-  EVENT_TAB_MINE = EventView::EVENT_VIEW_MINE
-
+  EVENT_TAB_UPCOMING = EventView::UPCOMING
+  EVENT_TAB_PAST = EventView::PAST 
+  EVENT_TAB_CALENDAR = EventView::CALENDAR
+#  EVENT_TAB_MINE = EventView::EVENT_VIEW_MINE
 
   validates :title, presence: true, allow_blank: false
 

@@ -1,60 +1,44 @@
-<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-<link href='http://fonts.googleapis.com/css?family=Fredoka+One' rel='stylesheet' type='text/css'>
-<!-- Start your code here -->
-<div class="panel panel-default event">
+
+
+<div class="panel panel-default event-list-item">
   <div class="panel-body">
-    <div class="rsvp col-xs-2 col-sm-2">
-      <i><%= event.start_date.mday %></i>
-      <i><%= month_name(event.start_date) %></i>
-      <!--
-      <div class="hidden-xs">
-        <span class="fa fa-thumbs-up fa-2x"></span>
-        <span class="fa fa-thumbs-down fa-2x"></span>
-      </div>
-    -->
+    <div class="date col-xs-2 col-sm-2">
+      <% curr_date = event.start_date_local %>
+      <i class="day"><%= curr_date.day %></i><br/>
+      <i class="month"><%= month_name(curr_date) %></i><br/>
+      <i class="time-span"><%= display_start_and_end_date(curr_date, event.end_date_local, true) %></i>  
     </div>
     <div class="info col-xs-8 col-sm-7">
-      <%= link_to event.title, event_path(event) %>
-      <div>
-        <%= render partial: "manage_event_widget", 
-               locals: { event: event } %>
+      <div class="title">
+        <%= link_to event.title, event_path(event) %>
       </div>
-      <!--
-      <div class="visible-xs">Lorem ipsum dolor sit amet, consectetur adipiscing elitero..</div>
-    -->
-    <!--
-      <div class="hidden-xs">
-          <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#location" aria-controls="location" role="tab" data-toggle="tab">Location</a></li>
-            <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
-          </ul>
-          
-          <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="location">Location</div>
-            <div role="tabpanel" class="tab-pane" id="profile">
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla mattis feugiat sem, eu sagittis libero. Duis non odio ut nibh volutpat tempus eget interdum elit. 
-            </div>
-          </div>
+      <% if address = event.event_venue %>
+        <hr/>
+        <div class="event-venue">
+          <span class="name"><%= address.name %></span><br/>
+          <span class="location"><%= address.location %></span>
         </div>
-      -->
+      <% end %>
     </div>
-    <div class="author col-xs-2 col-sm-3">
-        <div class="profile-image">
-          <%= render 'shared/avatar', size: :small, user: event.user %>
+
+    <div class="hosted-by col-xs-2 col-sm-3">
+      <div class="host-title">
+        Hosted By:
+
+      </div>
+  
+      <%= render 'shared/avatar', size: :small, user: event.user %>
+      <div class="profile-name hidden-xs">
+        <div class="user-name">
+          <%= event.user.name %>
         </div>
-        <div class="profile hidden-xs">
-            <strong><%= event.user.name %></strong>
-            <article>Event Organizer</article>
-            <!--
-            <div class="links hidden-sm">
-              <i class="fa fa-github-square fa-2x col-xs-3"></i>
-              <i class="fa fa-google-plus-square fa-2x col-xs-3"></i>
-              <i class="fa fa-facebook-square fa-2x col-xs-3"></i>
-              <i class="fa fa-linkedin-square  fa-2x col-xs-3"></i>
-            </div>
-          -->
-        </div>
-        
+      </div>
+
+      <div class="options">
+        <%= render partial: "manage_event_widget", 
+              locals: { event: event } %>
+      </div>
     </div>
+   
   </div>
 </div>

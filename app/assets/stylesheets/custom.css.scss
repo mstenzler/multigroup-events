@@ -445,6 +445,8 @@ div.answer-display-block {
   font-weight: bold;
 }
 
+/* old event list */
+
 .event .panel-body {
   background: #BBDEFB;
   border: 1px solid #448AFF;
@@ -521,6 +523,55 @@ div.answer-display-block {
 .event .author img {
     width:100%;
     border-radius:50%;
+}
+
+/* end old event list */
+
+/* event list */
+
+.event-list-item {
+  background: $grayLighter;
+  .date {
+    border-right: 1px solid white;
+    font-weight: bold;
+    .day, .month {
+      font-size: 2em;
+    }
+    .time-span {
+      font-size: 0.8em;
+    }
+  }
+  .info {
+    .title {
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+  }
+  .hosted-by {
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+    div.host-title {
+      font-size: 1.1em;
+      text-align: center;
+      padding: 5px;
+    }
+    div.user-avatar img.avatar-image {
+      float: none;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    div.profile-name div.user-name {
+      text-align: center;
+    }
+    div.options div.btn-group {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;    
+    }
+  }
+  
 }
 
 

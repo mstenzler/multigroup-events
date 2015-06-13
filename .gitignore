@@ -33,6 +33,7 @@ pickle-email-*.html
 config/secrets.yml
 database.yml
 doc/
+*.old.html.erb
 *.swp
 *~
 .project
