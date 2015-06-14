@@ -30,6 +30,7 @@ module CCMeetup
       def lon
         return self.rsvp['lon'].to_f
       end
+
     end
   end
 end

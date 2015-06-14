@@ -17,7 +17,7 @@ class StaticPagesController < ApplicationController
  # caches_page :event_js
 
   def event_js
-    valid = %w(event  event_list  no_rsvp  rsvp_count  rsvp_list  yes_rsvp)
+    valid = %w(event  event_list  no_rsvp  rsvp_count  rsvp_list  yes_rsvp num_yes_rsvps_by_event)
     if valid.include?(params[:page])
       #render layout: false, handlers: :, content_type: 'text/plain', file: File.join(Rails.root, 'app/views/events/templates', params[:page])
       render layout: false, plain: File.read(File.join(Rails.root, 'app/views/events/templates', params[:page]))

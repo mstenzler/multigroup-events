@@ -11,15 +11,17 @@
   var DEFAULT_NO_RSVP_TEMPLATE = '/events/templates/rsvp_list.erb';
   var DEFAULT_EVENT_LIST_TEMPLATE = '/events/templates/event_list.erb';
   var DEFAULT_RSVP_COUNT_TEMPLATE = '/events/templates/rsvp_count.erb';
+  var DEFAULT_NUM_YES_RSVPS_BY_EVENT_TEMPLATE = '/events/templates/num_yes_rsvps_by_event.erb';
   var DEFAULT_PRIMARY_EVENT_DISPLAY_TAG = '#primaryEvent';
   var DEFAULT_RSVP_COUNT_DISPLAY_TAG = '#rsvpCount';
   var DEFAULT_YES_RSVP_DISPLAY_TAG = '#yesRsvpList';
   var DEFAULT_NO_RSVP_DISPLAY_TAG = '#noRsvpList';
   var DEFAULT_EVENT_LIST_DISPLAY_TAG = '#eventList';
+  var DEFAULT_NUM_YES_RSVPS_BY_EVENT_DISPLAY_TAG_PREFIX = '#numYesRsvpsByEvent';
   var DEFAULT_ERROR_TAG = "#errorMessage";
   var DEFAULT_GENERAL_ERROR_MESSAGE = "An Error Has Occured!";
   var DEFAULT_USE_GENERAL_ERROR_MESSAGE = true;
-
+ 
   var DATA_TYPES = ['event_list', 'primary_event', 'yes_rsvps', 'no_rsvps'];
   var DATA_TYPE_EVENT_LIST = DATA_TYPES[0];
   var DATA_TYPE_PRIMARY_EVENT = DATA_TYPES[1];
@@ -314,6 +316,14 @@
     }
   }
 
+  var RsvpEvent = function(args){
+    if (typeof args == 'undefined') { args = {}; }
+    this.id = args.id;
+    this.event_url = args.event_url;
+    this.name = args.name;
+    this.time = this.time;
+  };
+
   var Event = function(args){
     if (typeof args == 'undefined') { args = {}; }
     this.id = args.id;
@@ -404,6 +414,46 @@
     this.rsvpUrls.length;
   }
 
+//Change this to RsvpCountForEvent!!! 
+  var RsvpCountForEvent = function(eventId) {
+    if (typeof eventId == 'undefined') {
+      throw "Must pass in eventId to RsvpCountForEvent";
+    }
+    this.eventId = eventId
+    this.numRsvps = 0;
+    this.numGuests = 0;
+  };
+
+ 
+  RsvpCountForEvent.prototype.total = function() {
+    var ret = this.numRsvps + this.numGuests;
+    return ret;
+  };
+
+  RsvpCountForEvent.prototype.addRsvp = function(rsvp) {
+    if (typeof rsvp == 'undefined') {
+      throw "Must pass in rsvp to atToCount";
+    }
+    this.numRsvps += 1;
+    if (rsvp.guests) {
+      this.numGuests += rsvp.guests;
+    }
+  };
+
+  RsvpCountForEvent.prototype.addNumRsvps = function(num) {
+    if (typeof num == 'undefined') {
+      num = 1;
+    }
+    this.numRsvps += num;
+  };
+
+  RsvpCountForEvent.prototype.addGuest = function(num) {
+    if (typeof num == 'undefined') {
+      num = 1;
+    }
+    this.numGuests += num;
+  };
+
   var EventList = function(eventList){
     this.eventArray = [];
     if (eventList) {
@@ -464,6 +514,7 @@
     this.response = args.response;
     this.member = args.member;
     this.group = args.group;
+    this.event = args.event;
     this.host = args.host;
     this.member_url = args.member_url;
     this.created = args.created;
@@ -535,8 +586,52 @@
     this.rsvpNoArray = [];
     this.uniqueYesUserIds = {};
     this.uniqueNoUserIds = {};
+    this.numYesRsvpsByEvent = {};
     this.numYesDups = 0;
     this.numNoDups = 0;
+  };
+
+  RsvpList.prototype.addRsvpToNumYesRsvpsByEvent = function(rsvp) {
+    if (typeof rsvp == "undefined") {
+      throw "Must pass in rsvp as first param to addRsvpToNumYesRsvpsByEvent";
+    }
+    var currRsvpEventId, currNumYesRsvpByEvent;
+    currRsvpEventId = rsvp.event.id;
+    if (typeof currRsvpEventId !== 'undefined') {
+      currNumYesRsvpByEvent = this.numYesRsvpsByEvent[currRsvpEventId];
+      if (typeof currNumYesRsvpByEvent == 'undefined') {
+        this.numYesRsvpsByEvent[currRsvpEventId] = new RsvpCountForEvent(currRsvpEventId);
+        currNumYesRsvpByEvent = this.numYesRsvpsByEvent[currRsvpEventId];
+      }
+      currNumYesRsvpByEvent.addRsvp(rsvp);
+    }
+  };
+
+  RsvpList.prototype.calculateYesRsvpsByEvent = function() {
+    console.log("**+**++** IN calculateYesRsvpsByEvent!!");
+    var currRsvp, currRsvp2, currRsvpEventId, currYesRsvpByEvent;
+    for(var i=0, l=this.rsvpYesArray.length; i<l; i++){
+      currRsvp = this.rsvpYesArray[i];
+ //     console.log("****^^&*&* in calculate. currRsvp =");
+ //     console.log(currRsvp);
+      if (currRsvp) {
+        if (currRsvp instanceof RsvpGroup) {
+ //         console.log("Is RsvpGroup");
+          for(var i2=0, l2=currRsvp.rsvpArray.length; i2<l2; i2++){
+            currRsvp2 = currRsvp.rsvpArray[i2];
+  //          console.log("In RsvpGroup iteration. currRsvp2 =");
+  //          console.log(currRsvp2);
+            if (currRsvp2 !==  'undefined') {
+              this.addRsvpToNumYesRsvpsByEvent(currRsvp2);
+            }
+          } 
+        }
+        else {
+  //        console.log("**&**!!!! NOT AN RsvpGroup!!");
+          this.addRsvpToNumYesRsvpsByEvent(currRsvp);
+        }
+      }
+    }
   };
 
   RsvpList.prototype.logSummery = function(){
@@ -545,7 +640,7 @@
     console.log("Num Yes Dups: " + this.numYesDups);
     console.log("Num No Dups: " + this.numNoDups);
     console.log(this);
-  }
+  };
 
   RsvpList.prototype.getSortedRsvps = function (listType, sortBy) {
     if (typeof listType == "undefined") {
@@ -720,14 +815,20 @@
     if (typeof currGroupData == 'undefined') {
       throw "no group in rsvpData";
     }
+    var currEventData = rsvpData.event;
+    if (typeof currEventData == 'undefined') {
+      throw "no event in rsvpData";
+    }
     var member = new Member(currMemberData);
     var group = new Group(currGroupData);
+    var event = new RsvpEvent(currEventData);
     var excludeUser = (EXCLUDE_USERS.indexOf(member.id) >= 0);
 
     if (!excludeUser) {
       rsvpArgs['member'] = member;
       rsvpArgs['response'] = currResponse = rsvpData.response;
       rsvpArgs['group'] = group;
+      rsvpArgs['event'] = event;
       rsvpArgs['created'] = rsvpData.created;
       rsvpArgs['host'] = rsvpData.host;
       rsvpArgs['mtime'] = rsvpData.mtime;
@@ -807,6 +908,34 @@
   function isLoggedIn(userId) {
     //change this
     user_id ? true : false;
+  }
+
+  function showEventRsvpCount(numYesRsvpsByEvent, args) {
+    if (typeof numYesRsvpsByEvent == 'undefined') {
+      throw "first argument must be numRsvpsByEvent in showEventRsvpCount";
+    }
+    if (typeof args == 'undefined') {
+      throw "second argument must be a hash of args in showEventRsvpCount";
+    }
+    var currTemplate = args.numYesRsvpsByEventTemplate;
+    var displayTagPrefix = args.numYesRsvpsByEventDisplayTagPrefix;
+    var showArgs, currDisplayTag, currRsvpCountForEvent, id;
+
+    for (id in numYesRsvpsByEvent) {
+      currRsvpCountForEvent = numYesRsvpsByEvent[id];
+      if (currRsvpCountForEvent !== 'undefined') {
+        showArgs = {
+          count: currRsvpCountForEvent
+        }
+        currDisplayTag = displayTagPrefix + '-' + id;
+
+        showTemplate({
+          template: currTemplate,
+          displayTag: currDisplayTag,
+          templateData: showArgs
+        });
+      }
+    }
   }
 
   function showRsvpInfo(rsvpList, args) {
@@ -1472,6 +1601,10 @@
           globalArgs.rsvpList = rsvpList;
           rsvpList.logSummery();
           showRsvpInfo(rsvpList, args);
+          if (args.displayEventRsvpCount) {
+            rsvpList.calculateYesRsvpsByEvent();
+            showEventRsvpCount(rsvpList.numYesRsvpsByEvent, args);
+          }
         }
         else {
           console.log("WARNING! got no rsvp results for allRsvpsUrl " + allRsvpsUrl);
@@ -1571,7 +1704,8 @@
       displayPrimaryEvent  : true,
       displayPrimaryEventTitle : true,
       displayEventList     : true,
-      displayRsvpCount     : true,
+      displayEventRsvpCount : false,
+  //    displayRsvpCount     : true,
       displayYesRsvpCount  : true,
       displayNoRsvpCount   : true,
       displayYesRsvps      : true,
@@ -1602,9 +1736,10 @@
       noRsvpTemplate:     DEFAULT_NO_RSVP_TEMPLATE,
       primaryEventTemplate:     DEFAULT_EVENT_TEMPLATE,
       eventListTemplate: DEFAULT_EVENT_LIST_TEMPLATE,
+      numYesRsvpsByEventTemplate: DEFAULT_NUM_YES_RSVPS_BY_EVENT_TEMPLATE,
+      numYesRsvpsByEventDisplayTagPrefix : DEFAULT_NUM_YES_RSVPS_BY_EVENT_DISPLAY_TAG_PREFIX
     }, options);
-
-
+  
     var apiUrls = settings.apiUrls;
     var eventIdList = settings.eventIdList;
     var eventInfoList = settings.eventInfoList;

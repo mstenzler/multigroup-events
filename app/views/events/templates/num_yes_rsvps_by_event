@@ -1,0 +1,14 @@
+  <% var count = data.count;
+    if (count !== 'undefined') { 
+      var totalRsvps = count.total();
+      var numRsvps = count.numRsvps;
+      var numGuests = count.numGuests;
+      var rsvpLabel = (totalRsvps == 1 ? 'Rsvp' : 'Rsvps'); 
+      var guestLabel = (numGuests == 1 ? 'Guest' : 'Guests'); 
+      %>
+      (<%= totalRsvps %> <%= rsvpLabel %> [<%= numRsvps %> + <%= numGuests %> <%= guestLabel %>])
+    <% } else {
+      console.log("Count not get count in num_yes_rsvps_by_group");
+      }
+    %>
+

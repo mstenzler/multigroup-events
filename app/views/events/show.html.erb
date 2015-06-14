@@ -32,7 +32,7 @@
             <h3>Participating Groups:</h3>
             <ul id="event-group-list">
               <% @event.remote_event_api.event_group_list.each do |curr_group| %>
-                <li><%= link_to(curr_group[:group_name], curr_group[:url]) %> (<%= curr_group[:yes_rsvp_count] %> RSVPs)</li>
+                <li><%= link_to(curr_group[:group_name], curr_group[:url]) %> <span id="numYesRsvpsByEvent-<%= curr_group[:event_id] %>">(<%= curr_group[:yes_rsvp_count] %> Rsvps)</span></li>
             <% end %>
             </ul>           
           </div>
@@ -127,6 +127,7 @@
         fetchAllEventsAtOnce : true,
         useGeneralErrorMessage : false,
         displayRsvpLinks     : true,
+        displayEventRsvpCount : true,
         displayRsvpDuplicates : true,
         requireLoginDisplayRsvpLinks : false,
         sortYesRsvpsBy       : defaultSortType,
