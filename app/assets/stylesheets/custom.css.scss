@@ -114,6 +114,10 @@ p {
   font-weight: bold;  
 }
 
+#multigroupEvent li {
+   page-break-inside : avoid; 
+}
+
 /* header */
 
 #logo {
