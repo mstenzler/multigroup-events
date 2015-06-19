@@ -581,9 +581,14 @@
 
   };
 
-  var RsvpList = function(){
+  var RsvpList = function(args){
+    if (typeof args === 'undefined') {
+      args = {};
+    }
     this.rsvpYesArray = [];
     this.rsvpNoArray = [];
+    this.excludeGuests = args.excludeGuests || [];
+    this.excludeUsers = args.excludeUsers || [];
     this.uniqueYesUserIds = {};
     this.uniqueNoUserIds = {};
     this.numYesRsvpsByEvent = {};
@@ -709,7 +714,7 @@
        var currRsvp = this.rsvpYesArray[i];
       // console.log("i = " + i + ". currRsvp = ");
       // console.log(currRsvp);
-       var excludeGuests = (EXCLUDE_GUESTS.indexOf(currRsvp.member.id) >= 0);
+       var excludeGuests = (this.excludeGuests.indexOf(currRsvp.member.id) >= 0);
        if (currRsvp.guests && !excludeGuests ) {
           ret += parseInt(currRsvp.guests);
        }
@@ -822,7 +827,7 @@
     var member = new Member(currMemberData);
     var group = new Group(currGroupData);
     var event = new RsvpEvent(currEventData);
-    var excludeUser = (EXCLUDE_USERS.indexOf(member.id) >= 0);
+    var excludeUser = (this.excludeUsers.indexOf(member.id) >= 0);
 
     if (!excludeUser) {
       rsvpArgs['member'] = member;
@@ -1103,7 +1108,8 @@
     }
 
     if (typeof rsvpList == 'undefined') {
-      rsvpList = new RsvpList();
+      rsvpList = new RsvpList( { excludeGuests: args.excludeGuests,
+                                 excludeUsers: args.excludeUsers });
     }
     debug("In loadAndShowRsvpInfo. urlList =");
     debug(rsvpList);
@@ -1577,7 +1583,8 @@
     var fetchAllRsvpsAtOnce = args.fetchAllRsvpsAtOnce;
 
     if (fetchAllRsvpsAtOnce) {
-      rsvpList = new RsvpList();
+      rsvpList = new RsvpList( { excludeGuests: args.excludeGuests,
+                                 excludeUsers: args.excludeUsers });
       var allRsvpsUrl = apiUrls.allRsvpsUrl;
       if (!allRsvpsUrl) {
         throw "apiUrls.allRsvpsUrl not defined in fetchAndShowRsvps";
@@ -1727,7 +1734,9 @@
       sortNoRsvpsBy       : SORT_BY_LAST_RSVP,
       getPayStatus        : false,
       useGeneralErrorMessage : DEFAULT_USE_GENERAL_ERROR_MESSAGE,
-      primaryEventIndex    : 0,
+      primaryEventIndex     : 0,
+      excludeGuests         : null,
+      excludeUsers          : null,
       primaryEventDisplayTag: DEFAULT_PRIMARY_EVENT_DISPLAY_TAG,
       eventListDisplayTag: DEFAULT_EVENT_LIST_DISPLAY_TAG,
       yesRsvpDisplayTag: DEFAULT_YES_RSVP_DISPLAY_TAG,

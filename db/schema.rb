@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150602220232) do
+ActiveRecord::Schema.define(version: 20150617000554) do
 
   create_table "authentications", force: true do |t|
     t.integer  "user_id"
@@ -76,6 +76,17 @@ ActiveRecord::Schema.define(version: 20150602220232) do
   add_index "events", ["slug"], name: "slug_opt", unique: true, using: :btree
   add_index "events", ["start_date"], name: "start_date_opt", using: :btree
   add_index "events", ["user_id"], name: "user_opt", using: :btree
+
+  create_table "excluded_remote_members", force: true do |t|
+    t.integer  "remote_member_id"
+    t.integer  "event_id"
+    t.string   "exclude_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "excluded_remote_members", ["event_id"], name: "excluded_members_event_opt", using: :btree
+  add_index "excluded_remote_members", ["remote_member_id"], name: "excluded_members_remotemem_opt", using: :btree
 
   create_table "geo_areas", force: true do |t|
     t.integer  "geo_country_id"
@@ -223,6 +234,80 @@ ActiveRecord::Schema.define(version: 20150602220232) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "remote_groups", force: true do |t|
+    t.string   "name"
+    t.string   "remote_source",               limit: 126
+    t.text     "description"
+    t.integer  "remote_group_id"
+    t.string   "urlname"
+    t.string   "link"
+    t.string   "join_mode",                   limit: 24
+    t.string   "visibility",                  limit: 24
+    t.integer  "members"
+    t.integer  "remote_organizer_profile_id"
+    t.float    "lat",                         limit: 24
+    t.float    "lon",                         limit: 24
+    t.string   "timezone",                    limit: 124
+    t.string   "state",                       limit: 100
+    t.string   "city",                        limit: 200
+    t.string   "country",                     limit: 100
+    t.integer  "geo_area_id"
+    t.datetime "created"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "remote_groups", ["geo_area_id"], name: "remote_groups_geo_area_opt", using: :btree
+  add_index "remote_groups", ["remote_group_id"], name: "remote_groups_groupid_opt", using: :btree
+  add_index "remote_groups", ["remote_organizer_profile_id"], name: "remote_groups_orgprofile_opt", using: :btree
+
+  create_table "remote_members", force: true do |t|
+    t.string   "name",                limit: 126
+    t.string   "remote_source",       limit: 126
+    t.integer  "remote_member_id"
+    t.integer  "geo_area_id"
+    t.string   "bio"
+    t.string   "country",             limit: 100
+    t.string   "city",                limit: 200
+    t.string   "state",               limit: 100
+    t.string   "gender",              limit: 16
+    t.string   "hometown",            limit: 200
+    t.float    "lat",                 limit: 24
+    t.float    "lon",                 limit: 24
+    t.datetime "joined"
+    t.string   "link"
+    t.integer  "membership_count"
+    t.string   "photo_high_res_link"
+    t.integer  "photo_id"
+    t.string   "photo_link"
+    t.string   "photo_thumb_link"
+    t.datetime "last_visited"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "remote_members", ["geo_area_id"], name: "remote_members_geo_area_opt", using: :btree
+  add_index "remote_members", ["remote_member_id"], name: "remote_members_memid_opt", using: :btree
+
+  create_table "remote_profiles", force: true do |t|
+    t.integer  "remote_member_id"
+    t.integer  "remote_group_id"
+    t.string   "bio"
+    t.string   "role",                limit: 16
+    t.string   "comment"
+    t.datetime "created"
+    t.datetime "last_updated"
+    t.string   "photo_high_res_link"
+    t.string   "photo_link"
+    t.string   "photo_thumb_link"
+    t.integer  "photo_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "remote_profiles", ["remote_group_id"], name: "remote_profiles_groupid_opt", using: :btree
+  add_index "remote_profiles", ["remote_member_id"], name: "remote_profiles_memid_opt", using: :btree
 
   create_table "roles", force: true do |t|
     t.string   "name"

@@ -11,6 +11,7 @@ class RemoteEvent < Event
   include SetModelNameHelper
 
 #  attr_accessor :remote_api_key, :remember_api_key
+  attr_accessor :excluded_guests, :excluded_users 
 
   REMOTE_EVENT_API_URL_TYPES = ["event", "rsvp"]
   EVENT_API_URL_TYPE = REMOTE_EVENT_API_URL_TYPES[0]
@@ -31,16 +32,15 @@ class RemoteEvent < Event
 
   has_one :remote_event_api, :dependent => :destroy, inverse_of: :remote_event
   accepts_nested_attributes_for :remote_event_api, allow_destroy: true, update_only: true
-#  has_many :remote_event_api_details
 
- # before_validation :populate_remote_event_api, on: :create
- #  before_save  :populate_remote_event_api
- before_save :init_and_load_remote_event_api
+  has_many :excluded_remote_members, foreign_key: :event_id, dependent: :destroy, inverse_of: :remote_event
+  accepts_nested_attributes_for :excluded_remote_members, allow_destroy: true
 
-#  validates :remote_event_api, presence: true
+
+  before_save :init_and_load_remote_event_api
+  after_initialize :populate_excluded_members
+
   validates_associated :remote_event_api
- # validate :must_have_linked_events
-#  validate :must_have_remote_api_key
 
   def self.determine_url_source(url)
     uri = URI(url)
@@ -52,7 +52,55 @@ class RemoteEvent < Event
     ret
   end
 
+  def excluded_guests_member_ids
+    (excluded_guests && excluded_guests.size > 0) ? 
+      excluded_guests.map { |eg| eg.remote_member.remote_member_id } :
+      []
+  end
+
+  def excluded_guests_as_string
+    ids = excluded_guests_member_ids
+    ids.size > 0 ? ids.map { |id| id.to_s }.join(',') : ""
+  end
+
+  def excluded_users_member_ids
+     (excluded_users && excluded_users.size > 0) ? 
+      excluded_users.map { |eu| eu.remote_member.remote_member_id } :
+      []   
+  end
+
+  def excluded_users_as_string
+    ids = excluded_users_member_ids
+    ids.size > 0 ? ids.map { |id| id.to_s }.join(',') : ""
+  end
+
   private
+
+    def populate_excluded_members
+      p "** in populate_excluded_members"
+      guests = []
+      users = []
+      if (excluded_remote_members && excluded_remote_members.size > 0)
+        p "Got excluded_remote_members "
+        excluded_remote_members.each do |erm|
+          curr_type = erm.exclude_type.to_sym
+          p "Current type = #{curr_type}"
+          case curr_type
+          when ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE
+            p "Adding to guests erm: #{erm.inspect}"
+            guests << erm
+          when ExcludedRemoteMember::EXCLUDE_USER_TYPE
+            p "Adding to user erm: #{erm.inspect}"
+            users << erm
+          else
+            p "Got invalid type #{curr_type}"
+          end
+        end
+      end
+      p "number of guests = #{guests.size}, num user = #{users.size}"
+      self.excluded_guests = (guests.size > 0) ? guests : nil
+      self.excluded_users = (users.size > 0) ? users : nil
+    end
 
     def must_have_linked_events
       errors.add(:base, 'Must have at least one linked event') if linked_events.all?(&:marked_for_destruction?)

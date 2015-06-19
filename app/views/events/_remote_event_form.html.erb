@@ -4,6 +4,26 @@
 
 <%= f.check_box :display_listing %>
 
+<hr/>
+<%= f.fields_for :excluded_remote_members do |excluded_members_form| %>
+  <%= render 'excluded_remote_member_fields', f: excluded_members_form %>
+<% end %>
+<%= link_to_add_fields "Add Another Exclude Guest Member", f, :excluded_remote_members, { nested_association: :remote_member } %>
+
+<% if false %>
+
+<%= f.fields_for :excluded_guests do |excluded_guests_form| %>
+  <%= excluded_guests_form.hidden_field :exclude_type %>
+  <%= excluded_guests_form.fields_for :exclude_guests do |exclude_guests_form| %>
+    <%= render 'excluded_guest_fields', f: exclude_guests_form %>
+  <% end %> 
+  <%= link_to_add_fields "Add Another Exclude Guest Member", f, :excluded_guests, { nested_association: :remote_member } %>
+<% end %>
+
+<% end %>
+
+<hr/>
+
 <%= f.fields_for :remote_event_api do |event_api_form| %>
   <%= event_api_form.hidden_field :last_rank %>
    <%= event_api_form.hidden_field :remote_source %>

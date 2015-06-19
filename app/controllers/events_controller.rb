@@ -75,6 +75,11 @@ class EventsController < ApplicationController
 
   def edit
     authorize! :edit, @event
+    build_excluded_members(@event)
+#    unless (@event.excluded_remote_members.length > 0)
+#      @event.excluded_remote_members.build
+#      @event.excluded_guests.build(exclude_type: ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE).build_remote_member(remote_source: RemoteEvent::MEETUP_NAME)
+#    end
 #    @event = Event.friendly.find(params[:id])
     @user = current_user
     @api_keys = get_api_keys
@@ -120,6 +125,26 @@ class EventsController < ApplicationController
       logger.debug("*** Loaded event = #{@event.inspect}")
     end
 
+    def build_excluded_members(event)
+      p "**__** in build_excluded_members!!"
+      if (!event.excluded_remote_members)
+        p "No excluded_remote_members. building from scratch"
+        event.build_excluded_remote_members.build_remote_member
+      elsif (event.excluded_remote_members.length > 0)
+        p "Have excluded_remote_members. iterating"
+        event.excluded_remote_members.each do |erm|
+          p "erm = #{erm.inspect}"
+          if (!erm.remote_member)
+            p "buiding erm.remote_member"
+            erm.build_remote_member
+          end
+        end
+      else
+        p "Have no excluded members"
+        event.excluded_remote_members.build.build_remote_member
+      end
+    end
+
     def new_event(type=nil)
       puts "in new_event. type = '#{type}'"
       ret = nil
@@ -147,6 +172,13 @@ class EventsController < ApplicationController
         ret.build_remote_event_api(remote_source: RemoteEvent::MEETUP_NAME)
         #ret.remote_event_api.remote_event_api_sources << RemoteEventApiSource.new(is_primary_event: true, rank: 1)
         ret.remote_event_api.remote_event_api_sources << api_source
+ #       remote_member = new RemoteMember(remote_source: RemoteEvent::MEETUP_NAME)
+ #       ret.build_excluded_guests( exclude_type: ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE).build_remote_member(remote_source: RemoteEvent::MEETUP_NAME)
+ #       ret.excluded_guests.build(exclude_type: ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE).remote_member.build(remote_source: RemoteEvent::MEETUP_NAME)
+ #     ret.excluded_guests.build(exclude_type: ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE).build_remote_member(remote_source: RemoteEvent::MEETUP_NAME)
+       #ret.excluded_remote_members.build
+        build_excluded_members(ret)
+#        ret.excluded_guests.exclude_guests
       end
       ret
     end
@@ -170,6 +202,7 @@ class EventsController < ApplicationController
              :remember_api_key, :display_privacy, :display_list, :title, 
              :description, :start_date, :end_date, :location_id,
              linked_events_attributes: [:url, :id],
+             excluded_remote_members_attributes: [:id, :_destroy, :exclude_type, remote_member_attributes: [:id, :remote_source, :remote_member_id]],
              remote_event_api_attributes: [:api_key, :remember_api_key, 
               :remote_source,:id, 
               remote_event_api_sources_attributes: [:url, :is_primary_event, :id, :_destroy, :rank]])

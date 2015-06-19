@@ -54,8 +54,20 @@ module ApplicationHelper
     last_rank = f.object.try("last_rank") || 0
     last_rank_input = options[:last_rank_input]
     new_rank_marker = options[:new_rank_marker]
+    nested_association = options[:nested_association]
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
+    p "==@@++@@++ IN LINK_TO_ADD_FIELDS. nested_association: #{nested_association}"
+    if (nested_association)
+      p "==@@== Has nested_association: #{nested_association}"
+      #Build nested association
+      build_command = "build_#{nested_association.to_s}".to_sym
+      p "build_command = #{build_command}"
+      if (new_object.respond_to? build_command)
+        p "Building #{build_command}"
+        new_object.send(build_command)
+      end
+    end
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
       render(association.to_s.singularize + "_fields", f: builder, loc_rank: last_rank+1)
     end

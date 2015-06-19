@@ -8,7 +8,9 @@ $(document).on('click', 'form .remove_fields', function(event) {
 //  console.log(inp);
 
  //$(this).prev('input[type=hidden]').val('1');
- var inputelm = $(this).closest('fieldset').find('input[type=hidden]');
+ //var inputelm = $(this).closest('fieldset').find('input[type=hidden]');
+ var inputelm = $(this).closest('fieldset').find(".input_destroy");
+ 
  console.log("inputelm =");
  console.log(inputelm)
  inputelm.val('true');

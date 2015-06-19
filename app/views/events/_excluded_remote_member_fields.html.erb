@@ -1,0 +1,14 @@
+<fieldset class="form-inline">
+  <div class="form-group">
+    <label class="control-label">Exclude User:</label><br/>
+    <%= f.hidden_field "_destroy", { class: "input_destroy" } %>
+    <%= f.select :exclude_type, ExcludedRemoteMember.display_type_options, { label: "Type:" }, { class: "selectpicker auto-width" } %>
+    <%= f.fields_for :remote_member do |remote_member_form| %>
+      <div class="input-group">
+        <%= remote_member_form.hidden_field :remote_source, value:  RemoteEvent::MEETUP_NAME %>
+        <%= remote_member_form.text_field :remote_member_id, label: "Member ID:", 
+append: link_to("Remove", "#", class: "btn btn-default remove_fields") %>
+      </div>
+    <% end %>
+  </div>
+</fieldset>

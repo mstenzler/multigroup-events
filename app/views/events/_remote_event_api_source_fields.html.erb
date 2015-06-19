@@ -1,6 +1,6 @@
 <fieldset>
   <% rank_val = defined?(curr_rank) ? curr_rank : RemoteEventApiSource::NEW_RANK_MARKER %>
-  <%= f.hidden_field "_destroy" %>
+  <%= f.hidden_field "_destroy", { class: "input_destroy" } %>
   <%= f.hidden_field :rank, value: rank_val %>
   <div class="input-group">
     <%= f.text_field :url, label: "Meetup event URL or unique ID", 
