@@ -432,10 +432,10 @@
 
   RsvpCountForEvent.prototype.addRsvp = function(rsvp) {
     if (typeof rsvp == 'undefined') {
-      throw "Must pass in rsvp to atToCount";
+      throw "Must pass in rsvp to addRsvp";
     }
     this.numRsvps += 1;
-    if (rsvp.guests) {
+    if (rsvp.guests && !rsvp.excludeGuests) {
       this.numGuests += rsvp.guests;
     }
   };
@@ -521,6 +521,7 @@
     this.mtime = args.mtime;
     this.pay_status = args.pay_status;
     this.guests = args.guests;
+    this.excludeGuests = args.excludeGuests;
     this.rsvp_id = args.rsvp_id;
     this.eventsRsvpdTo = args.eventsRsvpdTo || [];
   };
@@ -538,6 +539,7 @@
     this.mtime = null;
     this.pay_status = null;
     this.guests = 0;
+    this.excludeGuests = ( (typeof args.excludeGuests === 'undefined') ? null : args.excludeGuests);
     console.log("In new RsvpGroup. args.rsvp =");
     console.log(args.rsvp);
     if (args.rsvp) {
@@ -828,6 +830,7 @@
     var group = new Group(currGroupData);
     var event = new RsvpEvent(currEventData);
     var excludeUser = (this.excludeUsers.indexOf(member.id) >= 0);
+    var excludeGuests = (this.excludeGuests.indexOf(member.id) >= 0);
 
     if (!excludeUser) {
       rsvpArgs['member'] = member;
@@ -838,6 +841,7 @@
       rsvpArgs['host'] = rsvpData.host;
       rsvpArgs['mtime'] = rsvpData.mtime;
       rsvpArgs['guests'] = rsvpData.guests;
+      rsvpArgs['excludeGuests'] = excludeGuests;
       rsvpArgs['rsvp_id'] = rsvpData.rsvp_id;
       if (globalArgs.getPayStatus) {
         rsvpArgs['pay_status'] = rsvpData.pay_status;
