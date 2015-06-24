@@ -1,5 +1,7 @@
 class RemoteEventApi < ActiveRecord::Base
-  belongs_to :remote_event, inverse_of: :remote_event_api
+ require 'ccmeetup'
+
+ belongs_to :remote_event, inverse_of: :remote_event_api
 #  has_many :remote_event_api_details, :dependent => :delete_all
   has_many :remote_event_api_sources, -> { order(:rank) }, inverse_of: :remote_event_api, :dependent => :delete_all
   accepts_nested_attributes_for :remote_event_api_sources, allow_destroy: true, update_only: true

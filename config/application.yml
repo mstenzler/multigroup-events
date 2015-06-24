@@ -4,7 +4,15 @@ min_age:
 max_age: 
 omniauth_providers: ['meetup', 'twitter', 'facebook', 'google_apps']
 omniauth_providers_with_key: ['meetup', 'twitter', 'facebook']
+remote_api_sources:
+  meetup:
+    name: 'meetup'
+    uri_host: 'api.meetup.com'
+  facebook:
+    name: 'facebook'
+    uri_host: 'api.facebook.com'
 user_form_options: ['name?', 'username?', 'gender?', 'birthdate?', 'time_zone?', 'country?', 'zip_code?', 'geo_area?']
+valid_event_js_templates: ['event', 'event_list', 'no_rsvp', 'rsvp_count', 'rsvp_list', 'yes_rsvp num_yes_rsvps_by_event', 'my_events_chooser']
 enable_name?: true
 require_name?: true
 enable_username?: true

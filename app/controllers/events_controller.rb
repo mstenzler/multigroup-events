@@ -1,6 +1,7 @@
 class EventsController < ApplicationController
   before_filter :signed_in_user, :except => [:index, :index_tab, :show]
   before_filter :load_event, :only => [:show, :rsvp_print, :edit, :update, :reload_api, :destroy]
+  before_filter :load_auth, :only => [:new, :edit]
   layout "minimal", only: [:rsvp_print]
 
   class InvalidEventTypeError  < StandardError; end
@@ -120,6 +121,19 @@ class EventsController < ApplicationController
   end
 
   private
+    def load_auth
+      @user = current_user
+      auth = @user.authentications.by_provider('meetup').first
+      if (auth)
+        @access_token = auth.get_fresh_token
+        logger.debug("Fresh Access Token = #{@access_token}")
+        if (@access_token)
+          logger.debug("Setting auth = #{auth.inspect}")
+          @auth = auth
+        end
+      end
+    end
+
     def load_event
       @event = Event.friendly.find(params[:id])
       logger.debug("*** Loaded event = #{@event.inspect}")

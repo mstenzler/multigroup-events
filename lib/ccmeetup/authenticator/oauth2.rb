@@ -8,9 +8,9 @@ module CCMeetup
     class Oauth2 < Base
       def initialize(options = {})
       	@authentication = options[:authentication]
-        @access_token = options[:access_token]
-        unless (@authentication || @access_token)
-          raise CCMeetup::NotConfiguredError.new("Must pass :authentication or :access_token to CCMeetup::Authenticator::Oauth2.new")
+      #  @access_token = options[:access_token]
+        unless (@authentication)
+          raise CCMeetup::NotConfiguredError.new("Must pass :authentication to CCMeetup::Authenticator::Oauth2.new")
         end
         if (@authentication && !@authentication.methods.include?(:get_fresh_token))
           raise CCMeetup::NotConfiguredError.new("authentication must have get_fresh_token method")
@@ -18,8 +18,12 @@ module CCMeetup
       end
       
       #Add key=api_key to query string to authorize the request for the api_key
-      def authorize_url(uri)
-        token = @authentication.try(:get_fresh_token) || @access_token
+      def authorize_url(uri, options={})
+        token = @authentication.try(:get_fresh_token)
+        p "** token - #{token}"
+        unless (token)
+          raise CCMeetup::NotConfiguredError.new("Could not get fresh token from authentication")
+        end
       	add_to_query_string(uri, access_token: token)
       end
 

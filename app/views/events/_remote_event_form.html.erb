@@ -1,3 +1,10 @@
+<% curr_user = current_user %>
+<% if event
+     p "*^*^*^ GOT EVENT! = #{event.inspect}"
+   else
+     p "*^*^*^*^ DON'T have an event!!!"
+    end 
+%>
 <%= f.text_field :title %>
 
 <%= f.select :display_privacy, Event.display_privacy_options, { label: "Privacy Type:" }, { class: "selectpicker auto-width" } %>
@@ -46,15 +53,66 @@
   <hr/>
   <h3>Linked Meetup Events: </h3>
 
-  <%= event_api_form.fields_for :remote_event_api_sources do |source_builder| %>
-    <% curr_rank = source_builder.object.try("rank") || 0 %>
-    <%= render 'remote_event_api_source_fields', f: source_builder, curr_rank: curr_rank %>
-  <% end %>
-  <%= link_to_add_fields "Add Another Event", event_api_form, :remote_event_api_sources, { last_rank_input: "input[name$='[rank]']",
+  <div id="remote-event-fields">
+    <%= event_api_form.fields_for :remote_event_api_sources do |source_builder| %>
+      <% curr_rank = source_builder.object.try("rank") || 0 %>
+      <%= render 'remote_event_api_source_fields', f: source_builder, curr_rank: curr_rank %>
+    <% end %>
+ 
+    <%= link_to_add_fields "Add Another Event", event_api_form, :remote_event_api_sources, { last_rank_input: "input[name$='[rank]']", id: "add-event-field-link",
                                 new_rank_marker: RemoteEventApiSource::NEW_RANK_MARKER } %>
+  </div>                              
   <br/>
 <% end %>
+<% if curr_user %>
+  <h3>My events: <a href="javascript:void(0)" id="my-events-toggle-link"><span id="my-events-toggle-icon" class="glyphicon glyphicon-minus-sign"></span></a></h3>
+<% end %>
+<div id="myEventChooser">
+<% if curr_user %>
+  Current User = <%= curr_user.name %><br/>
+  <% if auth = curr_user.authentications.by_provider('meetup').first %>
+    Current User authentication.uid = <%= auth.uid %><br/>
+    Current User authentication.token = <%= auth.token %><br/>
+    <% if auth.expires %>
+      Current User athentication.expires_at = <%= word_date_time(auth.expires_at) %><br/>
+      Current User authentication.refresh_token = <%= auth.refresh_token %><br/>
+    <% end %>
+  <% end %>
+<% end %>
+</div>
 
 <script type='text/javascript'>
-    $(document).ready( $("input[name='event[remote_event_api_attributes][api_key]']").updateFromRadioButton("input[name='api_key_option']") )
+  <% if @access_token && @auth %>
+    var loadArgs = {
+      accessKey : '<%= @access_token %>',
+      memberId  : '<%= @auth.uid %>'
+    };
+    <% remote_api = event.remote_event_api
+      eventIdList = nil
+      if remote_api
+        eventIdList = remote_api.event_id_list.to_json()
+      end
+      if eventIdList %>
+        loadArgs['eventIdList'] = '<%= eventIdList.html_safe() %>';
+        console.log("eventIdList = " + loadArgs['eventIdList']);
+      <% end %>
+  <% end %>
+   $(document).ready( function() {
+      if (typeof loadArgs !== 'undefined') {
+        $('#myEventChooser').loadUserEventChooser(loadArgs);
+        $(document).on('click', '.my-event-choice-item .add-item-area .item-add', function(event) {
+          event.preventDefault();
+          console.log("Got Click!!!");
+          //var event_id =  $(this).data('event-id');
+          //var event_url = $(this).data('event-url');
+          //$('#remote-event-fields').attr('data-next-event-url', event_url);
+         // alert('Clicked! event_url = ' + event_url + '. event_id = ' + event_id);
+          populateRemoteEventField(this);
+           $(this).closest('.my-event-choice-item').hide();
+          return event.preventDefault();
+        });
+      }
+      $("input[name='event[remote_event_api_attributes][api_key]']").updateFromRadioButton("input[name='api_key_option']") 
+    });
+
   </script>

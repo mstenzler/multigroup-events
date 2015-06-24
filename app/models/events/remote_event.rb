@@ -18,12 +18,20 @@ class RemoteEvent < Event
   RSVP_API_URL_TYPE = REMOTE_EVENT_API_URL_TYPES[1]
 
 
-  REMOTE_SOURCES = [ { name: 'meetup', uri_host: 'api.meetup.com' }, 
-                     { name: 'facebook', uri_host: 'api.facebook.com' }]
-  MEETUP_NAME = REMOTE_SOURCES[0][:name]
-  MEETUP_URI_HOST = REMOTE_SOURCES[0][:uri_host]
-  FACEBOOK_NAME = REMOTE_SOURCES[1][:name]
-  FACEBOOK_URI_HOST = REMOTE_SOURCES[1][:uri_host]
+#  REMOTE_SOURCES = [ { name: 'meetup', uri_host: 'api.meetup.com' }, 
+#                     { name: 'facebook', uri_host: 'api.facebook.com' }]
+#  REMOTE_SOURCES = CONFIG[:remote_api_sources]
+#  MEETUP_NAME = REMOTE_SOURCES[0][:name]
+#  MEETUP_URI_HOST = REMOTE_SOURCES[0][:uri_host]
+#  FACEBOOK_NAME = REMOTE_SOURCES[1][:name]
+#  FACEBOOK_URI_HOST = REMOTE_SOURCES[1][:uri_host]
+
+  REMOTE_SOURCES = CONFIG[:remote_api_sources]
+#  logger.debug("remote_sorces =#{REMOTE_SOURCES.inspect}" )
+  MEETUP_NAME = REMOTE_SOURCES['meetup']['name']
+  MEETUP_URI_HOST = REMOTE_SOURCES['meetup']['uri_host']
+  FACEBOOK_NAME = REMOTE_SOURCES['facebook']['name']
+  FACEBOOK_URI_HOST = REMOTE_SOURCES['facebook']['uri_host']
 
   REMOTE_SOURCE_HOST_MAP = { 
     MEETUP_URI_HOST => MEETUP_NAME,

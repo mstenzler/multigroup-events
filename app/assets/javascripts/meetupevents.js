@@ -1,10 +1,13 @@
 (function($){
 //  var MEETUP_KEY = '5e7e4f791557b5f3843303f103d4';
-  var MEETUP_API_BASE_URL = "http://api.meetup.com/2/"
+  var MEETUP_API_BASE_URL = "https://api.meetup.com/2/"
   var MEETUP_API_EVENT_URL = MEETUP_API_BASE_URL + "event";
   var MEETUP_API_EVENTS_URL =  MEETUP_API_BASE_URL +"events";
   var MEETUP_API_RSVP_URL = MEETUP_API_BASE_URL + "rsvps";
   var MEETUP_BASE_URL = "http://www.meetup.com/"
+
+  var DEFAULT_MY_EVENTS_CHOOSER_TEMPLATE = '/events/templates/my_events_chooser.erb';
+  var DEFAULT_MY_EVENTS_CHOOSER_DISPLAY_TAG = '#myEventChooser'
 
   var DEFAULT_EVENT_TEMPLATE = '/events/templates/event.erb';
   var DEFAULT_YES_RSVP_TEMPLATE = '/events/templates/rsvp_list.erb';
@@ -1224,7 +1227,12 @@
     var displayTag = args.displayTag;
     var dataType = args.dataType;
     var showFunction = args.showFunction;
+    var addToTemplateData = args.addToTemplateData;
     var eventData = null;
+    var addToTemplateKeys = null;
+
+    console.log('loadUrl = ' + loadUrl + '. template = ' + template);
+    console.log('displayTag = ' + displayTag + '. dataType = ' + dataType);
 
     if (!(loadUrl && template && displayTag && dataType)) {
       throw "Must supply values for 'loadUrl', 'template', 'displayTag', and dataType in loadAndShowData";
@@ -1234,7 +1242,18 @@
     promise.then(
       //success
       function(data){
+        console.log("Raw data =");
+        console.log(data);
         eventData = createDataType(dataType, data);
+        if (addToTemplateData) {
+          addToTemplateKeys = Object.keys(addToTemplateData);
+          if (addToTemplateKeys) {
+            for(var i=0, l=addToTemplateKeys.length; i<l; i++) {
+              var currKey = addToTemplateKeys[i];
+              eventData[currKey] = addToTemplateData[currKey];
+            }
+          }
+        }
         globalArgs.eventData = eventData;
         showTemplate(
         {
@@ -1313,6 +1332,28 @@
       newId = currId.replace(matcher, '$1');
       idArray[i] = newId;
     }
+  }
+
+  function createMyAuthEventsUrl(accessKey, memberId, options){
+     if (typeof accessKey == 'undefined' || typeof memberId == 'undefined') {
+      throw "need to pass in accessKey and memberId to createMyAuthEventsUrl";
+    }
+    if (typeof options == 'undefined') {
+      options = {};
+    }
+ 
+    var rsvp = "yes";
+    var status = "upcoming";
+    var eventFields = options.eventFields;
+    var fieldsText = "";
+
+    if (notEmpty(eventFields)) {
+      fieldsText = "&fields=" + eventFields;
+    }
+ 
+    return MEETUP_API_EVENTS_URL + "?member_id=" + memberId + 
+          "&access_token=" + accessKey + "&rsvp=" + rsvp + 
+          "&status=" + status + fieldsText + "&callback=?";
   }
 
   function createMeetupMemberUrl(member, group) {
@@ -1708,6 +1749,44 @@
       $(RSVP_NO_TOGGLE_ICON_ID).attr('class', RSVP_TOGGLE_ICON_OPEN);
     }
   }
+
+  $.fn.loadUserEventChooser = function( options ) {
+    var settings = $.extend( {
+      displayMyEvents : true,
+      myEventsChooserTemplate : DEFAULT_MY_EVENTS_CHOOSER_TEMPLATE,
+      myEventsChooserDisplayTag : DEFAULT_MY_EVENTS_CHOOSER_DISPLAY_TAG
+    }, options);
+
+    var accessKey = settings.accessKey;
+    var memberId = settings.memberId;
+    var eventIdList = settings.eventIdList;
+    
+    if (typeof accessKey == 'undefined') {
+      throw "Must pass in accessKey to loadUserEventChooser";
+    }
+    if (typeof memberId == 'undefined') {
+      throw "Must pass in memberId to loadUserEventChooser";
+    }
+
+    var  myEventsChooserTemplate = settings.myEventsChooserTemplate;
+    var myEventsChooserDisplayTag = settings.myEventsChooserDisplayTag;
+
+    console.log("** In loadUserEventChooser. accessKey = '" + accessKey + "'. memberId = '" + memberId + "'");
+
+    var loadUrl = createMyAuthEventsUrl(accessKey, memberId);
+    var loadArgs = {
+      loadUrl : loadUrl,
+      template : myEventsChooserTemplate,
+      displayTag : myEventsChooserDisplayTag,
+      dataType : DATA_TYPE_EVENT_LIST
+    };
+    if (eventIdList) {
+      loadArgs['addToTemplateData'] = { eventIdList : eventIdList };
+    }
+
+    loadAndShowData(loadArgs);
+  
+  };
 
   $.fn.loadEventData = function( options ) {
     //Default settings

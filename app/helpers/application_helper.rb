@@ -55,6 +55,7 @@ module ApplicationHelper
     last_rank_input = options[:last_rank_input]
     new_rank_marker = options[:new_rank_marker]
     nested_association = options[:nested_association]
+    a_id = options[:id]
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     p "==@@++@@++ IN LINK_TO_ADD_FIELDS. nested_association: #{nested_association}"
@@ -78,7 +79,14 @@ module ApplicationHelper
     if new_rank_marker
       data_h[:new_rank_marker] = new_rank_marker
     end
-    link_to(name, '#', class: "add_fields", data: data_h)
+    link_options = { class: "add_fields", data: data_h }
+    p "**__**__ ID = #{id}"
+    if (a_id)
+      link_options[:id] = a_id
+    end
+    p "**_**__** link_options = #{link_options.inspect}"
+#    link_to(name, '#', class: "add_fields", data: data_h)
+    link_to(name, '#', link_options)
   end
 
   def add_active_if_current(args = {})

@@ -8,6 +8,7 @@ $grayMediumLight: #eaeaea;
 $grayLighter:     #eee;
 $blueMedium:      #3F73A1;
 $white:           #FFF;
+$lightBlack:      #AAAAAA;
 
 @mixin box_sizing {
   -moz-box-sizing: border-box;
@@ -576,7 +577,6 @@ div.answer-display-block {
   
 }
 
-
 /* Calendar */
 
 .calendar tr td {
@@ -665,6 +665,27 @@ li span.cal-item-time {
     max-width: 100%; 
 }
 
+/* add event form */
+
+#my-event-choices {
+  div.my-event-choice-item {
+    border: 1px solid $lightBlack;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 6px;
+    div.item-name {
+      font-weight: bold;
+    }
+    div.item-url {
+      font-size: 0.9em;
+    }
+    div.add-item-area {
+      .item-add {
+        margin-top: 5px;
+      }
+    }
+  }
+}
 
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) { 

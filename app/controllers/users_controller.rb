@@ -5,6 +5,7 @@ class UsersController < ApplicationController
 	before_action :is_signed_in,   only: [:new, :create]
   before_action :load_user, :only => [:show, :edit, :update, :destroy]
   load_and_authorize_resource
+  skip_authorize_resource :only => [:new, :create]
   #before_action :correct_user,   only: [:edit, :update]
   #before_action :admin_user,     only: :destroy
   #before_action :is_signed_in,   only: [:new, :create]
