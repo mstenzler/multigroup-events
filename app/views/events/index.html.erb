@@ -26,9 +26,11 @@
       <% if @events.size <= 0 %>
        <div class="alert alert-info">There are no events to display!</div>
       <% else %>
+        <%= will_paginate @events %>
         <% @events.each do |event| %>
           <%= render partial: "event_list_item", locals: { event: event } %>
         <% end %>
+        <%= will_paginate @events %>
       <% end %>
 
    <% end %>

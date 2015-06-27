@@ -4,6 +4,9 @@ class EventsController < ApplicationController
   before_filter :load_auth, :only => [:new, :edit]
   layout "minimal", only: [:rsvp_print]
 
+  PAGINATION_PAGE_PARAM = CONFIG[:pagination_page_param].to_sym
+  PAGINATION_PER_PAGE =   CONFIG[:evetns_pagination_per_page]
+
   class InvalidEventTypeError  < StandardError; end
 
   def index
@@ -22,9 +25,9 @@ class EventsController < ApplicationController
 
     case tab.downcase
     when Event::EVENT_TAB_UPCOMING
-      @events = Event.listed.upcoming
+      @events = Event.listed.upcoming.paginate(page: params[PAGINATION_PAGE_PARAM], per_page: PAGINATION_PER_PAGE )
     when Event::EVENT_TAB_PAST
-      @events = Event.listed.past
+      @events = Event.listed.past.paginate(page: params[PAGINATION_PAGE_PARAM], per_page: PAGINATION_PER_PAGE )
     when Event::EVENT_TAB_CALENDAR
       @date = params[:date] ? Date.parse(params[:date]) : Date.today
       @events_by_date = Event.by_month(@date).group_by { |i| i.start_date_local.to_date }

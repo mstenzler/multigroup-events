@@ -14,6 +14,8 @@ remote_api_sources:
 user_form_options: ['name?', 'username?', 'gender?', 'birthdate?', 'time_zone?', 'country?', 'zip_code?', 'geo_area?']
 valid_event_js_templates: ['event', 'event_list', 'no_rsvp', 'rsvp_count', 'rsvp_list', 'yes_rsvp', 'num_yes_rsvps_by_event', 'my_events_chooser']
 default_no_photo_src: '/images/noPhoto_80.png'
+pagination_page_param: 'page'
+events_pagination_per_page: 20
 enable_name?: true
 require_name?: true
 enable_username?: true
