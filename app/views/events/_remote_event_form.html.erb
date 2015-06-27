@@ -1,9 +1,12 @@
 <% curr_user = current_user %>
-<% if event
+<% p "+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+="
+   if event
      p "*^*^*^ GOT EVENT! = #{event.inspect}"
    else
      p "*^*^*^*^ DON'T have an event!!!"
     end 
+
+    p "+++ @auth = #{@auth}, @access_token = #{@access_token}"
 %>
 <%= f.text_field :title %>
 
@@ -18,13 +21,6 @@
   <% end %>
   <%= link_to_add_fields "Add Another Exclude Guest Member", f, :excluded_remote_members, { nested_association: :remote_member ,
                                id: 'add-excluded-member-field-link'} %>
-
-  <% p "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-     f.object.excluded_remote_members.each do |exobj|
-       p "++ exobj = #{exobj}"
-       p "++ member_id = #{exobj.remote_member.remote_member_id}"
-     end
-  %>
 
   <% current_excluded_remote_member_ids = f.object.excluded_remote_members.map { |mem| mem.remote_member.remote_member_id } %>
 
@@ -124,17 +120,6 @@
    $(document).ready( function() {
       if (typeof loadArgs !== 'undefined') {
         $('#myEventChooser').loadUserEventChooser(loadArgs);
-        $(document).on('click', '.my-event-choice-item .add-item-area .item-add', function(event) {
-          event.preventDefault();
-          console.log("Got Click!!!");
-          //var event_id =  $(this).data('event-id');
-          //var event_url = $(this).data('event-url');
-          //$('#remote-event-fields').attr('data-next-event-url', event_url);
-         // alert('Clicked! event_url = ' + event_url + '. event_id = ' + event_id);
-          populateRemoteEventField(this);
-           $(this).closest('.my-event-choice-item').hide();
-          return event.preventDefault();
-        });
       }
       $("input[name='event[remote_event_api_attributes][api_key]']").updateFromRadioButton("input[name='api_key_option']") 
     });

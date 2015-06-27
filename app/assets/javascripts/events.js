@@ -57,19 +57,14 @@ $(document).on('change', "input[name$='[is_primary_event]']", function(event) {
 //  return event.preventDefault();
 }).change();
 
-/*
 $(document).on('click', '.my-event-choice-item .add-item-area .item-add', function(event) {
   event.preventDefault();
-  console.log("Got Click!!!");
-  //var event_id =  $(this).data('event-id');
-  //var event_url = $(this).data('event-url');
-  //$('#remote-event-fields').attr('data-next-event-url', event_url);
- // alert('Clicked! event_url = ' + event_url + '. event_id = ' + event_id);
+  console.log("Got Click in .my-event-choice-item .add-item-area .item-add!!!");
   populateRemoteEventField(this);
    $(this).closest('.my-event-choice-item').hide();
   return event.preventDefault();
 });
-*/
+
 $(document).on('click', '.excluded-member-chooser-item .item-add', function(event) {
   event.preventDefault();
   console.log("Got exclude-member-chooser-item Click!!!");

@@ -70,6 +70,8 @@ class EventsController < ApplicationController
       redirect_to @event
     else
       @api_keys = get_api_keys
+      load_auth
+      remove_remote_member_ids(@event)
       render 'new'
     end
   end
@@ -82,14 +84,14 @@ class EventsController < ApplicationController
 #      @event.excluded_guests.build(exclude_type: ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE).build_remote_member(remote_source: RemoteEvent::MEETUP_NAME)
 #    end
 #    @event = Event.friendly.find(params[:id])
-    @user = current_user
+ #   @user = current_user
     @api_keys = get_api_keys
   end
 
   def update
     authorize! :update, @event
   #  @event = Event.friendly.find(params[:id])
-    @user = current_user
+#    @user = current_user
 
 #    @user = User.find_by_id!(params[:id])
     #add_existing_remote_member_ids_to_params
@@ -99,7 +101,8 @@ class EventsController < ApplicationController
       redirect_to @event
       #redirect_to edit_user_url(@user), :notice => "Username has been changed."
     else
-      @api_keys = get_api_keys
+ #     @api_keys = get_api_keys
+      load_auth
       render :edit
     end
   end
@@ -123,9 +126,24 @@ class EventsController < ApplicationController
   end
 
   private
+    def remove_remote_member_ids(event)
+      logger.debug("%$%$%$%$%$%$%$%$%$%$%$%$%$%")
+      logger.debug("In remote_remote_member_ids")
+      event.excluded_remote_members.each do |erm|
+        logger.debug("erm = #{erm.inspect}")
+        curr_remote_member_id = erm.remote_member.remote_member_id
+        logger.debug("curr_remote_member_id = #{curr_remote_member_id}")
+        erm.remote_member_id = nil
+        erm.build_remote_member(remote_member_id: curr_remote_member_id)
+        logger.debug("After remove erm = #{erm.inspect}")
+      end
+    end
+
     def load_auth
+      logger.debug("++**++!!!!! in load_auth")
       @user = current_user
       auth = @user.authentications.by_provider('meetup').first
+      logger.debug("auth = #{auth}")
       if (auth)
         @access_token = auth.get_fresh_token
         logger.debug("Fresh Access Token = #{@access_token}")
