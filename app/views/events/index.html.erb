@@ -3,7 +3,7 @@
 
 <% if can? :create, Event %>
   <div class="center block">
-    <%= link_to new_event_path, class: "btn btn-default" do %>
+    <%= link_to new_event_type_path(type: "RemoteEvent"), class: "btn btn-default" do %>
       <span class="glyphicon glyphicon-plus"></span> New Event
     <% end %>
   </div>
@@ -35,4 +35,3 @@
 
 <br />
 
-<%= link_to 'New event', new_event_path %>

@@ -33,7 +33,7 @@
                 <li><%= link_to "Profile", show_profile_path(current_user) %></li>
                 <li><%= link_to "Edit User", edit_user_path(current_user) %></li>
                 <li><%= link_to "Edit Profile", edit_profile_path(current_user) %></li>
-                <li><%= link_to "Create Event", new_event_path %></li>
+                <li><%= link_to "Create Event", new_event_type_path(type: "RemoteEvent") %></li>
                 <li><%= link_to "3rd party aps", authentications_path %></li>
                 <li class="divider"></li>
                 <li>
