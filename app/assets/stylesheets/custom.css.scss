@@ -70,7 +70,20 @@ img.center {
 .top-pading-1em {
   padding-top: 1.5em;
 }
-  
+.clear-float {
+  clear: both;
+}
+
+.hide_div {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+.show_div {
+  display: block !important;
+  visibility: visible !important;
+}
+
 /* typography */
 
 h1, h2, h3, h4, h5, h6 {
@@ -113,6 +126,13 @@ p {
   border-radius: 10px;
 #  font-size: 1.2em;
   font-weight: bold;  
+}
+
+.clearfix:after {
+  content: " ";
+  display: block;
+  height: 0;
+  clear: both;
 }
 
 #multigroupEvent li {
@@ -683,6 +703,25 @@ li span.cal-item-time {
       .item-add {
         margin-top: 5px;
       }
+    }
+  }
+}
+#excluded-member-chooser {
+  margin-top: 1em;
+  margin-bottom: 1em;;
+  #excluded-member-chooser-list {
+    li {
+      list-style-type: none;
+      display: inline;
+      padding-right: 5px;
+      float: left;
+      height: 140px;  
+  /*    width: 90px; */
+      padding-bottom: 10px;
+      padding-top: 10px;
+      margin-right: 15px;
+  /*    font-size: 20px; */
+      min-width: 100px;
     }
   }
 }

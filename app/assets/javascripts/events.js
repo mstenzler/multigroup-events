@@ -57,6 +57,37 @@ $(document).on('change', "input[name$='[is_primary_event]']", function(event) {
 //  return event.preventDefault();
 }).change();
 
+/*
+$(document).on('click', '.my-event-choice-item .add-item-area .item-add', function(event) {
+  event.preventDefault();
+  console.log("Got Click!!!");
+  //var event_id =  $(this).data('event-id');
+  //var event_url = $(this).data('event-url');
+  //$('#remote-event-fields').attr('data-next-event-url', event_url);
+ // alert('Clicked! event_url = ' + event_url + '. event_id = ' + event_id);
+  populateRemoteEventField(this);
+   $(this).closest('.my-event-choice-item').hide();
+  return event.preventDefault();
+});
+*/
+$(document).on('click', '.excluded-member-chooser-item .item-add', function(event) {
+  event.preventDefault();
+  console.log("Got exclude-member-chooser-item Click!!!");
+  var newValue = $(this).data('member-id');
+  var lastInputFieldSelect = "#excluded-members-fields input[name$='[remote_member_attributes][remote_member_id]']";
+  var newFieldTriggerSelect = '#add-excluded-member-field-link';
+
+  populateInputField(newValue, lastInputFieldSelect, newFieldTriggerSelect);
+  $(this).closest('.excluded-member-chooser-item').hide();
+  var numItems = $('.excluded-member-chooser-item:visible').size();
+  console.log("numItems = " + numItems);
+  if (numItems == 0) {
+//    $('#no-saved-excluded-members').css("display", "block");
+     $('#no-saved-excluded-members').attr("class", "show_div");
+   }
+  return event.preventDefault();
+});
+
 $(document).on('click', '#my-events-toggle-link', function(event) {
   var targetDiv = "#myEventChooser";
   var toggleIcon = "#my-events-toggle-icon";
@@ -116,6 +147,39 @@ function populateRemoteEventField(sel) {
     }
     else {
       throw "Could not get last input field in populateRemoteEventField";
+    }
+  
+  }
+  return true;
+};
+
+function populateInputField(newValue, lastInputFieldSelect, newFieldTriggerSelect) {
+  if (typeof newValue === 'undefined') {
+    throw "must pass in clickedElement as 1st param to populateInputField";
+  }
+  if (typeof lastInputFieldSelect === 'undefined') {
+    throw "must pass in lastInputFieldSelect as 2nd param to populateInputField";
+  }
+  if (typeof newFieldTriggerSelect === 'undefined') {
+    throw "must pass in newFieldTriggerSelect as 3rd param to populateInputField";
+  }
+  
+  var createNewField = false;
+  var inputField = getLastEmptyInputField(lastInputFieldSelect);
+  //var input_field = $("#remote-event-fields input[name$='[url]']").filter(":last");
+ 
+  if (inputField) {
+    inputField.val(newValue);
+  }
+  else {
+    console.log("About to trigger click for " + newFieldTriggerSelect);
+    $(newFieldTriggerSelect).trigger("click");
+    inputField = getLastEmptyInputField(lastInputFieldSelect);
+    if (inputField) {
+      inputField.val(newValue);
+    }
+    else {
+      throw "Could not get last input field in populateInputField";
     }
   
   }

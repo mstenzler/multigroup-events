@@ -25,7 +25,7 @@ class CreateRemoteMembers < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index "remote_members", ["remote_member_id"], :name => "remote_members_memid_opt"
+    add_index "remote_members", ["remote_member_id", "remote_source"], :unique => true, :name => "remote_members_memid_opt"
     add_index "remote_members", ["geo_area_id"], :name => "remote_members_geo_area_opt"
 
   end

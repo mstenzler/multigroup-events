@@ -35,6 +35,9 @@ MultigroupEvents::Application.routes.draw do
   get 'user_avatar/edit', to: "change_avatars#edit", as: :edit_user_avatar
   match 'user_avatar', to: "change_avatars#update", as: :user_avatar, via: ['put', 'patch']
 
+  get 'saved_excluded/edit', to: "saved_excluded_members#edit", as: :edit_saved_excluded_members
+  match 'saved_excluded', to: "saved_excluded_members#update", as: :saved_excluded_members, via: ['put', 'patch']
+
   get 'username/edit', to: "change_usernames#edit", as: :edit_username
   match 'username', to: "change_usernames#update", as: :username, via: ['put', 'patch']
 

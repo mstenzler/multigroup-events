@@ -45,8 +45,13 @@
       Roles: <%= @user.roles_list_for_print %>
       <% if can? :assign_roles, @user %>
         - <%= link_to "Edit Roles", edit_user_roles_path %>
-        <% end %>
-      </div>
+      <% end %>
+    </div>
+
+    <div class="row">
+      Saved Excluded Members: <%= @user.num_saved_excluded_members_for_print %>
+        - <%= link_to "Update Saved Members", edit_saved_excluded_members_path %>
+    </div>
 
 	  <% if User::HAS_USER_EDIT_FIELDS %>
 	     <hr/>

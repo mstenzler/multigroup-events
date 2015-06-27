@@ -1,0 +1,18 @@
+<% provide(:title, "Update Saved Excluded Members") %>
+<h1>Upsate Saved Excluded Members</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+    <%= bootstrap_form_for @user, :url => saved_excluded_members_path(@user) do |f| %>
+      <%= render 'shared/error_messages', target: @user %>
+
+      <%= f.fields_for :saved_excluded_remote_members do |saved_excluded_members_form| %>
+        <%= render 'saved_excluded_remote_member_fields', f: saved_excluded_members_form %>
+      <% end %>
+      <%= link_to_add_fields "Add Another Saved Excluded Member", f, :saved_excluded_remote_members, { nested_association: :remote_member } %>
+      <p>&nbsp;</p>
+
+      <%= f.submit "Update", class: "btn btn-lg btn-primary" %></div>
+    <% end %>
+  </div>
+</div>

@@ -8,7 +8,7 @@ class RemoteUserApiMeetup < RemoteUserApi
     end
     set_remote_client
     unless (@remote_client)
-      raise "Counld not instantiate remote client in #{self.class.name}.#{__method__}"
+      raise "Could not instantiate remote client in #{self.class.name}.#{__method__}"
     end
   end
 
@@ -16,6 +16,11 @@ class RemoteUserApiMeetup < RemoteUserApi
     remote_client.fetch(:events, { member_id: self.remote_member_id, status: "upcoming", rsvp: "yes", get_signed_url: true })
   end
 
+  def get_remote_members(member_id_arr)
+    member_id_list = member_id_arr.map { |id| id.to_i}.join(',')
+    remote_client.fetch(:members, { member_id: member_id_list })
+  end
+  
   private
 
     def set_remote_client

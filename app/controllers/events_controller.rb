@@ -92,6 +92,8 @@ class EventsController < ApplicationController
     @user = current_user
 
 #    @user = User.find_by_id!(params[:id])
+    #add_existing_remote_member_ids_to_params
+    #logger.debug("NEW PARAMS = #{params.inspect}")
     if @event.update_attributes(event_params)
       flash[:success] = "Your Event has been updated!"
       redirect_to @event
@@ -210,6 +212,32 @@ class EventsController < ApplicationController
       end
       ret
     end
+
+=begin
+    def add_existing_remote_member_ids_to_params
+      logger.debug("**--^%^%^$ in add to params. params = #{params[:event].inspect}")
+      params[:event][:excluded_remote_members_attributes].each do |key, val|
+        logger.debug("==-==-- val (#{val.class.name}) = #{val.inspect}")
+        logger.debug("val[:remote_member_attributes] (#{val[:remote_member_attributes].class.name}) = #{val[:remote_member_attributes]}")
+        remote_member = val[:remote_member_attributes]
+        logger.debug("remote_member (#{remote_member.class.name}= #{remote_member.inspect}")
+        curr_source = remote_member['remote_source']
+        curr_id = remote_member['remote_member_id']
+        if (curr_source && curr_id)
+          curr_member = RemoteMember.where(remote_source: curr_source, 
+                                       remote_member_id: curr_id).first
+          logger.debug("**--^%^%^$ in add to params. curr_member = #{curr_member.inspect}")
+           if (curr_member)
+            logger.debug("Addinge remote_member.id = #{curr_member.id}")
+             #val['remote_member_ids'] = [curr_member.id]
+             new_id = ActiveSupport::HashWithIndifferentAccess.new('remote_member_ids' => [curr_member.id])
+             val.replace(new_id.update(val))
+             remote_member['id'] = curr_member.id
+          end
+        end
+      end
+    end
+=end
 
     def event_params
       params.require(:event).permit(:type, :remote_api_key, :display_listing, 

@@ -12,10 +12,14 @@ module CCMeetup
     # See http://www.meetup.com/meetup_api/docs/members/ for available fields
     
     class Member
-      attr_accessor :member
+      attr_accessor :member, :photo
       
       def initialize(member = {})
         self.member = member
+        if (loc_photo = member['photo'])
+          self.photo = Photo.new(loc_photo)
+        end
+ 
       end
       
       def method_missing(id, *args)

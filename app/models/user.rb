@@ -6,6 +6,11 @@ class User < ActiveRecord::Base
   has_many :events
   has_many :authentications
 
+  has_many :saved_excluded_remote_members, dependent: :destroy, inverse_of: :user
+  accepts_nested_attributes_for :saved_excluded_remote_members, allow_destroy: true, update_only: true
+  has_many :excluded_remote_members, through: :saved_excluded_remote_members, 
+            source: :remote_member
+
   before_create :create_remember_token
   before_create :init_new_user
   before_create :init_profile
@@ -14,6 +19,7 @@ class User < ActiveRecord::Base
   before_save { username.try(:downcase!) }
 
   before_save :update_age
+  after_save :populate_excluded_remote_members, :if => :populate_excluded?
 
   mount_uploader :avatar, AvatarUploader
   
@@ -147,6 +153,8 @@ class User < ActiveRecord::Base
              inclusion: { in: ActiveSupport::TimeZone.zones_map(&:name).keys },
             if: "CONFIG[:enable_time_zone?]"
 
+  validates_associated :saved_excluded_remote_members
+
   if CONFIG[:enable_birthdate?]
 #    p "IN enable_birthdate validation. MIN_AGE = #{MIN_AGE}. birthdate_can_be_blank = #{birthdate_can_be_blank}"
     date_hash = { allow_blank: birthdate_can_be_blank }
@@ -230,10 +238,81 @@ class User < ActiveRecord::Base
     ret
   end
 
+  def populate_excluded?
+    logger.debug("+++++====+++ in populate_excluded. val = #{@populate_excluded}")
+    !!@populate_excluded
+  end
+
+  def populate_excluded=(val)
+    @populate_excluded = val
+  end
+
+  def num_saved_excluded_members
+    saved_excluded_remote_members.size()
+  end
+
+  def has_saved_excluded_members
+    saved_excluded_remote_members.size() > 0
+  end
+
+  def num_saved_excluded_members_for_print
+    ret = "None"
+    if saved_excluded_remote_members
+      ret = "(#{saved_excluded_remote_members.size()})"
+    end
+    ret
+  end
+
+  def excluded_remote_member_id_list
+    excluded_remote_members.map { |mem| mem.remote_member_id }
+  end
+
+  def excluded_remote_member_list(discard_id_arr = nil)
+    ret = nil
+    logger.debug("-------------------------------")
+    logger.debug("discard_id_arr = #{discard_id_arr.inspect}")
+    if (discard_id_arr)
+      #discard_id_arr_str = discard_id_arr.map { |id| id.to_s }
+      logger.debug("excluded_remote_members = #{excluded_remote_members.inspect}")
+      logger.debug("discard_id_arr = #{discard_id_arr.inspect}")
+      ret = excluded_remote_members.reject { |mem| logger.debug("*_*-*- remote_member_id = #{mem.remote_member_id}"); discard_id_arr.include?(mem.remote_member_id) }
+      logger.debug("*******______******-----ret = #{ret.inspect}")
+    else
+      ret = excluded_remote_members
+    end
+    ret
+  end
+
+  def excluded_members_list_for_print
+    ret = "None"
+    list = nil
+    if saved_excluded_remote_members
+      list = saved_excluded_remote_members.map { |mem| mem.remote_member.remote_member_id }
+      if list.size > 0
+        ret = list.join(',')
+      end
+    end
+    ret
+  end
+
   def auth_api_keys
     ret = nil
     if authentications
       ret = authentications.map { |auth| { provider: auth.provider_name, key: auth.api_key } if auth.api_key.present? }
+    end
+    ret
+  end
+
+  def authentication_for_meetup
+    ret = nil
+    logger.debug("++==++ in authentication_for_meetup!")
+    if authentications
+      names = authentications.map { |au| au.provider }
+      logger.debug("** names = #{names.inspect}")
+      list = authentications.select { |auth| auth.provider == RemoteEvent::MEETUP_NAME }
+      if (list.size > 0)
+        ret = list[0]
+      end
     end
     ret
   end
@@ -539,6 +618,60 @@ class User < ActiveRecord::Base
     end
 
   private
+    def populate_excluded_remote_members
+      logger.debug("+++++====+++ in populate_excluded_remote_members!!")
+
+      auth = authentication_for_meetup
+      logger.debug("++ auth = #{auth.inspect}")
+      if auth
+        api = RemoteUserApiMeetup.new(auth)
+        ids = excluded_remote_members.map { |mem| mem.remote_member_id }
+        if (ids && ids.size > 0)
+          remote_member_arr = api.get_remote_members(ids)
+          #logger.debug("**&*&&**&** remote_memmbers = #{remote_member_arr.inspect}")
+
+          remote_member_hash = {}
+          remote_member_arr.each do |rm|
+            logger.debug("rm.id = #{rm.id}")
+            curr_id = rm.id
+            if (curr_id)
+              remote_member_hash[curr_id] = rm
+            else
+              logger.error("ERROR. no ID for remote_member: #{rm}")
+            end
+          end
+          excluded_remote_members.each do |lrm|
+            logger.debug("Iteration. lrm = #{lrm.inspect}")
+            logger.debug("lrm.remote_member_id = #{lrm.remote_member_id}")
+            curr_rm = remote_member_hash[lrm.remote_member_id]
+            logger.debug("curr_rm = #{curr_rm}")
+            if (curr_rm)
+              lrm.name = curr_rm.name if curr_rm.name
+              lrm.bio = curr_rm.bio if curr_rm.bio
+              lrm.country = curr_rm.country if curr_rm.country
+              lrm.city = curr_rm.city if curr_rm.city
+              lrm.state = curr_rm.state if curr_rm.state
+              lrm.gender = curr_rm.gender if curr_rm.gender
+              lrm.hometown = curr_rm.hometown if curr_rm.hometown
+              lrm.lat = curr_rm.lat if curr_rm.lat
+              lrm.lon = curr_rm.lon if curr_rm.lon
+              lrm.joined = curr_rm.joined  if curr_rm.joined 
+              lrm.link = curr_rm.link if curr_rm.link
+              lrm.membership_count = curr_rm.membership_count if curr_rm.membership_count
+              if (photo = curr_rm.photo)
+                lrm.photo_high_res_link = photo.high_res_link if photo.high_res_link
+                lrm.photo_id = photo.photo_id if photo.photo_id
+                lrm.photo_link = photo.photo_link if photo.photo_link
+                lrm.photo_thumb_link = photo.thumb_link if photo.thumb_link
+              end
+              lrm.last_visited = curr_rm.last_visited if curr_rm.last_visited
+              lrm.save!
+              logger.debug("updated lrm = #{lrm.inspect}")
+            end
+          end                 
+        end
+      end
+    end
 
     def check_gravatar_size(size)
       unless GRAVATAR_SIZE_MAP.keys.include?(size)

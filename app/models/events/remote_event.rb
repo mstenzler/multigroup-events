@@ -42,7 +42,7 @@ class RemoteEvent < Event
   accepts_nested_attributes_for :remote_event_api, allow_destroy: true, update_only: true
 
   has_many :excluded_remote_members, foreign_key: :event_id, dependent: :destroy, inverse_of: :remote_event
-  accepts_nested_attributes_for :excluded_remote_members, allow_destroy: true
+  accepts_nested_attributes_for :excluded_remote_members, allow_destroy: true, update_only: true
 
 
   before_save :init_and_load_remote_event_api

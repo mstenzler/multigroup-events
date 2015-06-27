@@ -3,7 +3,7 @@ class CreateExcludedRemoteMembers < ActiveRecord::Migration
     create_table :excluded_remote_members do |t|
       t.integer :remote_member_id
       t.integer :event_id
-      t.string :exclude_type
+      t.string :exclude_type,  :limit => 16
 
       t.timestamps
     end

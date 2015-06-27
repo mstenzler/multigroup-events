@@ -12,24 +12,48 @@
 <%= f.check_box :display_listing %>
 
 <hr/>
-<%= f.fields_for :excluded_remote_members do |excluded_members_form| %>
-  <%= render 'excluded_remote_member_fields', f: excluded_members_form %>
-<% end %>
-<%= link_to_add_fields "Add Another Exclude Guest Member", f, :excluded_remote_members, { nested_association: :remote_member } %>
+<div id="excluded-members-fields">
+  <%= f.fields_for :excluded_remote_members do |excluded_members_form| %>
+    <%= render 'excluded_remote_member_fields', f: excluded_members_form %>
+  <% end %>
+  <%= link_to_add_fields "Add Another Exclude Guest Member", f, :excluded_remote_members, { nested_association: :remote_member ,
+                               id: 'add-excluded-member-field-link'} %>
 
-<% if false %>
+  <% p "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+     f.object.excluded_remote_members.each do |exobj|
+       p "++ exobj = #{exobj}"
+       p "++ member_id = #{exobj.remote_member.remote_member_id}"
+     end
+  %>
 
-<%= f.fields_for :excluded_guests do |excluded_guests_form| %>
-  <%= excluded_guests_form.hidden_field :exclude_type %>
-  <%= excluded_guests_form.fields_for :exclude_guests do |exclude_guests_form| %>
-    <%= render 'excluded_guest_fields', f: exclude_guests_form %>
-  <% end %> 
-  <%= link_to_add_fields "Add Another Exclude Guest Member", f, :excluded_guests, { nested_association: :remote_member } %>
-<% end %>
+  <% current_excluded_remote_member_ids = f.object.excluded_remote_members.map { |mem| mem.remote_member.remote_member_id } %>
 
-<% end %>
+  <% saved_excluded_members = curr_user.excluded_remote_member_list(current_excluded_remote_member_ids) %>
+  <h4>Saved Excluded Members</h4>
+  <% has_saved_excluded_members = false %>
+  <% if saved_excluded_members && saved_excluded_members.size() > 0 %>
+    <% has_saved_excluded_members = true %>
+    <div id="excluded-member-chooser">
+      <div id="excluded-member-chooser-list" class="clearfix">
+      <ul>
+        <% saved_excluded_members.each do |mem| %>
+          <li class="excluded-member-chooser-item">
+            <img src="<%= mem.thumb_photo_src %>"><br/>
+            <%= mem.name %><br/>
+            <button class="item-add" data-member-id="<%= mem.remote_member_id %>">Add <%= mem.remote_member_id %></button>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+ 
+  <div id="no-saved-excluded-members" <%= has_saved_excluded_members ? "class='hide_div'".html_safe : "" %>>
+     No Saved Excluded Members to show. <%= link_to "Add more saved items", edit_saved_excluded_members_path %>
+  </div>
 
-<hr/>
+</div>
+
+<hr class="clear-float"/>
 
 <%= f.fields_for :remote_event_api do |event_api_form| %>
   <%= event_api_form.hidden_field :last_rank %>
