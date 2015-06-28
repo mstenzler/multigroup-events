@@ -89,19 +89,19 @@ class RemoteEvent < Event
       guests = []
       users = []
       if (excluded_remote_members && excluded_remote_members.size > 0)
-        p "Got excluded_remote_members "
+        logger.debug "Got excluded_remote_members "
         excluded_remote_members.each do |erm|
-          curr_type = erm.exclude_type.to_sym
-          p "Current type = #{curr_type}"
+          curr_type = erm.exclude_type
+          logger.debug "Current type = #{curr_type}"
           case curr_type
           when ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE
-            p "Adding to guests erm: #{erm.inspect}"
+            logger.debug "Adding to guests erm: #{erm.inspect}"
             guests << erm
           when ExcludedRemoteMember::EXCLUDE_USER_TYPE
-            p "Adding to user erm: #{erm.inspect}"
+            logger.debug "Adding to user erm: #{erm.inspect}"
             users << erm
           else
-            p "Got invalid type #{curr_type}"
+            logger.error "Got invalid type #{curr_type}"
           end
         end
       end
