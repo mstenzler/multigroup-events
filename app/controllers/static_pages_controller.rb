@@ -1,15 +1,17 @@
 class StaticPagesController < ApplicationController
   def home
+    num_events = CONFIG[:num_home_page_events] || 10
+    @events = Event.by_home_page(num_events)
   end
 
-  def help
-  end
+#  def help
+#  end
 
   def about
   end
 
-  def contact
-  end
+ # def contact
+ # end
 
   def error
   end

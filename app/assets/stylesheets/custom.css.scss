@@ -157,6 +157,9 @@ p {
   }
 }
 
+.navbar-inverse .navbar-nav > li > a {
+    color: #BBBBBB;
+}
 /* footer */
 
 footer {
@@ -596,6 +599,13 @@ div.answer-display-block {
   }
   
 }
+
+/* Event Display */
+
+#event-description p img {
+  display: block;
+  margin: 5px auto !important;
+} 
 
 /* Calendar */
 

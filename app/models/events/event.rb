@@ -24,6 +24,7 @@ class Event < ActiveRecord::Base
     end
   }
   scope :by_user, -> user { where(user_id: user.id) if user.present? }
+  scope :by_home_page, -> num { where("start_date >= ? AND show_home_page = ?",  Time.zone.now, true).order(priority: :desc, start_date: :asc).limit(num) }
 
 
   VALID_DISPLAY_PRIVACY_TYPES = ["public", "private", "registered", "group_members"]
