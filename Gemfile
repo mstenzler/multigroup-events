@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
-ruby '2.0.0'
-#ruby-gemset=rails-4-template
+ruby '2.2.2'
+#ruby-gemset=rails_4_2_1
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.1.6'
+gem 'rails', '4.2.1'
 
 
 # Use sqlite3 as the database for Active Record
@@ -31,6 +31,8 @@ gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 1.2'
 
+gem 'unicorn', '~> 4.8.3'
+
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
   gem 'sdoc', require: false
@@ -47,6 +49,14 @@ group :development do
   gem 'rename'
   gem 'random_data'
   gem 'rails-erd'
+  gem 'capistrano', '~>3.2.1'
+  #rails specific capistrano functions
+  gem 'capistrano-rails', '~> 1.1.0'
+  #integrate bundler with capistrano
+  gem 'capistrano-bundler'
+  gem 'capistrano-rbenv', '~> 2.0'
+  #include helper tasks
+  gem 'capistrano-cookbook', require: false
 end
 
 group :test do
