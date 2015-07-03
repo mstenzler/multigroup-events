@@ -13,8 +13,16 @@ require 'yaml'
   CSV_FILE_TYPE = VALID_DATA_FILE_TYPES[0]
   YML_FILE_TYPE = VALID_DATA_FILE_TYPES[1]
 
+  config   = Rails.configuration.database_configuration
+  host     = config[Rails.env]["host"]
+  database = config[Rails.env]["database"]
+  username = config[Rails.env]["username"]
+  password = config[Rails.env]["password"]
+
   Mysql2::Client.default_query_options[:connect_flags] |= Mysql2::Client::LOCAL_FILES
-  connection = ActiveRecord::Base.connection()
+#  connection = ActiveRecord::Base.connection()
+  client =   ActiveRecord::Base.establish_connection(adapter: "mysql2", username: username, host: host, password: password, database: database, local_infile: true)
+  connection = client.connection
 
   yml = YAML.load_file "#{Rails.root}/db/seed_data/tables.yml"
   p "got yml file"
