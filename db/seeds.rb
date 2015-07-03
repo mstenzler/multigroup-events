@@ -13,6 +13,9 @@ require 'yaml'
   CSV_FILE_TYPE = VALID_DATA_FILE_TYPES[0]
   YML_FILE_TYPE = VALID_DATA_FILE_TYPES[1]
 
+  Mysql2::Client.default_query_options[:connect_flags] |= Mysql2::Client::LOCAL_FILES
+  connection = ActiveRecord::Base.connection()
+
   yml = YAML.load_file "#{Rails.root}/db/seed_data/tables.yml"
   p "got yml file"
   yml.each_key do |table_name|
@@ -41,23 +44,23 @@ require 'yaml'
         p "truncated table #{table_name}"
     
         if reset_auto_increment
-          ActiveRecord::Base.connection.execute "alter table #{table_name} auto_increment=1"
+          connection.execute "alter table #{table_name} auto_increment=1"
         end   
 
         case data_file_type
           when CSV_FILE_TYPE
-            sql =  "LOAD DATA INFILE '#{data_file}' INTO TABLE #{table_name} FIELDS " +
+            sql =  "LOAD DATA LOCAL INFILE '#{data_file}' INTO TABLE #{table_name} FIELDS " +
                   "TERMINATED BY '#{delimiter}' " +
                   "LINES TERMINATED BY '#{terminated_by}' " + fields
             p "sql = " + sql
-            ActiveRecord::Base.connection.execute sql
+            connection.execute sql
             p "Loaded table: #{table_name}"
           when YML_FILE_TYPE
             p "yml not yet implemented!"
         end #case data_file_type
 
         if update_time
-          ActiveRecord::Base.connection.execute "update #{table_name} set updated_at = NOW(), created_at = NOW()"
+          connection.execute "update #{table_name} set updated_at = NOW(), created_at = NOW()"
         end   
 
       else
