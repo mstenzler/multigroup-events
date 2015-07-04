@@ -78,6 +78,14 @@ MultigroupEvents::Application.configure do
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
 
-  config.action_mailer.default_url_options = { :host => CONFIG[:development][:host] || "multigroupevents.com" }
-  
+  config.action_mailer.default_url_options = { :host => CONFIG[:production]['host'] || "www.multigroupevents.com" }
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    :authentication => :plain,
+    :address => CONFIG[:email_address] || "smtp.mailgun.org",
+    :port => CONFIG[:email_port] || 587,
+    :user_name => Rails.application.secrets.email_username,
+    :password => Rails.application.secrets.email_password
+  }
 end
