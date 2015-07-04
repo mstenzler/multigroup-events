@@ -10,7 +10,8 @@ class VerifyEmailsController < ApplicationController
   end
 
   def create
-    if @verify_email_form.submit(params[:verify_email_form])
+    p = params[:verify_email_form] || params
+    if @verify_email_form.submit(p)
     	render 'verify_email_success'
     else
       render "new"

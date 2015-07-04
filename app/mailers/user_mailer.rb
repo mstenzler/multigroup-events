@@ -1,5 +1,6 @@
 class UserMailer < ActionMailer::Base
-  default from: "mailer@example.com"
+  default from: "mailer@multgroupevents.com"
+  @site_name = CONFIG[:email_site_name] || "MultiGroup Events"
 
   def email_validation_token(user)
     @user = user

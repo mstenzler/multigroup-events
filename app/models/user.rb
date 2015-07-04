@@ -452,6 +452,7 @@ class User < ActiveRecord::Base
     hashed_token = User.make_hash(token)
     self.email_validation_token = hashed_token
     self.email_validated = false
+    self.save!
     { token: token, hashed_token: hashed_token}
   end
 

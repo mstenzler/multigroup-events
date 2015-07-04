@@ -1,10 +1,10 @@
-You are almost finished registering for @site_name.
+You are almost finished registering for <%= @site_name %>.
 
  You're email Validation Token is <%= @user.unhashed_email_validation_token %>
 
  You can enter this token in the 'verify token' field on the website or click the below link directly to complete the email verification proccess.
 
 
-<%= verify_email_token_url(user_id: @user.id, verify_token: @user.unhashed_email_validation_token) %>
+<%= verify_email_token_url(user_id: @user.username, verify_token: @user.unhashed_email_validation_token) %>
 
-If you did not recently register for @site_name, you can ignore this email
+If you did not recently register for <%= @site_name %>, you can ignore this email

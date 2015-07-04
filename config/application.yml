@@ -1,5 +1,6 @@
 title: Multigroup Events
 display_name: Multigroup Events
+email_site_name: MultiGroupEvents.com
 min_age: 
 max_age: 
 omniauth_providers: ['meetup', 'twitter', 'facebook', 'google_apps']
@@ -47,9 +48,12 @@ tiny__avatar_size: [30, 30]
 default_country: US
 default_time_zone: "Eastern Time (US & Canada)"
 default_remember_me: false
+email_address: 'smtp.mailgun.org'
+email_port: 587
 development:
   host: "localhost:3000"
 test:
   host: "test.local"
 production:
-  host: "multigroupevents.com"
+  host: "www.multigroupevents.com"
+
