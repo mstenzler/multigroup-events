@@ -52,4 +52,4 @@ development:
 test:
   host: "test.local"
 production:
-  host: "www.ApplicationTemplate.com"
+  host: "multigroupevents.com"
