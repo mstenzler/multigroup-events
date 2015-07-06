@@ -17,6 +17,10 @@ valid_event_js_templates: ['event', 'event_list', 'no_rsvp', 'rsvp_count', 'rsvp
 default_no_photo_src: '/images/noPhoto_80.png'
 pagination_page_param: 'page'
 events_pagination_per_page: 20
+#date format: dd-mm-yyyy
+calendar_start_date: '01-06-2015'
+#number of years in the future to show calendar months
+calendar_num_years_to_show: 5
 enable_name?: true
 require_name?: true
 enable_username?: true

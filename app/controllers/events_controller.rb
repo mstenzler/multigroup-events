@@ -6,12 +6,13 @@ class EventsController < ApplicationController
 
   PAGINATION_PAGE_PARAM = CONFIG[:pagination_page_param].to_sym
   PAGINATION_PER_PAGE =   CONFIG[:evetns_pagination_per_page]
+  CALENDAR_START_DATE = CONFIG[:calendar_start_date] ? CONFIG[:calendar_start_date].to_date : "01-06-2015".to_date
+  CALENDAR_NUM_YEARS_TO_SHOW = CONFIG[:calendar_num_years_to_show ] || 10
+  CALENDAR_END_DATE = CALENDAR_START_DATE >> (12*CALENDAR_NUM_YEARS_TO_SHOW)
 
   class InvalidEventTypeError  < StandardError; end
 
   def index
-#    @events = Event.listed.upcoming
-   #render :index_tab, tab: 'upcoming'
    index_tab
   end
 
@@ -31,6 +32,9 @@ class EventsController < ApplicationController
     when Event::EVENT_TAB_CALENDAR
       @date = params[:date] ? Date.parse(params[:date]) : Date.today
       @events_by_date = Event.by_month(@date).group_by { |i| i.start_date_local.to_date }
+      check_start_end_date(@date)
+#      @calendar_start_date = CALENDAR_START_DATE
+#      @calendar_end_date = CALENDAR_END_DATE
     when Event::EVENT_TAB_MINE
       signed_in_user
       @events = Event.by_user(current_user)
@@ -42,17 +46,13 @@ class EventsController < ApplicationController
   end
 
   def show
-   # @event = Event.friendly.find(params[:id], :include=>:linked_events)
-#    @event = Event.friendly.find(params[:id])
   end
 
   def rsvp_print
     authorize! :manage, @event
-#    @event = Event.friendly.find(params[:id])
   end
 
   def new
-#    flash.delete(:error) if flash[:error]
     authorize! :create, Event
     begin
       @event = new_event(params[:type])
@@ -82,29 +82,16 @@ class EventsController < ApplicationController
   def edit
     authorize! :edit, @event
     build_excluded_members(@event)
-#    unless (@event.excluded_remote_members.length > 0)
-#      @event.excluded_remote_members.build
-#      @event.excluded_guests.build(exclude_type: ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE).build_remote_member(remote_source: RemoteEvent::MEETUP_NAME)
-#    end
-#    @event = Event.friendly.find(params[:id])
- #   @user = current_user
+
     @api_keys = get_api_keys
   end
 
   def update
-    authorize! :update, @event
-  #  @event = Event.friendly.find(params[:id])
-#    @user = current_user
-
-#    @user = User.find_by_id!(params[:id])
-    #add_existing_remote_member_ids_to_params
-    #logger.debug("NEW PARAMS = #{params.inspect}")
     if @event.update_attributes(event_params)
       flash[:success] = "Your Event has been updated!"
       redirect_to @event
       #redirect_to edit_user_url(@user), :notice => "Username has been changed."
     else
- #     @api_keys = get_api_keys
       load_auth
       render :edit
     end
@@ -119,7 +106,6 @@ class EventsController < ApplicationController
     redirect_to @event
   end
 
-
   def destroy
     authorize! :destroy, @event
     logger.debug("About to desroy event: ")
@@ -129,6 +115,28 @@ class EventsController < ApplicationController
   end
 
   private
+    def check_start_end_date(date)
+      #today = Date.today
+#      logger.debug("-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=")
+#      logger.debug("***---** In check_start_end_date!! date = #{date}")
+      @show_previous_month = false
+      @show_next_month = false
+      curr_month = date.beginning_of_month
+      prev_month = curr_month << 1
+#      logger.debug("curr_month = #{curr_month}")
+#      logger.debug("prev_month = #{prev_month}")
+#      logger.debug("CALENDAR_START_DATE = #{CALENDAR_START_DATE}")
+#      logger.debug("CALENDAR_END_DATE = #{CALENDAR_END_DATE}")
+      if (prev_month >= CALENDAR_START_DATE)
+        logger.debug("Setting @show_previous_month to true")
+        @show_previous_month = true
+      end
+      if (curr_month < CALENDAR_END_DATE)
+        logger.debug("Setting @show_next_month to true")
+        @show_next_month = true
+      end
+    end
+
     def remove_remote_member_ids(event)
       logger.debug("%$%$%$%$%$%$%$%$%$%$%$%$%$%")
       logger.debug("In remote_remote_member_ids")
