@@ -1,6 +1,7 @@
 title: Multigroup Events
 display_name: Multigroup Events
 email_site_name: MultiGroupEvents.com
+google_analytics: UA-64836268-1
 min_age: 
 max_age: 
 omniauth_providers: ['meetup', 'twitter', 'facebook', 'google_apps']
