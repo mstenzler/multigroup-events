@@ -2,7 +2,7 @@ class Ability
     include CanCan::Ability
 
     def initialize(user)
-        p "***__** in Ability.initialize. user = #{user.inspect}"
+        Rails.logger.debug "***__** in Ability.initialize. user = #{user.inspect}"
         @user = user || User.new #for guest
         can [:update, :edit], User do |l_user|
             user.id == @user.id

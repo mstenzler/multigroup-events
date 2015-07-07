@@ -4,8 +4,10 @@ email_site_name: MultiGroupEvents.com
 google_analytics: UA-64836268-1
 min_age: 
 max_age: 
-omniauth_providers: ['meetup', 'twitter', 'facebook', 'google_apps']
-omniauth_providers_with_key: ['meetup', 'twitter', 'facebook']
+#omniauth_providers: ['meetup', 'twitter', 'facebook', 'google_apps']
+omniauth_providers: ['meetup']
+#omniauth_providers_with_key: ['meetup', 'twitter', 'facebook']
+omniauth_providers_with_key: ['meetup']
 remote_api_sources:
   meetup:
     name: 'meetup'
