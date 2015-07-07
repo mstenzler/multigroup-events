@@ -18,6 +18,7 @@
   <body class="pad-top">
     <%= render 'layouts/header' %>
     <div class="container">
+      <% logger.debug("flash = #{flash.inspect}") %>
       <% flash.each do |type, value| %>
         <%= content_tag(:div, value, class: "alert #{bootstrap_class_for(type)} fade in") %>
       <% end %> 
