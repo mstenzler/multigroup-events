@@ -1,6 +1,7 @@
 class EventsController < ApplicationController
   before_filter :signed_in_user, :except => [:index, :index_tab, :show]
   before_filter :load_event, :only => [:show, :rsvp_print, :edit, :update, :reload_api, :destroy]
+  before_filter :check_privileges!, :only => [:new, :create, :edit, :update, :destroy, :rsvp_print, :reload_api]
   before_filter :load_auth, :only => [:new, :edit]
   layout "minimal", only: [:rsvp_print]
 
@@ -49,11 +50,11 @@ class EventsController < ApplicationController
   end
 
   def rsvp_print
-    authorize! :manage, @event
+ #   authorize! :manage, @event
   end
 
   def new
-    authorize! :create, Event
+#    authorize! :create, Event
     begin
       @event = new_event(params[:type])
       @api_keys = get_api_keys
@@ -64,8 +65,7 @@ class EventsController < ApplicationController
   end
 
   def create
-    puts "event params = #{event_params}"
-    authorize! :create, Event
+ #   authorize! :create, Event
     @event = Event.new(event_params)
     @event.user_id = current_user.id
     if @event.save
@@ -80,13 +80,14 @@ class EventsController < ApplicationController
   end
 
   def edit
-    authorize! :edit, @event
+#    authorize! :edit, @event
     build_excluded_members(@event)
 
     @api_keys = get_api_keys
   end
 
   def update
+#    authorize! :update, @event
     if @event.update_attributes(event_params)
       flash[:success] = "Your Event has been updated!"
       redirect_to @event
@@ -98,7 +99,7 @@ class EventsController < ApplicationController
   end
 
   def reload_api
-    authorize! :update, @event
+ #   authorize! :update, @event
     if (api = @event.try(:remote_event_api))
       api.reload_api
       @event.save!
@@ -115,6 +116,10 @@ class EventsController < ApplicationController
   end
 
   private
+    def check_privileges!
+      authorize! :manage, @event, :message => "You are not authorized to perform this action!"
+    end
+
     def check_start_end_date(date)
       #today = Date.today
 #      logger.debug("-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=")

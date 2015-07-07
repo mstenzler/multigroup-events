@@ -10,6 +10,11 @@ class ApplicationController < ActionController::Base
   
   DEFAULT_ERROR_MESSAGE = "A Error has occured"
 
+  rescue_from CanCan::AccessDenied do |exception|
+    flash[:error] = exception.message
+    redirect_to root_path
+  end
+
   #For each of the user_form_options define require_#{option_name} and
   #enable_#{option_name} methods and make each one a helper method as well
   CONFIG[:user_form_options].each do |option_name|
