@@ -24,9 +24,6 @@
               <li><%= link_to "Upcoming", events_path %></li>
               <li><%= link_to "Past", events_tab_path(tab: EventView::PAST) %></li>
               <li><%= link_to "Calendar", events_tab_path(tab: EventView::CALENDAR) %></li>
-              <% if signed_in? && (can? :create, Event) %>
-                <%= link_to "Create Event", new_event_type_path(type: "RemoteEvent") %></li>
-              <% end %>
             </ul>   
           </li>     
         </ul>
