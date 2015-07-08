@@ -43,6 +43,7 @@ class Event < ActiveRecord::Base
 #  EVENT_TAB_MINE = EventView::EVENT_VIEW_MINE
 
   validates :title, presence: true, allow_blank: false
+  validates_format_of :url_identifier, :with => /\A[-_a-z0-9]+\Z/i, allow_blank: true, :on => [:create, :update]
 
   def self.event_tab_options
     VALID_EVENT_TABS

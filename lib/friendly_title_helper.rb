@@ -13,7 +13,7 @@ module FriendlyTitleHelper
   def slug_candidates
     [
       :title,
-      [:title, :url_identifier]
+      [:title, :url_identifier],
       [:title, ->{ start_date_to_append }],
       [:title, ->{ rand 1000 }]
     ]
