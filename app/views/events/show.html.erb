@@ -29,7 +29,7 @@
 
         <div id="multigroupEvent">
           <div id="eventList">
-            <h3>Participating Groups:</h3>
+            <span class="event-super-header">Participating Groups:</span>
             <ul id="event-group-list">
               <% @event.remote_event_api.event_group_list.each do |curr_group| %>
                 <li><%= link_to(curr_group[:group_name], curr_group[:url]) %> <span id="numYesRsvpsByEvent-<%= curr_group[:event_id] %>">(<%= curr_group[:yes_rsvp_count] %> Rsvps)</span></li>
@@ -88,7 +88,7 @@
           </div>
           <div id="RsvpIntro">
             <hr/>
-            <h3>Current RSVPS sorted by: 
+            <div class="current-rsvp-header">Current RSVPS sorted by: 
               <select id="sort_by">
                 <option value="last_rsvp" selected>Last Rsvp</option>
                 <option value="first_rsvp">First Rsvp</option>
@@ -98,7 +98,7 @@
               <a href="javascript:void(0)" id="refresh-rsvp-list">
                 <span id="refresh-icon" class="glyphicon glyphicon-refresh"></span>
               </a>
-            </h3>
+            </div>
           </div>
           <div id="yesRsvps">
           </div>

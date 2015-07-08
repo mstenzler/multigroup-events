@@ -40,6 +40,10 @@ img.center {
   margin-right: auto;
 }
 
+.container {
+  margin: 0 10px;
+}
+
 .pad-top {
   padding-top: 60px;
 }
@@ -91,19 +95,27 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 3em;
+  font-size: 2.4em;
   letter-spacing: -2px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   text-align: center;
 }
 
 h2 {
-  font-size: 1.2em;
+  font-size: 1.4em;
   letter-spacing: -1px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   text-align: center;
   font-weight: normal;
   color: $gray-light;
+}
+
+h3 {
+  font-size: 1.2em;
+  letter-spacing: -1px;
+  margin-bottom: 5px; 
+  text-align: center;
+  font-weight: bold;
 }
 
 p {
@@ -160,6 +172,11 @@ p {
 .navbar-inverse .navbar-nav > li > a {
     color: #BBBBBB;
 }
+
+.signed-in-pulldown {
+  float: none !important;
+}
+
 /* footer */
 
 footer {
@@ -439,6 +456,12 @@ div.answer-display-block {
   margin-top: 1.5em;
 }
 
+.current-rsvp-header {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.6em;
+}
+
 .rsvp-list {
   text-align: center;
   vertical-align: bottom;
@@ -664,12 +687,17 @@ li span.cal-item-time {
   padding: 10px;
 }
 #event-group-list li {
-  font-size: 1.3em;
+  font-size: 1.1em;
   font-weight: bold;
 }
 
 .event-header {
   font-size: 1.2em;
+  font-weight: bold;
+}
+
+.event-super-header {
+  font-size: 1.8em;
   font-weight: bold;
 }
 
@@ -744,7 +772,46 @@ li span.cal-item-time {
 
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) { 
+    h1 {
+      font-size: 3em;
+      letter-spacing: -2px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
 
+    h2 {
+      font-size: 2.2em;
+      letter-spacing: -1px;
+      margin-bottom: 30px;
+      text-align: center;
+      font-weight: normal;
+      color: $gray-light;
+    }
+
+    h3 {
+      font-size: 1.5em;
+      letter-spacing: -1px;
+      margin-bottom: 5px;
+      margin-top: 5px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .container {
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .signed-in-pulldown {
+      float: right !important;
+    }
+
+    #event-group-list li {
+      font-size: 1.3em;
+      font-weight: bold;
+    }
     /* header */
 
     #logo {
@@ -761,6 +828,10 @@ li span.cal-item-time {
         color: white;
         text-decoration: none;
       }
+    }
+
+    .current-rsvp-header {
+      font-size: 1.9em;
     }
 
     .event .panel-body {
