@@ -7,7 +7,8 @@ class User < ActiveRecord::Base
   has_many :authentications
 
   has_many :saved_excluded_remote_members, dependent: :destroy, inverse_of: :user
-  accepts_nested_attributes_for :saved_excluded_remote_members, allow_destroy: true, update_only: true
+  accepts_nested_attributes_for :saved_excluded_remote_members, 
+    reject_if: :check_saved_remote_member, allow_destroy: true, update_only: true
   has_many :excluded_remote_members, through: :saved_excluded_remote_members, 
             source: :remote_member
 
@@ -267,6 +268,14 @@ class User < ActiveRecord::Base
     excluded_remote_members.map { |mem| mem.remote_member_id }
   end
 
+  def excluded_remote_guest_member_id_list
+    saved_excluded_remote_members.select { |mem| mem.exclude_type == ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE}.map { |mem| mem.remote_member.remote_member_id }
+  end
+
+  def excluded_remote_user_member_id_list
+    saved_excluded_remote_members.select { |mem| mem.exclude_type == ExcludedRemoteMember::EXCLUDE_USER_TYPE}.map { |mem| mem.remote_member.remote_member_id }
+  end
+ 
   def excluded_remote_member_list(discard_id_arr = nil)
     ret = nil
     logger.debug("-------------------------------")
@@ -619,6 +628,52 @@ class User < ActiveRecord::Base
     end
 
   private
+
+    def check_saved_remote_member(member_attr)
+      ret = false
+      mem_id = member_attr['remote_member_attributes']['remote_member_id']
+      id = member_attr['id']
+      logger.debug("*===****++++=====*****======****")
+#      logger.debug("mem_id = #{mem_id}")
+#      logger.debug("member_attr = #{member_attr}.inspect")
+#      logger.debug("id = #{id}")
+ 
+      if (mem_id.blank?)
+        #if remote_member_id is blank, reject it.
+        logger.debug("remote_member_id is blank")
+        ret = true
+      elsif (id)
+        #if id is present then working on an already saved object so don't reject
+        ret = false
+      else
+        #make sure remote_member_id is an integer
+        mem_id_int = Integer(mem_id) rescue nil
+        exclude_type = member_attr['exclude_type']
+        logger.debug("mem_id_int = #{mem_id_int}, exclude_type = #{exclude_type}")
+        #Get the current saved guests or user list depending on
+        #the current attribute exclude_type
+        curr_member_id_list = nil
+        case exclude_type 
+        when ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE
+          curr_member_id_list = excluded_remote_guest_member_id_list
+        when  ExcludedRemoteMember::EXCLUDE_USER_TYPE
+          curr_member_id_list = excluded_remote_user_member_id_list
+        end
+            logger.debug("existing_ids = #{curr_member_id_list.inspect}")
+        #If we have saved members for this exclude type check to see that
+        #the current member attempting to be saved is not already included
+        if (mem_id_int && curr_member_id_list && curr_member_id_list.size > 0)
+          logger.debug("comparing to see if id: #{mem_id_int} is in list #{curr_member_id_list.inspect}")
+          if (curr_member_id_list.include?(mem_id_int))
+            logger.debug("Attempting to add already existing ID. Rejecting")
+            ret = true
+          end
+        end
+      end
+      logger.debug("ret value = #{ret}")
+      ret
+    end
+
     def populate_excluded_remote_members
       logger.debug("+++++====+++ in populate_excluded_remote_members!!")
 
