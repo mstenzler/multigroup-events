@@ -18,7 +18,7 @@ set :keep_releases, 5
 set :linked_files, %w{config/database.yml config/secrets.yml}
 
 #dirs we want symlinking to shared
-set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
+set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 
 #http://www.capistranob.com/documentatin/getting-started/flow
 #is a quick overviewd of what tasks are called and
