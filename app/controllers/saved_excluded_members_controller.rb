@@ -35,12 +35,4 @@ class SavedExcludedMembersController < ApplicationController
       params.require(:user).permit(saved_excluded_remote_members_attributes: [:id, :_destroy, :exclude_type, remote_member_attributes: [:id, :remote_source, :remote_member_id]])
     end
 
-    def check_params
-      pms = user_params
-      if (pms[:avatar_type] == User::UPLOAD_AVATAR && pms[:avatar].blank?)
-        @user.errors.add(:avatar, "Must not be blank")
-        return false
-      end
-      true
-    end
 end
