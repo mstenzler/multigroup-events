@@ -2,13 +2,16 @@ class SavedExcludedRemoteMember < ActiveRecord::Base
   belongs_to :user, inverse_of: :saved_excluded_remote_members
   belongs_to :remote_member, inverse_of: :saved_excluded_remote_members
 
-  accepts_nested_attributes_for :remote_member, reject_if: :all_blank, update_only: true
+  include RemoteMemberCheck
+
+  accepts_nested_attributes_for :remote_member, reject_if: :check_remote_member, update_only: true
 
   validates :exclude_type, presence: true, 
              inclusion: { in: ExcludedRemoteMember::VALID_EXCLUDE_MEMBER_TYPES }
 
   validates_associated :remote_member 
 
+=begin
   protected
 
     def check_remote_member(member_attr)
@@ -23,4 +26,6 @@ class SavedExcludedRemoteMember < ActiveRecord::Base
       end
       return false
     end
+=end
+
 end

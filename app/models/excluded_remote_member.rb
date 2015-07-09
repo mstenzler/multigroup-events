@@ -2,6 +2,8 @@ class ExcludedRemoteMember < ActiveRecord::Base
   belongs_to :remote_event, foreign_key: :event_id,  inverse_of: :excluded_remote_members
   belongs_to :remote_member, foreign_key: :remote_member_id, inverse_of: :excluded_remote_members
 
+  include RemoteMemberCheck
+
 #  accepts_nested_attributes_for :remote_member, reject_if: :all_blank, update_only: true
   accepts_nested_attributes_for :remote_member, reject_if: :check_remote_member, update_only: true
 
@@ -17,6 +19,7 @@ class ExcludedRemoteMember < ActiveRecord::Base
     VALID_EXCLUDE_MEMBER_TYPES.map { |type| type.to_s }
   end
 
+=begin
   protected
 
     def check_remote_member(member_attr)
@@ -30,4 +33,6 @@ class ExcludedRemoteMember < ActiveRecord::Base
       end
       return false
     end
+=end
+
 end
