@@ -42,6 +42,72 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def valid_omniauth_provider?(provider)
+    CONFIG[:omniauth_providers].include?(provider) ? true : false
+  end
+
+  #makes sure a user is signed in with an omniauth provider
+  def signed_in_auth_user(provider, options = {})
+    unless (provider && valid_omniauth_provider?(provider))
+      raise "Invalid provider: '#{provider}' in  #{self.class.name}.#{__method__}"
+    end
+    auth = nil
+    require_access_token = options.has_key?(:require_access_token) ? options[:require_access_token] : false
+ 
+    if signed_in?
+      auth = get_current_user_auth(provider)
+      if (auth)
+        if (require_access_token)
+          @access_token = auth.get_fresh_token
+          if (@access_token)
+            @auth = auth
+          else
+            #if access token is required and we don't have one then
+            #we need to log in again with this authentication
+            auth = nil
+          end
+        else
+          #If we don't require an access token then set @auth var
+          @auth = auth
+        end
+      end
+    end
+
+    #if we don't have auth, then we need to redirect user to signe in
+    #with using with the specified omniauth provider
+    unless (auth)
+      store_location
+      redirect_to signin_url(rop: provider), notice: "You must sign in through #{provider} to access this page."
+    end
+  end
+
+  def get_current_user_auth(provider)
+     unless (provider && valid_omniauth_provider?(provider))
+      raise "Invalid provider: '#{provider}' in  #{self.class.name}.#{__method__}"
+    end   
+    logger.debug("++**++!!!!! in get_current_user_auth")
+    cu = current_user
+    unless (cu)
+      raise "Could not get current_user in #{self.class.name}.#{__method__}"
+    end
+    ret = nil
+
+    auth = cu.authentications.by_provider(provider).first
+    logger.debug("auth = #{auth}")
+    if (auth)
+      ret = auth
+    end
+#    if (auth)
+#      @access_token = auth.get_fresh_token
+#      logger.debug("Fresh Access Token = #{@access_token}")
+#      if (@access_token)
+#        logger.debug("Setting auth = #{auth.inspect}")
+#        @auth = auth
+#      end
+#    end
+    ret
+  end
+
   # Returns the Gravatar (http://gravatar.com/) for the given user.
   def gravatar_for(user, options = { size: 50 })
     gravatar_url = gravatar_url(user, options)

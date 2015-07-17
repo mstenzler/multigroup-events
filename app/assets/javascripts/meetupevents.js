@@ -319,6 +319,69 @@
     }
   }
 
+  var EventHost = function(args){
+    if (typeof args == 'undefined') { args = {}; }
+    this.member_id = args.member_id;
+    this.member_name = args.member_name;
+  };
+
+  var EventHostList = function(eventHostList){
+    this.eventHostArray = [];
+    if (eventHostList) {
+      if (eventHostList instanceof Array) {
+        for(var i=0, l=eventHostList.length; i<l; i++){
+          this.eventHostArray.push(new EventHost(eventHostList[i]));
+        }
+      }
+      else {
+        throw "eventHostList must be an Array of EventHost items";
+      }
+    }
+    
+  };
+
+  EventHostList.prototype.logSummery = function(){
+    console.log("Num Events: " + this.eventHostArray.length);
+    console.log(this);
+  }
+
+  EventHostList.prototype.getNumHosts = function(){
+    return this.eventHostArray.length;
+  }
+
+  EventHostList.prototype.getHosts = function(){
+    return this.eventHostArray;
+  }
+
+  EventHostList.prototype.containsHostId = function(memberId){
+    var ret = false;
+    var hostArr = this.eventHostArray;
+    var currHost = null;
+//    console.log("**In containsHostId. hostArr.length = " + hostArr.length);
+//    console.log("typeof memberId = " + typeof memberId);
+    for(var i=0, l=hostArr.length; i<l; i++){
+      currHost = hostArr[i];
+//      console.log("currHost.member_id = " + currHost.member_id + ". memberId = " + memberId);
+//      console.log("typeof currHost.member_id = " + typeof currHost.member_id);
+      if (currHost.member_id == memberId) {
+//        console.log('GOT MATCH!!!!');
+        ret = true;
+        break;
+      }
+    }
+    return ret;
+  }
+
+  EventHostList.prototype.addEventHostInfo = function(eventHostObj){
+    if (typeof eventHostObj == 'undefined') {
+      throw "Must pass in an EventHost"
+    }
+    if (typeof eventHostObj.member_id == 'undefined') {
+      throw "EventHost does not have valid member_id"
+    }
+    this.eventHostArray.push(eventHostObj);
+  }
+
   var RsvpEvent = function(args){
     if (typeof args == 'undefined') { args = {}; }
     this.id = args.id;
@@ -351,6 +414,9 @@
     }
     if (typeof args.fee != 'undefined'){
       this.fee = new EventFee(args.fee);
+    }
+    if (typeof args.event_hosts != 'undefined') {
+      this.event_hosts = new EventHostList(args.event_hosts)
     }
     if (typeof args.displayTitle != 'undefined') {
       this.displayTitle = args.displayTitle;
@@ -917,6 +983,46 @@
     return ret;
   };
 
+  var filterEventListByHostId = function(eventListObj, opts) {
+    //include only events that have a specific member_id (hostId)
+    if (typeof eventListObj === 'undefined' || !(eventListObj instanceof EventList)) {
+      throw "Must pass in an EventList as first param to filterEventListByHostId";
+    }
+    if (typeof opts === 'undefined') {
+      throw "function filterEventListByHostId requires an opts param";
+    }
+    var eventList = eventListObj.getEvents();
+    var hostId = opts.hostId;
+    if (typeof hostId === 'undefined') {
+      throw "function filterEventListByHostId requires opts.hostId";
+    }
+//    console.log("In filterEventListByHostId. hostId = " + hostId + ". num events = " + eventList.length);
+    var ret = new EventList();
+    var i=0, l=0;
+    var currEvent = null;
+    var currEventHosts = null;
+
+    for (i=0, l=eventList.length; i<l; i++){
+      currEvent = eventList[i];
+      currEventHosts = currEvent.event_hosts;
+ //     console.log('currEvent = ');
+ //     console.log(currEvent);
+      if (typeof currEventHosts != 'undefined') {
+ //       console.log('currEventHosts = ');
+ //       console.log(currEventHosts);
+        if (currEventHosts.containsHostId(hostId)) {
+ //         console.log("About to add currEvent!!!! to ret");
+          ret.addEventInfo(currEvent);
+        }
+        else {
+  //        console.log("!!!!! NOT INCLUDING event: ");
+ //         console.log(currEvent);
+        }
+      }
+    }
+    return ret;   
+  }
+
   function isLoggedIn(userId) {
     //change this
     user_id ? true : false;
@@ -1062,43 +1168,6 @@
     });
   }
 
-  function fetchAllRsvpsInfo_depricated(allRsvpsUrl) {
-    if (typeof allRsvpsUrl == 'undefined') {
-      throw "first argument must be allRsvpsUrl in fetchAllRsvpsInfo";
-    }
-    var rsvpList = new RsvpList();
-    var promise = $.getJSON(allRsvpsUrl);
-    promise.then(
-      //success
-      function(data) {
-        if (data.problem) {
-          error = data.problem + " : " + data.details;
-          console.log("ERROR! " + error);
-          showError(error);
-        } 
-        else if (data.results.length > 0) {
-          console.log("Got data from url " + allRsvpsUrl);
-          rsvpList.addRsvpDataList(data.results);
-          rsvpList.logSummery();
-          globalArgs.rsvpList = rsvpList;
-        }
-        else {
-          console.log("WARNING! got no rsvp results for revpUrl " + rsvpUrl);
-        }
-      },
-      //fail
-      function ( jqxhr, textStatus, error ) {
-        var err = textStatus + ", " + error;
-        console.log( "Request Failed: " + err );
-     //   g_rsvpLoadState = LOAD_FAILED;
-        showError("Error! " + err);
-        throw "Got getJSON error: " + err;
-      }
-    );
-
-    return rsvpList;
-  }
-
   function loadAndShowRsvpInfo(urlList, args, rsvpList) {
     //loadAndShowRsvpInfo is called recursivly using promises to
     //ensure that the RSVP lists are loaded in the order 
@@ -1227,12 +1296,17 @@
     var displayTag = args.displayTag;
     var dataType = args.dataType;
     var showFunction = args.showFunction;
+    var filterDataFunction = args.filterDataFunction;
+    var filterDataFunctionArgs = args.filterDataFunctionArgs;
     var addToTemplateData = args.addToTemplateData;
     var eventData = null;
     var addToTemplateKeys = null;
 
     console.log('loadUrl = ' + loadUrl + '. template = ' + template);
     console.log('displayTag = ' + displayTag + '. dataType = ' + dataType);
+//    console.log('filterDataFunction = ' + filterDataFunction);
+    console.log('filterDataFunctionArgs = ');
+    console.log(filterDataFunctionArgs);
 
     if (!(loadUrl && template && displayTag && dataType)) {
       throw "Must supply values for 'loadUrl', 'template', 'displayTag', and dataType in loadAndShowData";
@@ -1245,6 +1319,13 @@
         console.log("Raw data =");
         console.log(data);
         eventData = createDataType(dataType, data);
+        if (typeof filterDataFunction !== 'undefined' && filterDataFunction) {
+          console.log("about to run filterDataFunction on eventData");
+          if (typeof filterDataFunctionArgs === 'undefined') {
+            filterDataFunctionArgs = {};
+          }
+          eventData = filterDataFunction(eventData, filterDataFunctionArgs);
+        }
         if (addToTemplateData) {
           addToTemplateKeys = Object.keys(addToTemplateData);
           if (addToTemplateKeys) {
@@ -1760,6 +1841,8 @@
     var accessKey = settings.accessKey;
     var memberId = settings.memberId;
     var eventIdList = settings.eventIdList;
+    var showAllEvents = settings.showAllEvents;
+    showAllEvents = null;
     
     if (typeof accessKey == 'undefined') {
       throw "Must pass in accessKey to loadUserEventChooser";
@@ -1770,15 +1853,29 @@
 
     var  myEventsChooserTemplate = settings.myEventsChooserTemplate;
     var myEventsChooserDisplayTag = settings.myEventsChooserDisplayTag;
+    var opts = {
+      eventFields: 'event_hosts'
+    }
+    var filterDataFunction;
+    var filterDataArgs;
+
+    if (typeof showAllEvents === 'undefined' || (!showAllEvents)) {
+      filterDataArgs = {
+        hostId: memberId
+      };
+      filterDataFunction = filterEventListByHostId;
+    }
 
     console.log("** In loadUserEventChooser. accessKey = '" + accessKey + "'. memberId = '" + memberId + "'");
 
-    var loadUrl = createMyAuthEventsUrl(accessKey, memberId);
+    var loadUrl = createMyAuthEventsUrl(accessKey, memberId, opts);
     var loadArgs = {
       loadUrl : loadUrl,
       template : myEventsChooserTemplate,
       displayTag : myEventsChooserDisplayTag,
-      dataType : DATA_TYPE_EVENT_LIST
+      dataType : DATA_TYPE_EVENT_LIST,
+      filterDataFunction : filterDataFunction,
+      filterDataFunctionArgs : filterDataArgs
     };
     if (eventIdList) {
       loadArgs['addToTemplateData'] = { eventIdList : eventIdList };

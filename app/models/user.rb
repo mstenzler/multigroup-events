@@ -341,6 +341,43 @@ class User < ActiveRecord::Base
     roles.map { |r| cast_func ? r.name.send(cast_func) : r.name }
   end
 
+  def has_role?(role)
+    role_names.include?(role)
+  end
+
+  def has_all_roles?(rolesArr)
+    unless rolesArr.is_a? Array
+      raise "has_all_roles? must be passed an array"
+    end
+    if rolesArr.size <= 0
+      return false
+    end
+    ret = true
+    l_roles = role_names
+    rolesArr.each do |role|
+      unless l_roles.include?(role)
+        ret = false
+        break
+      end
+    end
+    ret
+  end
+
+  def has_at_least_one_role?(rolesArr)
+    unless rolesArr.is_a? Array
+      raise "has_at_least_one_role? must be passed an array"
+    end
+    ret = false
+    l_roles = role_names
+    rolesArr.each do |role|
+      if l_roles.include?(role)
+        ret = true
+        break
+      end
+    end
+    ret
+  end
+  
   def roles_list_for_print(sep = ', ')
     l_roles = roles
     ret = nil

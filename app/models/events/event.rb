@@ -12,6 +12,8 @@ class Event < ActiveRecord::Base
   #Causes an error when loading event types if event_type class not loaded
   require 'event_type'
 
+  attr_accessor :current_user
+
   scope :listed, -> { where(display_listing: true) }
   scope :upcoming, -> { where("start_date >= ?",  Time.zone.now).order(:start_date) }
   scope :past, -> { where("start_date <= ?",  Time.zone.now).order(start_date: :desc) }

@@ -1,8 +1,10 @@
 class EventsController < ApplicationController
-  before_filter :signed_in_user, :except => [:index, :index_tab, :show]
-  before_filter :load_event, :only => [:show, :rsvp_print, :edit, :update, :reload_api, :destroy]
-  before_filter :check_privileges!, :only => [:new, :create, :edit, :update, :destroy, :rsvp_print, :reload_api]
-  before_filter :load_auth, :only => [:new, :edit]
+  before_filter(only: [:new, :edit, :create, :update, :reload_api]) { signed_in_auth_user Authentication::MEETUP_PROVIDER_NAME, { require_access_token: true} }
+  before_filter :signed_in_user, only: [:destroy, :rsvp_print]
+#  before_filter :signed_in_user, :except => [:index, :index_tab, :show]
+  before_filter :load_event, only: [:show, :rsvp_print, :edit, :update, :reload_api, :destroy]
+  before_filter :check_privileges!, only: [:new, :create, :edit, :update, :destroy, :rsvp_print, :reload_api]
+#  before_filter :load_auth, :only => [:new, :edit]
   layout "minimal", only: [:rsvp_print]
 
   PAGINATION_PAGE_PARAM = CONFIG[:pagination_page_param].to_sym
@@ -68,12 +70,13 @@ class EventsController < ApplicationController
  #   authorize! :create, Event
     @event = Event.new(event_params)
     @event.user_id = current_user.id
+    @event.current_user = current_user
     if @event.save
       flash[:success] = "Your Event has been created!"
       redirect_to @event
     else
       @api_keys = get_api_keys
-      load_auth
+  #    load_auth
       remove_remote_member_ids(@event)
       render 'new'
     end
@@ -172,25 +175,26 @@ class EventsController < ApplicationController
 
     def load_event
       @event = Event.friendly.find(params[:id])
+      @event.current_user = current_user
       logger.debug("*** Loaded event = #{@event.inspect}")
     end
 
     def build_excluded_members(event)
-      p "**__** in build_excluded_members!!"
+  #    p "**__** in build_excluded_members!!"
       if (!event.excluded_remote_members)
-        p "No excluded_remote_members. building from scratch"
+  #      p "No excluded_remote_members. building from scratch"
         event.build_excluded_remote_members.build_remote_member
       elsif (event.excluded_remote_members.length > 0)
-        p "Have excluded_remote_members. iterating"
+  #      p "Have excluded_remote_members. iterating"
         event.excluded_remote_members.each do |erm|
-          p "erm = #{erm.inspect}"
+  #        p "erm = #{erm.inspect}"
           if (!erm.remote_member)
-            p "buiding erm.remote_member"
+ #           p "buiding erm.remote_member"
             erm.build_remote_member
           end
         end
       else
-        p "Have no excluded members"
+#        p "Have no excluded members"
         event.excluded_remote_members.build.build_remote_member
       end
     end
@@ -202,9 +206,9 @@ class EventsController < ApplicationController
         if (Event.valid_event_type?(type))
           ret = type.constantize.new
           ret.type = type
-          p "new event = #{ret}, type = #{type}"
+ #         p "new event = #{ret}, type = #{type}"
         else
-          puts "About to raise InvalidEventTypeError"
+  #        puts "About to raise InvalidEventTypeError"
           raise InvalidEventTypeError.new "Invalid event Type '#{type}'"
         end
       else
@@ -218,7 +222,7 @@ class EventsController < ApplicationController
       if ret.event_type.is_remote?
         puts "event is remote!!!!"
         api_source = RemoteEventApiSource.new(is_primary_event: true, rank: 1)
-        puts("api_source = #{api_source.inspect}")
+#        puts("api_source = #{api_source.inspect}")
         ret.build_remote_event_api(remote_source: RemoteEvent::MEETUP_NAME)
         #ret.remote_event_api.remote_event_api_sources << RemoteEventApiSource.new(is_primary_event: true, rank: 1)
         ret.remote_event_api.remote_event_api_sources << api_source

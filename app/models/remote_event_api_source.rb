@@ -5,6 +5,7 @@ class RemoteEventApiSource < ActiveRecord::Base
 
 #  validates :url, presence: true
   validates :event_source_id, presence: true
+#  validate :must_be_event_host, if: :not_super_organizer
 
   NEW_RANK_MARKER = "__NEW_RANK_MARKER__"
 
@@ -19,6 +20,18 @@ class RemoteEventApiSource < ActiveRecord::Base
   end
 
   private
+    def must_be_event_host
+
+    end
+
+    def not_super_organizer
+      ret = false
+      cu = remote_event_api.remote_event.current_user
+      if cu
+        ret = !cu.has_at_least_one_role?(["admin", "super_organizer"])
+      end
+      ret
+    end
 
     def extract_event_source_id
       if (url)

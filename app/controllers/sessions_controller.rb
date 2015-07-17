@@ -5,6 +5,7 @@ class SessionsController < ApplicationController
     if CONFIG[:check_remember_me?]
       @signin_form.remember_me = 1
     end
+    @require_omniauth_provider = params[:rop] ? params[:rop] : nil
   end
   
   def create

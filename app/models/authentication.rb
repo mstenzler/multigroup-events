@@ -2,6 +2,8 @@ require 'rest-client'
 class Authentication < ActiveRecord::Base
 	belongs_to :user
 
+  MEETUP_PROVIDER_NAME = 'meetup'
+
   scope :by_provider, -> provider { where(provider: provider) if provider.present? }
 
   def provider_name

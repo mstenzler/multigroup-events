@@ -2,15 +2,17 @@
 
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-    <h2>Sign in with a social network:</h2>
+    <h2>Sign in through Meetup:</h2>
     <a href="/auth/meetup" class="auth_provider">
-      <%= image_tag "meetup_128.png", :size => "128x128" %>
+      <%= image_tag "meetup_128.png", :size => "128x128" %><br/>
+      (click to sign in)
     </a>
   </div>
 </div>
 
-<hr/>
+<% unless @require_omniauth_provider %>
 
+<hr/>
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
     <h2>Sign in with your email address:</h2>
@@ -29,3 +31,4 @@
     <p>New user? <%= link_to "Sign up now!", signup_path %></p>
   </div>
 </div>
+<% end %>
