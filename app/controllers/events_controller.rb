@@ -75,6 +75,8 @@ class EventsController < ApplicationController
       flash[:success] = "Your Event has been created!"
       redirect_to @event
     else
+      logger.debug("%$%$%$%$%$%$%$%$%$%$%$%$%$%")
+      logger.debug("event.remote_event_api.remote_event_api_sources = #{@event.remote_event_api.remote_event_api_sources.inspect}")
       @api_keys = get_api_keys
   #    load_auth
       remove_remote_member_ids(@event)
@@ -146,15 +148,15 @@ class EventsController < ApplicationController
     end
 
     def remove_remote_member_ids(event)
-      logger.debug("%$%$%$%$%$%$%$%$%$%$%$%$%$%")
-      logger.debug("In remote_remote_member_ids")
+#      logger.debug("%$%$%$%$%$%$%$%$%$%$%$%$%$%")
+#      logger.debug("In remote_remote_member_ids")
       event.excluded_remote_members.each do |erm|
-        logger.debug("erm = #{erm.inspect}")
+#        logger.debug("erm = #{erm.inspect}")
         curr_remote_member_id = erm.remote_member.remote_member_id
-        logger.debug("curr_remote_member_id = #{curr_remote_member_id}")
+#        logger.debug("curr_remote_member_id = #{curr_remote_member_id}")
         erm.remote_member_id = nil
         erm.build_remote_member(remote_member_id: curr_remote_member_id)
-        logger.debug("After remove erm = #{erm.inspect}")
+#        logger.debug("After remove erm = #{erm.inspect}")
       end
     end
 

@@ -1,7 +1,7 @@
 class RemoteEventApi < ActiveRecord::Base
- require 'ccmeetup'
+  require 'ccmeetup'
 
- belongs_to :remote_event, inverse_of: :remote_event_api
+  belongs_to :remote_event, inverse_of: :remote_event_api
 #  has_many :remote_event_api_details, :dependent => :delete_all
   has_many :remote_event_api_sources, -> { order(:rank) }, inverse_of: :remote_event_api, :dependent => :delete_all
   accepts_nested_attributes_for :remote_event_api_sources, allow_destroy: true, update_only: true
@@ -12,13 +12,14 @@ class RemoteEventApi < ActiveRecord::Base
   SET_REMOTE_DESCRIPTION_DEFAULT = true
   SET_REMOTE_FEE_DEFAULT = true
 
-  attr_accessor :sources_by_id_hash, :primary_source
+  attr_accessor :sources_by_id_hash, :primary_source, :event_host_ids
 
 #  before_validate :populate_ranks
 #  before_save :default_values
 #  before_save :catalog_sources
 #  before_save :load_api
 
+  before_validation :load_event_host_ids, on: [:create, :update]
   validates :api_key, presence: true
   validates_associated :remote_event_api_sources
 
@@ -112,6 +113,36 @@ class RemoteEventApi < ActiveRecord::Base
   end
 
   private
+    def load_event_host_ids
+      #This gets the event_ids for all the events that the 
+      # current user is an event host for
+      cu = remote_event.current_user
+      unless (cu)
+        raise "No Current User in #{self.class.name}.#{__method__}"
+      end
+      auth = cu.authentication_for_meetup
+      cu_member_id = auth.uid
+      logger.debug("++ auth = #{auth.inspect}")
+      if auth
+        id_list = []
+        api = RemoteUserApiMeetup.new(auth)
+        events = api.get_upcoming_events_rsvpd_to({ fields: "event_hosts"})
+        if (events && events.is_a?(Array) && events.size > 0)
+          events.each do |event|
+            event_hosts = event.event_hosts
+            if (event_hosts && event_hosts.is_a?(Array) && event_hosts.size > 0 && event_hosts.include?(cu_member_id))
+              id_list.push(event.id)
+            end
+          end
+        end
+        if (id_list.size > 0)
+          logger.debug("** Settiing event_host_ids to #{id_list.inspect}")
+          event_host_ids = id_list
+        else
+          logger.debug("** NO EVENT_HOST_IDS!")
+        end
+      end
+    end
 
     def default_values
       self.set_remote_date = SET_REMOTE_DATE_DEFAULT if self.set_remote_date.nil?

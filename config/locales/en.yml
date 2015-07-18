@@ -20,4 +20,14 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  activerecord:
+    models:
+      remote_event_api: "Linked Events"
+      remote_event_api_source: "Event Url or ID"
+    attributes:
+      event:
+        remote_event_api: "Linked Events"
+      remote_event_api/remote_event_api_sources:
+        event_source_id: "Event ID"
+      remote_event_api:
+        remote_event_api_sources: "Event Urls or IDs"

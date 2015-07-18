@@ -5,7 +5,7 @@ class RemoteEventApiSource < ActiveRecord::Base
 
 #  validates :url, presence: true
   validates :event_source_id, presence: true
-#  validate :must_be_event_host, if: :not_super_organizer
+  validate :must_be_event_host, if: :not_super_organizer
 
   NEW_RANK_MARKER = "__NEW_RANK_MARKER__"
 
@@ -21,7 +21,11 @@ class RemoteEventApiSource < ActiveRecord::Base
 
   private
     def must_be_event_host
-
+      logger.debug("** In must_be_event_host for event_source_id #{event_source_id}")
+      host_ids = remote_event_api.event_host_ids
+      unless (host_ids && host_ids.include?(event_source_id)) 
+        errors.add(:event_source_id, "#{event_source_id} is not an event you are a host of")
+      end
     end
 
     def not_super_organizer
@@ -30,6 +34,7 @@ class RemoteEventApiSource < ActiveRecord::Base
       if cu
         ret = !cu.has_at_least_one_role?(["admin", "super_organizer"])
       end
+      logger.debug("*** In not_super_organizer. ret = #{ret}")
       ret
     end
 
@@ -37,16 +42,16 @@ class RemoteEventApiSource < ActiveRecord::Base
       if (url)
         if (is_a_number?(url))
           self.event_source_id = url
-          self.url = nil
+#          self.url = nil
         elsif (is_valid_source_url?(url))
           s_id = extract_event_source_id_from_url(url)
           if (s_id)
             self.event_source_id = s_id
           else
-            errors.add(:base, "Could not get event source id from url '#{url}'")
+            errors.add(:event_id_source, "Could not get event source id from url '#{url}'")
           end
         else
-          errors.add(:base, "Event '#{url}' is not a valid url for #{source}")
+          errors.add(:event_id_source, "Event '#{url}' is not a valid url for #{source}")
         end
       end
     end

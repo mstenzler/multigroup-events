@@ -12,8 +12,13 @@ class RemoteUserApiMeetup < RemoteUserApi
     end
   end
 
-  def get_upcoming_events_rsvpd_to
-    remote_client.fetch(:events, { member_id: self.remote_member_id, status: "upcoming", rsvp: "yes", get_signed_url: true })
+  def get_upcoming_events_rsvpd_to(args={})
+    opts = { member_id: self.remote_member_id, status: "upcoming", rsvp: "yes", get_signed_url: true }
+    fields = args[:fields]
+    if (fields)
+      opts[:fields] = fields
+    end
+    remote_client.fetch(:events, opts)
   end
 
   def get_remote_members(member_id_arr)
