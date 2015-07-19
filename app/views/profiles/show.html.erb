@@ -5,7 +5,7 @@
       <div class="row">
         <%= render 'shared/avatar', user: @user, size: :large, html_class: 'img-circle img-responsive user-profile-avatar' %>
       </div>
-      <% if @show_edit_links %>
+      <% if can? :edit, @user %>
         <div class="row center-block text-center">
           <%= link_to "Edit Avitar", edit_user_avatar_path %>
         </div>
@@ -16,7 +16,7 @@
       <strong>Gender:</strong> <%= show_answer(@user.gender) %><br/>
       <strong>Age:</strong> <%= show_answer(@user.display_age) %><br/>
       <strong>Location:</strong> <%= show_answer(@user.display_location) %><br/>
-      <% if @show_edit_links %>
+      <% if can? :edit, @user %>
         <%= link_to "Edit User", edit_user_path(@user) %>
       <% end %>
     </div>
