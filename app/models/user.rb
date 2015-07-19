@@ -239,6 +239,10 @@ class User < ActiveRecord::Base
     ret
   end
 
+  def has_password_set?
+    self.password_digest ? true : false
+  end
+  
   def populate_excluded?
     logger.debug("+++++====+++ in populate_excluded. val = #{@populate_excluded}")
     !!@populate_excluded

@@ -1,13 +1,15 @@
 class SigninForm
   include ActiveModel::Model
 
+  NO_PASSWORD_ERROR = 1
+  NO_USER_ERROR = 2
   USER_ID_LABEL = CONFIG[:enable_username?] ? "Username or Email" : "Email"
 
   def persisted?
     false
   end
 
-  attr_accessor :user_id, :password, :remember_me
+  attr_accessor :user_id, :password, :remember_me, :form_error
   attr_writer :target_user
 
   validates_presence_of :user_id
@@ -26,10 +28,18 @@ class SigninForm
   	self.user_id = params[:user_id] unless params[:user_id].blank?
   	self.password = params[:password] unless params[:password].blank?
   	self.remember_me = params[:remember_me] unless params[:remember_me].blank?
-    if valid?
-    	true
+    if (self.user_id && !target_user_exists?)
+      self.form_error = NO_USER_ERROR
+      return false
+    elsif (self.user_id && !target_user_has_password_set?)
+      self.form_error = NO_PASSWORD_ERROR
+      return false
     else
-      false
+      if valid?
+      	true
+      else
+        false
+      end
     end
   end
 
@@ -51,6 +61,14 @@ class SigninForm
 
     def target_user
   	  @target_user ||= get_user_from_id(self.user_id)
+    end
+
+    def target_user_has_password_set?
+      target_user && target_user.has_password_set?
+    end
+
+    def target_user_exists?
+      target_user ? true : false
     end
 
   	def is_email(str)

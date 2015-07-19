@@ -17,7 +17,12 @@ class SessionsController < ApplicationController
       sign_in user, remember_me
       redirect_back_or user    
     else
-      render "new"
+      logger.debug("%%&&%%&&%%& GOT SIGNIN FORM ERROR! = #{@signin_form.form_error}")
+      if (@signin_form.form_error && (@signin_form.form_error == SigninForm::NO_PASSWORD_ERROR))
+        redirect_to new_password_reset_url, :notice => "You need to set a password for #{@signin_form.user_id} before you can log in."
+      else
+        render "new"
+      end
     end
   end
 
