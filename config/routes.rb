@@ -3,7 +3,7 @@ MultigroupEvents::Application.routes.draw do
   match '/auth/:provider/callback', to: 'authentications#create', via: 'get'
 
   resources :authentications
-  resources :password_resets
+  resources :password_resets, only: [:new, :create, :edit, :update]
   resources :profiles 
 
   resources :users, except: [:show] do
