@@ -178,6 +178,7 @@ class EventsController < ApplicationController
     def load_event
       @event = Event.friendly.find(params[:id])
       @event.current_user = current_user
+      @event.populate_excluded=true
       logger.debug("*** Loaded event = #{@event.inspect}")
     end
 

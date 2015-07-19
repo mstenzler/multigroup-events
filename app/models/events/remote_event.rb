@@ -46,7 +46,7 @@ class RemoteEvent < Event
 
 
   before_save :init_and_load_remote_event_api
-  after_initialize :populate_excluded_members
+  after_initialize :populate_excluded_members, :if => :populate_excluded?
 
   validates_associated :remote_event_api
 
@@ -60,6 +60,15 @@ class RemoteEvent < Event
     ret
   end
 
+  def populate_excluded?
+    logger.debug("+++++====+++ in populate_excluded. val = #{@populate_excluded}")
+    !!@populate_excluded
+  end
+
+  def populate_excluded=(val)
+    @populate_excluded = val
+  end
+  
   def excluded_guests_member_ids
     (excluded_guests && excluded_guests.size > 0) ? 
       excluded_guests.map { |eg| eg.remote_member.remote_member_id } :
