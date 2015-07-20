@@ -46,7 +46,7 @@ class RemoteEvent < Event
 
 
   before_save :init_and_load_remote_event_api
-  after_initialize :populate_excluded_members, :if => :populate_excluded?
+#  after_initialize :populate_excluded_members, :if => :populate_excluded?
 
   validates_associated :remote_event_api
 
@@ -60,15 +60,15 @@ class RemoteEvent < Event
     ret
   end
 
-  def populate_excluded?
-    logger.debug("+++++====+++ in populate_excluded. val = #{@populate_excluded}")
-    !!@populate_excluded
-  end
+#  def populate_excluded?
+#    logger.debug("+++++====+++ in populate_excluded. val = #{@populate_excluded}")
+#    !!@populate_excluded
+#  end
 
-  def populate_excluded=(val)
-    @populate_excluded = val
-  end
-  
+#  def populate_excluded=(val)
+#    @populate_excluded = val
+#  end
+
   def excluded_guests_member_ids
     (excluded_guests && excluded_guests.size > 0) ? 
       excluded_guests.map { |eg| eg.remote_member.remote_member_id } :
@@ -91,33 +91,33 @@ class RemoteEvent < Event
     ids.size > 0 ? ids.map { |id| id.to_s }.join(',') : ""
   end
 
-  private
-
-    def populate_excluded_members
-      p "** in populate_excluded_members"
-      guests = []
-      users = []
-      if (excluded_remote_members && excluded_remote_members.size > 0)
-        logger.debug "Got excluded_remote_members "
-        excluded_remote_members.each do |erm|
-          curr_type = erm.exclude_type
-          logger.debug "Current type = #{curr_type}"
-          case curr_type
-          when ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE
-            logger.debug "Adding to guests erm: #{erm.inspect}"
-            guests << erm
-          when ExcludedRemoteMember::EXCLUDE_USER_TYPE
-            logger.debug "Adding to user erm: #{erm.inspect}"
-            users << erm
-          else
-            logger.error "Got invalid type #{curr_type}"
-          end
+  def populate_excluded_members
+    p "** in populate_excluded_members"
+    guests = []
+    users = []
+    if (excluded_remote_members && excluded_remote_members.size > 0)
+      logger.debug "Got excluded_remote_members "
+      excluded_remote_members.each do |erm|
+        curr_type = erm.exclude_type
+        logger.debug "Current type = #{curr_type}"
+        case curr_type
+        when ExcludedRemoteMember::EXCLUDE_GUESTS_TYPE
+          logger.debug "Adding to guests erm: #{erm.inspect}"
+          guests << erm
+        when ExcludedRemoteMember::EXCLUDE_USER_TYPE
+          logger.debug "Adding to user erm: #{erm.inspect}"
+          users << erm
+        else
+          logger.error "Got invalid type #{curr_type}"
         end
       end
-      p "number of guests = #{guests.size}, num user = #{users.size}"
-      self.excluded_guests = (guests.size > 0) ? guests : nil
-      self.excluded_users = (users.size > 0) ? users : nil
     end
+    p "number of guests = #{guests.size}, num user = #{users.size}"
+    self.excluded_guests = (guests.size > 0) ? guests : nil
+    self.excluded_users = (users.size > 0) ? users : nil
+  end
+
+  private
 
     def must_have_linked_events
       errors.add(:base, 'Must have at least one linked event') if linked_events.all?(&:marked_for_destruction?)
