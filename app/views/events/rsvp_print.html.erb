@@ -41,7 +41,9 @@
       //  eventListTemplate: '/events/templates/event_list.erb',
       //  yesRsvpTemplate:  '/events/templates/rsvp_list.erb',
         allEventsApiUrl: '<%= @event.remote_event_api.all_events_api_url.html_safe %>',
-        allRsvpsApiUrl: '<%= @event.remote_event_api.all_rsvps_api_url.html_safe %>'       
+        allRsvpsApiUrl: '<%= @event.remote_event_api.all_rsvps_api_url.html_safe %>',
+        excludeGuests: <%= @event.excluded_guests_member_ids.to_json %>,
+        excludeUsers: <%= @event.excluded_users_member_ids.to_json %>
       };
     $(document).ready( function() {
       $('#multigroupEvent').loadEventData(loadArgs);
