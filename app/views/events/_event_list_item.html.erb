@@ -2,18 +2,24 @@
 
 <div class="event-list-item panel panel-default">
   <div class="panel-body">
-    <div class="date col-xs-2 col-sm-2">
+    <div class="date col-sm-2">
       <% curr_date = event.start_date_local %>
-      <i class="day"><%= curr_date.day %></i><br/>
-      <i class="month"><%= month_name(curr_date) %></i><br/>
-      <i class="time-span"><%= display_start_and_end_date(curr_date, event.end_date_local, true) %></i>  
+      <span class="visible-xs">
+        <i class="small-date"><%= curr_date.day %> <%= month_name(curr_date) %> - <%= display_start_and_end_date(curr_date, event.end_date_local, true) %>
+        </i>
+      </span>
+      <span class="hidden-xs">
+        <i class="day"><%= curr_date.day %></i><br/>
+        <i class="month"><%= month_name(curr_date) %></i><br/>
+        <i class="time-span"><%= display_start_and_end_date(curr_date, event.end_date_local, true) %></i>  
+      </span>
     </div>
-    <div class="info col-xs-8 col-sm-7">
+    <div class="info col-sm-7 col-xs-10">
       <div class="title">
         <%= link_to event.title, event_path(event) %>
       </div>
       <% if address = event.event_venue %>
-        <hr/>
+        <hr class="event-listing-hrule"/>
         <div class="event-venue">
           <span class="name"><%= address.name %></span><br/>
           <span class="location"><%= address.location %></span>
@@ -21,7 +27,7 @@
       <% end %>
     </div>
 
-    <div class="hosted-by col-xs-2 col-sm-3">
+    <div class="hosted-by col-sm-3 hidden-xs">
       <div class="host-title">
         Hosted By:
 
