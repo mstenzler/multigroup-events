@@ -177,9 +177,15 @@ class EventsController < ApplicationController
 
     def load_event
       @event = Event.friendly.find(params[:id])
+      logger.debug("--==----==----==---===---==---==---=--====")
+      logger.debug("Loaded event = #{@event}")
       @event.current_user = current_user
       @event.populate_excluded_members
       logger.debug("*** Loaded event = #{@event.inspect}")
+    rescue ActiveRecord::RecordNotFound
+      logger.debug("Record does not exist! rescuing")
+      flash[:notice] = "This event does not exist!"
+      redirect_to :action => 'index'
     end
 
     def build_excluded_members(event)
