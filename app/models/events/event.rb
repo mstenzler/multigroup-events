@@ -15,7 +15,7 @@ class Event < ActiveRecord::Base
   attr_accessor :current_user
 
   scope :listed, -> { where(display_listing: true) }
-  scope :upcoming, -> { where("start_date >= ?",  Time.zone.now).order(:start_date) }
+  scope :upcoming, -> { where("end_date >= ? OR start_date >= ?", Time.zone.now, Time.zone.now - 3.hours).order(:start_date) }
   scope :past, -> { where("start_date <= ?",  Time.zone.now).order(start_date: :desc) }
   scope :by_month, -> date { 
     if (date.present?)
@@ -26,7 +26,7 @@ class Event < ActiveRecord::Base
     end
   }
   scope :by_user, -> user { where(user_id: user.id) if user.present? }
-  scope :by_home_page, -> num { where("start_date >= ? AND show_home_page = ?",  Time.zone.now, true).order(priority: :desc, start_date: :asc).limit(num) }
+  scope :by_home_page, -> num { where("start_date >= ? AND show_home_page = ?",  Time.zone.now - 3.hours, true).order(priority: :desc, start_date: :asc).limit(num) }
 
 
   VALID_DISPLAY_PRIVACY_TYPES = ["public", "private", "registered", "group_members"]
