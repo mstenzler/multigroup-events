@@ -19,6 +19,14 @@ class RemoteEventApiSource < ActiveRecord::Base
     is_primary_event ? true : false
   end
 
+  def filterd_group_name
+    str = self.group_name
+    if (str)
+      str = str.gsub(/\A[\"\'\!\*\s]*(.+?)[\"\'\!\*\s]*\z/, '\1')
+    end
+    str
+  end
+
   private
     def must_be_event_host
       logger.debug("** In must_be_event_host for event_source_id #{event_source_id}")

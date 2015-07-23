@@ -65,7 +65,7 @@ class RemoteEventApi < ActiveRecord::Base
     ret = []
     remote_event_api_sources.each do |source|
       p ""
-      item = { event_id: source.event_source_id, group_name: source.group_name, url: source.url,
+      item = { event_id: source.event_source_id, group_name: source.filterd_group_name, url: source.url,
                yes_rsvp_count: source.yes_rsvp_count }
       ret << item
     end

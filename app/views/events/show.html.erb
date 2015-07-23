@@ -28,14 +28,25 @@
         <% end %>
 
         <div id="multigroupEvent">
-          <div id="eventList">
+          <div id="eventList" class="panel panel-primary">
+            <div class="panel-heading event-super-header">
+              Participating Groups
+            </div>
+            <ul id="event-group-list" class="list-group">
+              <% @event.remote_event_api.event_group_list.each do |curr_group| %>
+              <li class="list-group-item"><%= link_to(curr_group[:group_name], curr_group[:url]) %> <span id="numYesRsvpsByEvent-<%= curr_group[:event_id] %>"> <%= curr_group[:yes_rsvp_count] %> Rsvps</span></li>
+            <% end %>
+            </ul>
+          </div>      
+     <% if false %>
             <span class="event-super-header">Participating Groups:</span>
             <ul id="event-group-list">
               <% @event.remote_event_api.event_group_list.each do |curr_group| %>
                 <li><%= link_to(curr_group[:group_name], curr_group[:url]) %> <span id="numYesRsvpsByEvent-<%= curr_group[:event_id] %>">(<%= curr_group[:yes_rsvp_count] %> Rsvps)</span></li>
             <% end %>
-            </ul>           
-          </div>
+            </ul> 
+    <% end %>
+        </div>
 
           <div id="primaryEvent">    
             <% start_date = @event.start_date_local

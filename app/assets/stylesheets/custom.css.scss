@@ -99,7 +99,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 2.4em;
+  font-size: 1.8em;
   letter-spacing: -2px;
   margin-bottom: 20px;
   text-align: center;
@@ -708,7 +708,7 @@ li span.cal-item-time {
 }
 
 .event-super-header {
-  font-size: 1.8em;
+  font-size: 1.3em;
   font-weight: bold;
 }
 
@@ -784,7 +784,7 @@ li span.cal-item-time {
 /* Small devices (tablets, 768px and up) */
 @media (min-width: 768px) { 
     h1 {
-      font-size: 3em;
+      font-size: 2.5em;
       letter-spacing: -2px;
       margin-bottom: 30px;
       text-align: center;
@@ -823,6 +823,11 @@ li span.cal-item-time {
       font-size: 1.3em;
       font-weight: bold;
     }
+
+    .event-super-header {
+      font-size: 1.5em;
+    }
+
     /* header */
 
     #logo {
