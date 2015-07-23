@@ -3,7 +3,7 @@
 <ul id="event-group-list">
 <% for (var i=0, l=eventArr.length; i<l; i++){ %>
 <%   var event = eventArr[i]; %>
-<%   var eventName = (typeof event.group.name == 'undefined' ? event.name : event.group.name); %>
+<%   var eventName = (typeof event.group.name == 'undefined' ? event.name : event.group.filtered_name()); %>
      <li><%= link_to(eventName, event.event_url) %></li>
 <% } %>
 </ul>

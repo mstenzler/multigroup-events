@@ -264,6 +264,19 @@
     this.photo = args.photo;
   };
 
+  Group.prototype.filtered_name = function() {
+    var re1 = /^[\"\!\*\s]+/;
+    var re2 = /[\"\!\*\s]+$/;
+    var str = this.name;
+ //   console.log("****---*****--- In Group.filtered_name. str = " + str);
+    if (typeof str !== 'undefined') {
+      str = str.replace(re1, '');
+      str = str.replace(re2, '');
+ //     console.log("replaced string. new str = " + str);
+    }
+    return str;
+  };
+
   var EventVenue = function(args){
     if (typeof args == 'undefined') { args = {}; }
     this.id = args.id;
