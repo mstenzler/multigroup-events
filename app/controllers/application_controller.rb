@@ -35,11 +35,14 @@ class ApplicationController < ActionController::Base
   	helper_method use_name
   end
 
-  def signed_in_user
+  def signed_in_user(mess = "Please sign in.")
+    ret = true
   	unless signed_in?
   		store_location
-      redirect_to signin_url, notice: "Please sign in."
+      ret = false
+      redirect_to signin_url, notice: mess
     end
+    ret
   end
 
   def valid_omniauth_provider?(provider)

@@ -4,6 +4,8 @@ class EventsController < ApplicationController
 #  before_filter :signed_in_user, :except => [:index, :index_tab, :show]
   before_filter :load_event, only: [:show, :rsvp_print, :edit, :update, :reload_api, :destroy]
   before_filter :check_privileges!, only: [:new, :create, :edit, :update, :destroy, :rsvp_print, :reload_api]
+  before_filter :check_privacy, only: [:show]
+  before_filter :check_display_listing, only: [:create, :update]
 #  before_filter :load_auth, :only => [:new, :edit]
   layout "minimal", only: [:rsvp_print]
 
@@ -89,6 +91,7 @@ class EventsController < ApplicationController
     build_excluded_members(@event)
 
     @api_keys = get_api_keys
+    @show_update_slug = true
   end
 
   def update
@@ -99,6 +102,7 @@ class EventsController < ApplicationController
       #redirect_to edit_user_url(@user), :notice => "Username has been changed."
     else
       load_auth
+      @show_update_slug = true
       render :edit
     end
   end
@@ -123,6 +127,23 @@ class EventsController < ApplicationController
   private
     def check_privileges!
       authorize! :manage, @event, :message => "You are not authorized to perform this action!"
+    end
+
+    def check_privacy
+      si_mess = "You need to be signed in to access this page. Please sign in."
+      case @event.display_privacy
+      when Event::PRIVATE_DISPLAY_PRIVACY
+        if signed_in_user(si_mess)
+          authorize! :manage, @event, :message => "You are not authorized to view this event"
+        end
+      when Event::REGISTERED_DISPLAY_PRIVACY
+        signed_in_user(si_mess)
+      else
+        raise "Invalid privacy type #{@event.display_privacy}"
+      end
+    end
+    def check_display_listing
+
     end
 
     def check_start_end_date(date)
@@ -229,7 +250,7 @@ class EventsController < ApplicationController
 #      ret.linked_events << LinkedEvent.new
       ret.user_id = current_user.id
       if ret.event_type.is_remote?
-        puts "event is remote!!!!"
+#        puts "event is remote!!!!"
         api_source = RemoteEventApiSource.new(is_primary_event: true, rank: 1)
 #        puts("api_source = #{api_source.inspect}")
         ret.build_remote_event_api(remote_source: RemoteEvent::MEETUP_NAME)
@@ -288,7 +309,7 @@ class EventsController < ApplicationController
 
     def event_params
       params.require(:event).permit(:type, :url_identifier, :remote_api_key, :display_listing, 
-             :remember_api_key, :display_privacy, :display_list, :title, 
+             :remember_api_key, :display_privacy, :display_list, :title, :update_slug,
              :description, :start_date, :end_date, :location_id,
              linked_events_attributes: [:url, :id],
              excluded_remote_members_attributes: [:id, :_destroy, :exclude_type, remote_member_attributes: [:id, :remote_source, :remote_member_id]],

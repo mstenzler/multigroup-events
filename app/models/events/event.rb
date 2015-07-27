@@ -12,7 +12,8 @@ class Event < ActiveRecord::Base
   #Causes an error when loading event types if event_type class not loaded
   require 'event_type'
 
-  attr_accessor :current_user
+  attr_accessor :current_user, :update_slug
+  alias_method :update_slug?, :update_slug
 
   scope :listed, -> { where(display_listing: true) }
   scope :upcoming, -> { where("end_date >= ? OR start_date >= ?", Time.zone.now, Time.zone.now - 3.hours).order(:start_date) }
@@ -80,6 +81,10 @@ class Event < ActiveRecord::Base
 
   def self.get_event_types
     return EVENT_TYPES
+  end
+
+  def should_generate_new_friendly_id?
+    slug.blank? || (title_changed? && update_slug?)
   end
 
   def num_linked_events

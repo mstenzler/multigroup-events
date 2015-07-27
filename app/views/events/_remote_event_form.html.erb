@@ -1,6 +1,9 @@
 <% curr_user = current_user %>
 
 <%= f.text_field :title %>
+<% if @show_update_slug %>
+  <%= f.check_box :update_slug, label: 'Update Url Slug' %>
+<% end %>
 
 <div class="row">
   <div class="col-xs-4">
