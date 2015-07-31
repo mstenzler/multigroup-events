@@ -25,6 +25,10 @@ class RemoteUserApiMeetup < RemoteUserApi
     member_id_list = member_id_arr.map { |id| id.to_i}.join(',')
     remote_client.fetch(:members, { member_id: member_id_list })
   end
+
+  def get_joined_groups(member_id)
+    remote_client.fetch(:groups, { member_id: member_id })
+  end
   
   private
 

@@ -14,7 +14,9 @@
   </div>
 </div>
 
-<%= f.select :display_privacy, Event.display_privacy_options, { label: "Privacy Type:" }, { class: "selectpicker auto-width" } %>
+<%= f.select :display_privacy, Event.display_privacy_options, { label: "Display Privacy Type:" }, { class: "selectpicker auto-width" } %>
+<%= f.select :rsvp_display_privacy, Event.display_privacy_options, { label: "Rsvp Display Privacy Type:" }, { class: "selectpicker auto-width" } %>
+<%= f.select :rsvp_count_display_privacy, Event.display_privacy_options, { label: "Rsvp Count Display Privacy Type:" }, { class: "selectpicker auto-width" } %>
 
 <%= f.check_box :display_listing %>
 

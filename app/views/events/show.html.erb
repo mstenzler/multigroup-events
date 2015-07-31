@@ -3,7 +3,26 @@
         <h1 id="pageTitle"></h1>
         <h2 id="errorMessage"></h2>
         <hr/>
-        <H1><%= @event.title %></h1> 
+        rsvp_display_state = <%= @rsvp_display_state %><br/>
+        rsvp_count_display_state = <%= @rsvp_count_display_state %><br/>
+        rsvp_no_display_reason = <%= @rsvp_no_display_reason %> <br/>
+        rsvp_count_no_display_reason = <%= @rsvp_count_no_display_reason %>
+
+        <% hideRsvps = (@rsvp_display_state == Event::HIDDEN_DISPLAY_STATE) ? true : false
+          hideRsvpCount = (@rsvp_count_display_state == Event::HIDDEN_DISPLAY_STATE) ? true : false %>
+
+        <H1><%= @event.title %></h1>
+        <% if hideRsvps %>
+          <div class="alert alert-info" role="alert">
+            <%= Event.get_no_display_alert_message(:rsvp, @rsvp_no_display_reason) %>
+          </div>
+        <% end %>
+
+        <% if hideRsvpCount %>
+          <div class="alert alert-info" role="alert">
+            <%= Event.get_no_display_alert_message(:rsvp_count, @rsvp_count_no_display_reason) %>
+          </div>
+        <% end %>
         <hr/>
         <% if can? :manage, @event %>
 
@@ -34,7 +53,7 @@
             </div>
             <ul id="event-group-list" class="list-group">
               <% @event.remote_event_api.event_group_list.each do |curr_group| %>
-              <li class="list-group-item"><%= link_to(curr_group[:group_name], curr_group[:url]) %> <span id="numYesRsvpsByEvent-<%= curr_group[:event_id] %>"> <%= curr_group[:yes_rsvp_count] %> Rsvps</span></li>
+              <li class="list-group-item"><%= link_to(curr_group[:group_name], curr_group[:url]) %> <% if hideRsvpCount %> COUNT HIDDEN <% else %><span id="numYesRsvpsByEvent-<%= curr_group[:event_id] %>"> <%= curr_group[:yes_rsvp_count] %> Rsvps</span><% end %></li>
             <% end %>
             </ul>
           </div>      
@@ -145,6 +164,8 @@
         rsvpCountDisplayTag: '#rsvpCount',
         yesRsvpDisplayTag: '#yesRsvps',
         noRsvpDisplayTag:  '#noRsvps',
+        rsvpDisplayState: '<%= @rsvp_display_state %>',
+        rsvpCountDisplayState: '<%= @rsvp_count_display_state %>',
         allEventsApiUrl: '<%= @event.remote_event_api.all_events_api_url.html_safe %>',
         allRsvpsApiUrl: '<%= @event.remote_event_api.all_rsvps_api_url.html_safe %>',
         excludeGuests: <%= @event.excluded_guests_member_ids.to_json %>,

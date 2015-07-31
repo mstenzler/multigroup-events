@@ -29,6 +29,19 @@ class Event < ActiveRecord::Base
   scope :by_user, -> user { where(user_id: user.id) if user.present? }
   scope :by_home_page, -> num { where("start_date >= ? AND show_home_page = ?",  Time.zone.now - 3.hours, true).order(priority: :desc, start_date: :asc).limit(num) }
 
+  MEETUP_PROVIDER = "meetup"
+
+  VALID_DISPLAY_STATES = ["visible", "invisible", "hidden"]
+  VISIBLE_DISPLAY_STATE = VALID_DISPLAY_STATES[0]
+  INVISIBLE_DISPLAY_STATE = VALID_DISPLAY_STATES[1]
+  HIDDEN_DISPLAY_STATE = VALID_DISPLAY_STATES[2]
+
+  VALID_NOT_VISIBLE_REASONS = ["not_logged_in", "not_authenticated", "not_authorized", "not_logged_in_and_authenticated", "not_member"]
+  NOT_LOGGED_IN_REASON = VALID_NOT_VISIBLE_REASONS[0]
+  NOT_AUTHENTICATED_REASON = VALID_NOT_VISIBLE_REASONS[1]
+  NOT_AUTHORIZED_REASON = VALID_NOT_VISIBLE_REASONS[2]
+  NOT_LOGGED_IN_AND_AUTHENTICATED_REASON = VALID_NOT_VISIBLE_REASONS[3]
+  NOT_MEMBER_REASON = VALID_NOT_VISIBLE_REASONS[4]
 
   VALID_DISPLAY_PRIVACY_TYPES = ["public", "private", "registered", "group_members"]
   PUBLIC_DISPLAY_PRIVACY = VALID_DISPLAY_PRIVACY_TYPES[0]
@@ -48,6 +61,38 @@ class Event < ActiveRecord::Base
   validates :title, presence: true, allow_blank: false
   validates_format_of :url_identifier, :with => /\A[-_a-z0-9]+\Z/i, allow_blank: true, :on => [:create, :update]
 
+  def self.get_no_display_alert_message(display_type, no_display_reason)
+    ret = nil
+    reason = nil
+    target = nil
+    additinal = ""
+
+    case display_type 
+    when :event
+      target = "event details"
+    when :rsvp
+      target = "user RSVP's"
+    when :rsvp_count
+      target = "RSVP count"
+    else
+      target = "content"
+    end
+
+    case no_display_reason
+    when NOT_LOGGED_IN_REASON
+      reason = "You must be logged in to"
+    when NOT_AUTHENTICATED_REASON, NOT_LOGGED_IN_AND_AUTHENTICATED_REASON
+      reason = "you must be logged in through Meetup to"
+    when NOT_AUTHORIZED_REASON
+      reason = "you are not authorized to"
+    when NOT_MEMBER_REASON
+      reason = "you must be a member of one of the participating groups to"
+    else 
+      reason = "you can't"
+    end
+    ret = "Note! #{reason} view the #{target}"
+  end
+
   def self.event_tab_options
     VALID_EVENT_TABS
   end
@@ -57,7 +102,7 @@ class Event < ActiveRecord::Base
   end
 
   def self.display_privacy_options
-    [PUBLIC_DISPLAY_PRIVACY, PRIVATE_DISPLAY_PRIVACY, REGISTERED_DISPLAY_PRIVACY]
+    [PUBLIC_DISPLAY_PRIVACY, PRIVATE_DISPLAY_PRIVACY, REGISTERED_DISPLAY_PRIVACY, GROUP_MEMBERS_DISPLAY_PRIVACY]
   end
 
   def self.get_sublcass_select_arr

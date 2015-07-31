@@ -103,7 +103,7 @@ module CCRemoteEvent
           #create add the details to the RemoteEventAPISource objs
           all_events_info.each do |event_info|
             curr_event_id = event_info.id.to_s.to_sym
-            puts("curr_event_id = '#{curr_event_id}'. class_name = '#{curr_event_id.class.name}'")
+#            puts("curr_event_id = '#{curr_event_id}'. class_name = '#{curr_event_id.class.name}'")
             curr_api_source = remote_event_api.get_source_by_event_id(curr_event_id)
             if (curr_api_source)
               curr_api_source.url = event_info.event_url
@@ -118,7 +118,7 @@ module CCRemoteEvent
               curr_api_source.timezone = event_info.timezone if event_info.timezone
               curr_api_source.utc_offset = event_info.utc_offset if event_info.utc_offset
               event_fee = event_info.event_fee
-              puts "*=*=*= yes_rsvp_count = #{curr_api_source.yes_rsvp_count}"
+#              puts "*=*=*= yes_rsvp_count = #{curr_api_source.yes_rsvp_count}"
               if (event_fee)
                 curr_api_source.fee_accepts = event_fee.accepts
                 curr_api_source.fee_amount = event_fee.amount
@@ -128,33 +128,34 @@ module CCRemoteEvent
                 curr_api_source.fee_required = event_fee.reqired
               end
               event_group = event_info.group
-              puts "event_group = #{event_group.inspect}"
+ #             puts "event_group = #{event_group.inspect}"
               if (event_group)
                 curr_api_source.group_name = event_group["name"]
+                curr_api_source.remote_group_id = event_group["id"]
                 curr_api_source.group_url = construct_meetup_group_url(event_group["urlname"])
               end
               curr_api_source.description = event_info.description
               if (event_info.time) 
-                puts "event_info.time = #{event_info.time}"
+#                puts "event_info.time = #{event_info.time}"
                 #loc_start_date = Time.at(event_info.time)
                 curr_api_source.start_date = event_info.time
-                puts "start_date = #{curr_api_source.start_date}"
+ #               puts "start_date = #{curr_api_source.start_date}"
                 if (time_delta = event_info.duration)
-                  puts "event_info.duration = #{event_info.duration}"
-                  puts "time_delta = '#{time_delta}'"
+#                  puts "event_info.duration = #{event_info.duration}"
+#                  puts "time_delta = '#{time_delta}'"
                   start_date_in_ms = event_info.time.strftime('%Q').to_i
                   loc_end_time = Time.at((start_date_in_ms + time_delta)/1000)
-                  puts "loc_end_time = '#{loc_end_time}'"
+#                  puts "loc_end_time = '#{loc_end_time}'"
                   curr_api_source.end_date = loc_end_time
-                  puts "end_date = #{curr_api_source.end_date}"
+#                  puts "end_date = #{curr_api_source.end_date}"
                 end
               end
               if (venue = event_info.venue)
-                puts "About to find or create EventVenue. venue = #{venue.inspect}"
+#                puts "About to find or create EventVenue. venue = #{venue.inspect}"
                 event_venue = EventVenue.find_or_create_for_meetup(venue)
-                puts("event_venue = #{event_venue.inspect}")
+#                puts("event_venue = #{event_venue.inspect}")
                 curr_api_source.event_venue_id = event_venue.id
-                puts "event_venue_id = curr_api_source.event_venue_id"
+#                puts "event_venue_id = curr_api_source.event_venue_id"
 #                curr_api_source.build_event_venue(event_venue.attributes)
               end
             else

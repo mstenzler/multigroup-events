@@ -5,8 +5,10 @@
          displayPayStatus = data.getPayStatus,
          paidIdentifier = data.paidIdentifier,
          displayRsvpLinks = data.displayRsvpLinks,
-         displayRsvpDuplicates = data.displayRsvpDuplicates
-         currentShowState = data.currentShowState;
+         displayRsvpDuplicates = data.displayRsvpDuplicates,
+         currentShowState = data.currentShowState,
+         hideRsvps = data.hideRsvps,
+         hideRsvpCount = data.hideRsvpCount;
     if ( (!typeof displayPayStatus == 'undefined') && displayPayStatus) {
       liClass = (liClass ? liClass + ' ' + add_height : liClass);
     }
@@ -16,6 +18,21 @@
     if (typeof displayRsvpDuplicates === 'undefined') {
       displayRsvpDuplicates = false;
     }
+    if (typeof hideRsvps === 'undefined') {
+      console.log("**@@ Seting default hideRsvps false");
+      hideRsvps = false;
+    }
+    if (typeof hideRsvpCount === 'undefined') {
+      console.log("**@@ Seting default hideRsvpCount false");
+      hideRsvpCount = false;
+    }
+    if (hideRsvps) {
+      displayRsvpLinks = false;
+      displayPayStatus = false;
+      displayRsvpDuplicates = false;
+    }
+    console.log("==++--++ hideRsvps = " + hideRsvps);
+    console.log("==++--++ hideRsvpCount = " + hideRsvpCount);
   %>
   <hr/>
   <% var liClassText = (liClass ? ' class="' + liClass + '"' : ""); 
@@ -29,7 +46,9 @@
 
   <div id="rsvp-<%= rsvpType %>-count">
 
-    <% if (countData) { %>
+    <% if (hideRsvpCount) { %>
+       <span class="yes-no-header"><%= data.rsvpTypeLabel %> RSVPs: HIDDEN
+    <% } else if (countData) { %>
       <span class="yes-no-header"><%= data.rsvpTypeLabel %> RSVPs: <%= countData.numRsvps %>
       <% if (countData.numGuestRsvps) { %>
         <% var guestLabel = (countData.numGuestRsvps > 1 ? "Guests" : "Guest") %>
@@ -60,6 +79,7 @@
       var memberLinkStart = "";
       var memberLinkEnd = "";
       var linkDataContent = "";
+      var currMemberName = hideRsvps ? currMember.hiddenName() : currMember.name;
 
       if (typeof currRsvp.memberUrls === 'function') {
         console.log("*$$*Member " + currMember.name + " has memberUrls!");
@@ -75,9 +95,12 @@
 
       var numMemberUrls = memberUrls.length;
       var firstMemberUrl = memberUrls[0];
-      console.log("____****___***__** memberUrls =");
-      console.log(memberUrls);
-      if (currMember.photo){
+ /*     console.log("____****___***__** memberUrls =");
+      console.log(memberUrls);  */
+      if (hideRsvps) {
+        currMemberPic = data.noPhotoSrc;
+      }
+      else if (currMember.photo){
         currMemberPic = currMember.photo.thumb_link;
       }
       else {
@@ -106,7 +129,7 @@
         true : false;
     %>
      <li<%= liClassText %>><%= memberLinkStart %><img src="<%= currMemberPic %>"><br/>
-         <%= currMember.name %> <%= memberLinkEnd %>
+         <%= currMemberName %> <%= memberLinkEnd %>
          <% if (curr_is_paid) { %>
            <span class='paid'>Paid</span>
          <% } %>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150707232014) do
+ActiveRecord::Schema.define(version: 20150727180345) do
 
   create_table "authentications", force: :cascade do |t|
     t.integer  "user_id",       limit: 4
@@ -50,31 +50,34 @@ ActiveRecord::Schema.define(version: 20150707232014) do
   end
 
   create_table "events", force: :cascade do |t|
-    t.integer  "user_id",             limit: 4,                        null: false
-    t.string   "type",                limit: 255
-    t.string   "title",               limit: 255,                      null: false
-    t.string   "slug",                limit: 255,                      null: false
-    t.string   "fee",                 limit: 124
-    t.text     "description",         limit: 65535
-    t.string   "display_privacy",     limit: 255,   default: "public"
-    t.boolean  "display_listing",     limit: 1,     default: true
+    t.integer  "user_id",                    limit: 4,                        null: false
+    t.string   "type",                       limit: 255
+    t.string   "title",                      limit: 255,                      null: false
+    t.string   "slug",                       limit: 255,                      null: false
+    t.string   "fee",                        limit: 124
+    t.text     "description",                limit: 65535
+    t.string   "display_privacy",            limit: 255,   default: "public"
+    t.boolean  "display_listing",            limit: 1,     default: true
     t.datetime "start_date"
     t.datetime "end_date"
-    t.float    "fee_amount",          limit: 24
-    t.string   "fee_currency",        limit: 16
-    t.string   "fee_description",     limit: 24
-    t.string   "fee_label",           limit: 16
-    t.boolean  "fee_required",        limit: 1
-    t.integer  "event_venue_id",      limit: 4
-    t.string   "remote_event_api_id", limit: 255
+    t.float    "fee_amount",                 limit: 24
+    t.string   "fee_currency",               limit: 16
+    t.string   "fee_description",            limit: 24
+    t.string   "fee_label",                  limit: 16
+    t.boolean  "fee_required",               limit: 1
+    t.integer  "event_venue_id",             limit: 4
+    t.string   "remote_event_api_id",        limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "timezone",            limit: 124
-    t.integer  "utc_offset",          limit: 4
-    t.boolean  "featured",            limit: 1,     default: false
-    t.boolean  "show_home_page",      limit: 1,     default: true
-    t.integer  "priority",            limit: 4,     default: 0
-    t.string   "url_identifier",      limit: 24
+    t.string   "timezone",                   limit: 124
+    t.integer  "utc_offset",                 limit: 4
+    t.boolean  "featured",                   limit: 1,     default: false
+    t.boolean  "show_home_page",             limit: 1,     default: true
+    t.integer  "priority",                   limit: 4,     default: 0
+    t.string   "url_identifier",             limit: 24
+    t.string   "rsvp_display_privacy",       limit: 24,    default: "public"
+    t.string   "rsvp_count_display_privacy", limit: 24,    default: "public"
+    t.boolean  "show_event_hosts",           limit: 1,     default: true
   end
 
   add_index "events", ["slug"], name: "slug_opt", unique: true, using: :btree

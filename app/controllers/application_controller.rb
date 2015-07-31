@@ -111,6 +111,34 @@ class ApplicationController < ActionController::Base
     ret
   end
 
+  def is_member_of_participating_event_groups?(auth, event)
+    unless (auth)
+      raise "No auth passed to #{self.class.name}.#{__method__}"
+    end
+    unless (event)
+      raise "No event passed to #{self.class.name}.#{__method__}"
+    end
+    remote_event_api = event.remote_event_api
+    unless (remote_event_api)
+      raise "Could not get remote_event_api from event in #{self.class.name}.#{__method__}"
+    end
+    ret = false
+    api = RemoteUserApiMeetup.new(auth)
+    group_arr = api.get_joined_groups(auth.uid)
+#    logger.debug("** IN is_member_of_participating_event_groups?")
+#    logger.debug("group_arr.size = #{group_arr.size}")
+    if (group_arr && group_arr.size > 0)
+      user_group_ids = group_arr.map { |g| g.id  }
+#      logger.debug("user_group_ids = #{user_group_ids.inspect}")
+      group_id_list = remote_event_api.group_id_list
+#      logger.debug("group_id_list = #{group_id_list}")
+      if (group_id_list && group_id_list.size > 0)
+        ret = group_id_list.any? {|id| user_group_ids.include?(id) }
+      end
+    end
+    ret
+  end
+
   # Returns the Gravatar (http://gravatar.com/) for the given user.
   def gravatar_for(user, options = { size: 50 })
     gravatar_url = gravatar_url(user, options)

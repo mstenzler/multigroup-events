@@ -1,5 +1,12 @@
   <% var count = data.count;
-    if (count !== 'undefined') { 
+     var hideRsvpCount = data.hideRsvpCount;
+     if (typeof hideRsvpCount === 'undefined') {
+       hideRsvpCount = false;
+     }
+    if (hideRsvpCount) { %>
+      COUNT HIDDEN
+    <% }
+    else if (count !== 'undefined') { 
       var totalRsvps = count.total();
       var numRsvps = count.numRsvps;
       var numGuests = count.numGuests;

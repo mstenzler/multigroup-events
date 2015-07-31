@@ -130,18 +130,167 @@ class EventsController < ApplicationController
     end
 
     def check_privacy
-      si_mess = "You need to be signed in to access this page. Please sign in."
+      logger.debug("**--**--**--**--++--**++------------------")
+      logger.debug("In check_privacy")
+      #Check if we need to require login, need to know if we can manage an event
+      #or if current user needs to be a member of one of the participating groups
+      #and check each condition once
+      require_login = false
+      check_can_manage_event = false
+      check_is_group_member = false
+
+      is_logged_in = signed_in?
+      can_manage_event = false
+      is_group_member = false
+      curr_user_auth = nil
+      @event_display_state = Event::VISIBLE_DISPLAY_STATE
+
+      rsvp_states = [@event.rsvp_display_privacy, @event.rsvp_count_display_privacy]
       case @event.display_privacy
       when Event::PRIVATE_DISPLAY_PRIVACY
-        if signed_in_user(si_mess)
-          authorize! :manage, @event, :message => "You are not authorized to view this event"
+        require_login = check_can_manage_event = true
+      when Event::REGISTERED_DISPLAY_PRIVACY
+        require_login = true
+      when Event::GROUP_MEMBERS_DISPLAY_PRIVACY
+        check_is_group_member = true
+      else
+        raise "Invalid display_privacy type #{@event.display_privacy}"
+      end
+
+      if (rsvp_states.include?(Event::PRIVATE_DISPLAY_PRIVACY))
+        check_can_manage_event = true
+      end
+      if (rsvp_states.include?(Event::GROUP_MEMBERS_DISPLAY_PRIVACY))
+        check_is_group_member = true
+      end
+
+      logger.debug("require_login = #{require_login}, check_can_manage_event = #{check_can_manage_event}, check_is_group_member = #{check_is_group_member}")
+
+      #Check certian conditions if required
+      if (require_login)
+        unless (signed_in_user("You need to be signed in to access this page. Please sign in."))
+          return nil
+        end
+      end
+      if (check_can_manage_event)
+        can_manage_event = can? :manage, @event
+      end
+      if (check_is_group_member)
+        if (is_logged_in)
+          if (curr_user_auth = current_user.authentication_for_meetup)
+            if (is_member_of_participating_event_groups?(curr_user_auth, @event))
+              is_group_member = true
+            else
+              logger.debug("NOT A GROUP MEMBER!!!")
+            end
+          end
+        end
+      end
+
+      logger.debug("@event.display_privacy = #{@event.display_privacy},
+                    @event.rsvp_display_privacy = #{@event.rsvp_display_privacy}
+                    @event.rsvp_count_display_privacy = #{@event.rsvp_count_display_privacy}")
+      logger.debug("is_logged_in = #{is_logged_in}, curr_user_auth = #{curr_user_auth}")
+
+      logger.debug("can_manage_event = #{can_manage_event}, is_group_member = #{is_group_member}")
+#  VISIBLE_DISPLAY_STATE = VALID_DISPLAY_STATES[0]
+#  INVISIBLE_DISPLAY_STATE = VALID_DISPLAY_STATES[1]
+#  HIDDEN_DISPLAY_STATE = VALID_DISPLAY_STATES[2]
+
+#  NOT_LOGGED_IN_REASON = VALID_DISPLAY_STATES[0]
+#  NOT_AUTHENTICATED_REASON = VALID_DISPLAY_STATES[1]
+#  NOT_AUTHORIZED_REASON = VALID_DISPLAY_STATES[2]
+#  NOT_LOGGED_IN_AND_AUTHENTICATED_REASON = VALID_DISPLAY_STATES[3]
+#  NOT_MEMBER_REASON = VALID_DISPLAY_STATES[4]
+
+      #check display privacy to see if user can view page. If require login, this
+      #should have already been checked above
+      case @event.display_privacy
+      when Event::PRIVATE_DISPLAY_PRIVACY
+        if (is_logged_in)
+          if (can_manage_event)
+            @event_display_state = Event::VISIBLE_DISPLAY_STATE
+          else
+            @event_display_state = Event::INVISIBLE_DISPLAY_STATE
+            @event_no_display_reason = Event::NOT_AUTHORIZED_REASON
+          end
+        end
+      when Event::GROUP_MEMBERS_DISPLAY_PRIVACY
+        if (is_group_member)
+          @event_display_state = Event::VISIBLE_DISPLAY_STATE
+        else 
+          @event_display_state = Event::INVISIBLE_DISPLAY_STATE
+          @event_no_display_reason = Event::NOT_MEMBER_REASON
+        end
+      end
+      rsvp_args = { is_logged_in: is_logged_in,
+                    can_manage_event: can_manage_event,
+                    is_group_member: is_group_member,
+                    curr_user_auth: curr_user_auth }
+
+      @rsvp_display_state, @rsvp_no_display_reason = get_rsvp_display_state(@event.rsvp_display_privacy, rsvp_args)
+      @rsvp_count_display_state, @rsvp_count_no_display_reason = get_rsvp_display_state(@event.rsvp_count_display_privacy, rsvp_args)
+      logger.debug("@rsvp_display_state = #{@rsvp_display_state}, @rsvp_count_display_state = #{@rsvp_count_display_state}")
+      logger.debug("Is Group member = #{is_group_member}")
+    end
+
+    def get_rsvp_display_state(rsvp_display_privacy, args={})
+      rsvp_display_state = nil
+      rsvp_no_display_reason = nil
+      is_logged_in = args[:is_logged_in]
+      can_manage_event = args[:can_manage_event]
+      is_group_member = args[:is_group_member]
+      curr_user_auth = args[:curr_user_auth]
+
+      logger.debug("--------------------------+++++++=====------")
+      logger.debug("IN get_rsvp_display_state. rsvp_display_privacy = #{rsvp_display_privacy}")
+      logger.debug("is_logged_in = #{is_logged_in}, can_manage_event = #{can_manage_event}")
+      logger.debug("is_group_member = #{is_group_member}, curr_user_auth = #{curr_user_auth}")
+
+      case rsvp_display_privacy
+      when Event::PUBLIC_DISPLAY_PRIVACY
+        rsvp_display_state = Event::VISIBLE_DISPLAY_STATE
+      when Event::PRIVATE_DISPLAY_PRIVACY
+        if (is_logged_in)
+          if can_manage_event
+            rsvp_display_state = Event::VISIBLE_DISPLAY_STATE
+          else
+            rsvp_display_state = Event::INVISIBLE_DISPLAY_STATE
+            rsvp_no_display_reason = Event::NOT_AUTHORIZED_REASON
+          end
+        else
+          rsvp_display_state = Event::HIDDEN_DISPLAY_STATE
+          rsvp_no_display_reason = Event::NOT_LOGGED_IN_REASON 
         end
       when Event::REGISTERED_DISPLAY_PRIVACY
-        signed_in_user(si_mess)
-      else
-        raise "Invalid privacy type #{@event.display_privacy}"
+        if (is_logged_in)
+          rsvp_display_state = Event::VISIBLE_DISPLAY_STATE
+        else
+          rsvp_display_state = Event::HIDDEN_DISPLAY_STATE
+          rsvp_no_display_reason = Event::NOT_LOGGED_IN_REASON
+        end
+      when Event::GROUP_MEMBERS_DISPLAY_PRIVACY
+        if (!is_logged_in)
+          rsvp_display_state = Event::HIDDEN_DISPLAY_STATE
+          rsvp_no_display_reason = Event::NOT_LOGGED_IN_AND_AUTHENTICATED_REASON
+        elsif (curr_user_auth)
+          logger.debug("**** GOT CURR_USER_AUTH")
+          if (is_group_member)
+            rsvp_display_state = Event::VISIBLE_DISPLAY_STATE
+          else
+            rsvp_display_state = Event::HIDDEN_DISPLAY_STATE
+            rsvp_no_display_reason = Event::NOT_MEMBER_REASON
+          end
+        else
+          logger.debug("** NO CURR_USER_AUTH!!")
+          rsvp_display_state = Event::HIDDEN_DISPLAY_STATE
+          rsvp_no_display_reason = Event::NOT_LOGGED_IN_AND_AUTHENTICATED_REASON
+        end
       end
+      logger.debug("About to return values [#{rsvp_display_state}, #{rsvp_no_display_reason}]")
+      [rsvp_display_state, rsvp_no_display_reason]
     end
+
     def check_display_listing
 
     end
@@ -310,8 +459,8 @@ class EventsController < ApplicationController
     def event_params
       params.require(:event).permit(:type, :url_identifier, :remote_api_key, :display_listing, 
              :remember_api_key, :display_privacy, :display_list, :title, :update_slug,
-             :description, :start_date, :end_date, :location_id,
-             linked_events_attributes: [:url, :id],
+             :description, :start_date, :end_date, :location_id, :rsvp_display_privacy, 
+             :rsvp_count_display_privacy, linked_events_attributes: [:url, :id],
              excluded_remote_members_attributes: [:id, :_destroy, :exclude_type, remote_member_attributes: [:id, :remote_source, :remote_member_id]],
              remote_event_api_attributes: [:api_key, :remember_api_key, 
               :remote_source,:id, 

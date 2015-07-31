@@ -81,7 +81,8 @@ class Authentication < ActiveRecord::Base
 		    :client_id => Rails.application.secrets.meetup_key,
 		    :client_secret =>  Rails.application.secrets.meetup_secret
 		  rescue => e
-		    logger.debug("GOT ERROR: response = #{e.response.inspect}")
+        #logger.debug("GOT ERROR: response = #{e.response.inspect}")
+        logger.error("GOT ERROR: error = #{e.inspect}")
 		  else
   		  if response
   		    logger.debug("response.body = #{response.body.inspect}")

@@ -64,12 +64,15 @@ class RemoteEventApi < ActiveRecord::Base
   def get_event_group_list
     ret = []
     remote_event_api_sources.each do |source|
-      p ""
       item = { event_id: source.event_source_id, group_name: source.filterd_group_name, url: source.url,
-               yes_rsvp_count: source.yes_rsvp_count }
+               group_id: source.remote_group_id, yes_rsvp_count: source.yes_rsvp_count }
       ret << item
     end
     ret
+  end
+
+  def group_id_list
+    event_group_list.map { |g| g[:group_id] }
   end
 
   def event_id_list

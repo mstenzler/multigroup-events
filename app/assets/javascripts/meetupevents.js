@@ -31,6 +31,11 @@
   var DATA_TYPE_YES_RSVPS = DATA_TYPES[2];
   var DATA_TYPE_NO_RSVPS = DATA_TYPES[4];
 
+  var VALID_DISPLAY_STATES = ['visible', 'invisible', 'hidden']
+  var VISIBLE_DISPLAY_STATE = VALID_DISPLAY_STATES[0]
+  var INVISIBLE_DISPLAY_STATE = VALID_DISPLAY_STATES[1]
+  var HIDDEN_DISPLAY_STATE = VALID_DISPLAY_STATES[2]
+
   var DEFAULT_NO_PHOTO_SRC = "/images/noPhoto_80.png";
   var DEFAULT_GET_PAY_STATUS = false;
 //  var EVENT_TEMPLATE_URL = "templates/event.ejs";
@@ -249,7 +254,17 @@
     this.name = args.name;
     this.id = args.member_id;
     this.photo = args.photo;
+  };
 
+  Member.prototype.hiddenName = function() {
+    var re = /[^\s]/g;
+    var str = this.name;
+ //   console.log("****---*****--- In Group.filtered_name. str = " + str);
+    if (typeof str !== 'undefined') {
+      str = str.replace(re, 'X');
+ //     console.log("replaced string. new str = " + str);
+    }
+    return str;
   };
   
   var Group = function(args){
@@ -1051,12 +1066,14 @@
     var currTemplate = args.numYesRsvpsByEventTemplate;
     var displayTagPrefix = args.numYesRsvpsByEventDisplayTagPrefix;
     var showArgs, currDisplayTag, currRsvpCountForEvent, id;
+    var hideRsvpCount = (typeof args.rsvpCountDisplayState === 'undefined') ? false : args.rsvpCountDisplayState
 
     for (id in numYesRsvpsByEvent) {
       currRsvpCountForEvent = numYesRsvpsByEvent[id];
       if (currRsvpCountForEvent !== 'undefined') {
         showArgs = {
-          count: currRsvpCountForEvent
+          count: currRsvpCountForEvent,
+          hideRsvpCount: hideRsvpCount
         }
         currDisplayTag = displayTagPrefix + '-' + id;
 
@@ -1076,13 +1093,25 @@
     if (typeof args == 'undefined') {
       throw "second argument must be a hash of args in showRsvpInfo";
     }
+    console.log("---+++---++++-----+++++------++++++-----+++----+++---");
+    console.log("@@!@@ args.rsvpDisplayState = " + args.rsvpDisplayState);
+    console.log("@@!@@ args.rsvpCountDisplayState = " + args.rsvpCountDisplayState);
 
     var currTemplate, currDisplayTag, countData, showArgs, sortBy, yesList, noList;
     var numYes, numNo, numGuests, numYesWithGuests, toggleRsvps, commonArgs;
+    var hideRsvps, hideRsvpCount;
+
+    hideRsvps = (args.rsvpDisplayState === HIDDEN_DISPLAY_STATE) ? true : false;
+    hideRsvpCount =  (args.rsvpCountDisplayState === HIDDEN_DISPLAY_STATE) ? true : false;
+
+    console.log("@@!@@ hideRsvps = " + hideRsvps);
+    console.log("@@!@@ hideRsvpCount = " + hideRsvpCount);
 
     commonArgs = {
       displayRsvpLinks: false,
-      displayRsvpDuplicates: false
+      displayRsvpDuplicates: false,
+      hideRsvps: hideRsvps,
+      hideRsvpCount: hideRsvpCount
     };
 
     if (args.displayRsvpLinks) {
@@ -1930,6 +1959,8 @@
       primaryEventIndex     : 0,
       excludeGuests         : null,
       excludeUsers          : null,
+      rsvpDisplayState      : VISIBLE_DISPLAY_STATE,
+      rsvpCountDisplayState : VISIBLE_DISPLAY_STATE,
       primaryEventDisplayTag: DEFAULT_PRIMARY_EVENT_DISPLAY_TAG,
       eventListDisplayTag: DEFAULT_EVENT_LIST_DISPLAY_TAG,
       yesRsvpDisplayTag: DEFAULT_YES_RSVP_DISPLAY_TAG,
@@ -1949,7 +1980,9 @@
     var displayEventList = settings.displayEventList;
     var displayPrimaryEvent = settings.displayPrimaryEvent;
     var displayYesRsvps = settings.displayYesRsvps;
-    var displayNoRsvps = settings.displayNoRsvps;   
+    var displayNoRsvps = settings.displayNoRsvps;  
+    var rsvpDisplayState = settings.rsvpDisplayState
+    var rsvpCountDisplayState = settings.rsvpCountDisplayState 
 //    var displayRsvpLinks = settings.displayRsvpLinks;
 //    var displayRsvpDuplicates  = settings.displayRsvpDuplicates;
 //    var requireLoginDisplayRsvpLinks  = settings.requireLoginDisplayRsvpLinks;
@@ -1967,6 +2000,15 @@
 
     globalArgs.getPayStatus = settings.getPayStatus;
     globalArgs.useGeneralErrorMessage = useGeneralErrorMessage;
+
+    if (rsvpDisplayState === INVISIBLE_DISPLAY_STATE) {
+      settings.displayYesRsvps = false;
+      settings.displayNoRsvps = false;
+    }
+    if (rsvpCountDisplayState === INVISIBLE_DISPLAY_STATE) {
+      settings.displayYesRsvpCount  = false;
+      settings.displayNoRsvpCount  = false;
+    }
 
     if (pageTitle) {
       $('title').html(pageTitle);

@@ -8,11 +8,16 @@ class AuthenticationsController < ApplicationController
   end
 
   def create
+    logger.debug("*** in authentications_controller.create!!!")
     omniauth = request.env["omniauth.auth"]
+#    p "omniauth = #{omniauth.inspect}"
     authentication = omniauth ? Authentication.find_by_provider_and_uid(omniauth['provider'], omniauth['uid']) : nil
+#    p "authentication = #{authentication.inspect}"
     if authentication
+      logger.debug("About to call authentication.update_credentials(omniauth)")
       authentication.update_credentials(omniauth)
       flash[:notice] = "Signed in successfully"
+      logger.debug("About to sign_in")
       sign_in(authentication.user, CONFIG[:default_remember_me] || false)
       redirect_to authentication.user
     elsif current_user
