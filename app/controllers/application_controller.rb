@@ -124,7 +124,9 @@ class ApplicationController < ActionController::Base
     end
     ret = false
     api = RemoteUserApiMeetup.new(auth)
-    group_arr = api.get_joined_groups(auth.uid)
+    group_arr = Rails.cache.fetch("/remote_member/meetup/#{auth.uid}/joined_groups", expires_in: 3.hours) do
+      api.get_joined_groups(auth.uid)
+    end
 #    logger.debug("** IN is_member_of_participating_event_groups?")
 #    logger.debug("group_arr.size = #{group_arr.size}")
     if (group_arr && group_arr.size > 0)
