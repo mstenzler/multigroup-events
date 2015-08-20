@@ -61,7 +61,7 @@ class Event < ActiveRecord::Base
   validates :title, presence: true, allow_blank: false
   validates_format_of :url_identifier, :with => /\A[-_a-z0-9]+\Z/i, allow_blank: true, :on => [:create, :update]
 
-  def self.get_no_display_alert_message(display_type, no_display_reason)
+  def self.get_no_display_alert_message(display_type, no_display_reason, label = "Note!")
     ret = nil
     reason = nil
     target = nil
@@ -90,7 +90,7 @@ class Event < ActiveRecord::Base
     else 
       reason = "you can't"
     end
-    ret = "Note! #{reason} view the #{target}"
+    ret = "#{label} #{reason} view the #{target}"
   end
 
   def self.event_tab_options

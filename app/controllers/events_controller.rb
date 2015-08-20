@@ -15,6 +15,8 @@ class EventsController < ApplicationController
   CALENDAR_NUM_YEARS_TO_SHOW = CONFIG[:calendar_num_years_to_show ] || 10
   CALENDAR_END_DATE = CALENDAR_START_DATE >> (12*CALENDAR_NUM_YEARS_TO_SHOW)
 
+  API_ERRORS = [CCMeetup::ApiError, CCMeetup::Fetcher::ApiError]
+
   class InvalidEventTypeError  < StandardError; end
 
   def index
@@ -147,11 +149,14 @@ class EventsController < ApplicationController
 
       rsvp_states = [@event.rsvp_display_privacy, @event.rsvp_count_display_privacy]
       case @event.display_privacy
+      when Event::PUBLIC_DISPLAY_PRIVACY
+        require_login = check_can_manage_event = false
       when Event::PRIVATE_DISPLAY_PRIVACY
         require_login = check_can_manage_event = true
       when Event::REGISTERED_DISPLAY_PRIVACY
         require_login = true
       when Event::GROUP_MEMBERS_DISPLAY_PRIVACY
+        require_login = true
         check_is_group_member = true
       else
         raise "Invalid display_privacy type #{@event.display_privacy}"
@@ -168,7 +173,8 @@ class EventsController < ApplicationController
 
       #Check certian conditions if required
       if (require_login)
-        unless (signed_in_user("You need to be signed in to access this page. Please sign in."))
+        si_mess = check_is_group_member ? "You need to be signed in through Meetup and be a member of a participating group to access this page." : "You need to be signed in to access this page. Please sign in."
+        unless (signed_in_user(si_mess))
           return nil
         end
       end
@@ -178,10 +184,19 @@ class EventsController < ApplicationController
       if (check_is_group_member)
         if (is_logged_in)
           if (curr_user_auth = current_user.authentication_for_meetup)
-            if (is_member_of_participating_event_groups?(curr_user_auth, @event))
-              is_group_member = true
-            else
-              logger.debug("NOT A GROUP MEMBER!!!")
+            begin
+              if (is_member_of_participating_event_groups?(curr_user_auth, @event))
+                is_group_member = true
+              else
+                logger.debug("NOT A GROUP MEMBER!!!")
+              end
+            rescue *API_ERRORS => error
+              #an error here means that there was a problem with this users auth
+              logger.error("GOT ApiError: #{error.inspect}")
+              #sign_out
+              store_location
+              redirect_to signin_url(rop: Authentication::MEETUP_PROVIDER_NAME), notice: "You must sign in through #{Authentication::MEETUP_PROVIDER_NAME} to access this page."
+              return nil
             end
           end
         end
