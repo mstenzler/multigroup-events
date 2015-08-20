@@ -22,7 +22,7 @@ module CCMeetup
         token = @authentication.try(:get_fresh_token)
         p "** token - #{token}"
         unless (token)
-          raise CCMeetup::NotConfiguredError.new("Could not get fresh token from authentication")
+          raise CCMeetup::ApiError.new("Could not get fresh token from authentication")
         end
       	add_to_query_string(uri, access_token: token)
       end

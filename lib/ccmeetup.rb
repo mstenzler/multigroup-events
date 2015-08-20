@@ -19,6 +19,12 @@ module CCMeetup
       super "Config Error: #{msg}."
     end
   end
+
+  class ApiError < StandardError
+    def initialize(msg)
+      super "Api Error: #{msg}."
+    end
+  end
   
   class InvalidRequestTypeError < StandardError
     def initialize(type)
