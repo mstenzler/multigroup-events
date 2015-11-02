@@ -23,6 +23,7 @@
 capybara-*.html
 .rspec
 .rvmrc
+.ruby-version
 /public/system
 /public/uploads
 /coverage/
@@ -36,6 +37,7 @@ doc/
 *.old.html.erb
 *.swp
 *~
+*.bak
 .project
 .DS_Store
 .idea
