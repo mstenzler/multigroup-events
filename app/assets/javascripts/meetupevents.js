@@ -143,6 +143,16 @@
     return MEETUP_API_RSVP_URL + "?event_id=" + eventId + "&key=" + MEETUP_KEY + fields + "&callback=?";
   }
 
+  function addPayStatusToUrl(url) {
+    //TO DO: Finsish implemetation of function
+    var has_blank_fields = url.match(/(\&fields\=\&/)
+    var exists = url.match(/(pay_status)/);
+    if (!exists) {
+      debug("**Adding pay status", 2);
+      url = "";
+    }
+  }
+
   function addCallbackToUrl(url) {
     var exists = url.match(/(callback=\?)/);
     if (!exists) {
@@ -1066,7 +1076,8 @@
     var currTemplate = args.numYesRsvpsByEventTemplate;
     var displayTagPrefix = args.numYesRsvpsByEventDisplayTagPrefix;
     var showArgs, currDisplayTag, currRsvpCountForEvent, id;
-    var hideRsvpCount = (typeof args.rsvpCountDisplayState === 'undefined') ? false : args.rsvpCountDisplayState
+    var hideRsvpCount = (typeof args.rsvpCountDisplayState === 'undefined') ? false : (args.rsvpCountDisplayState === HIDDEN_DISPLAY_STATE) ? true : false;
+//    console.log("**&&**&&** showEventRsvpCount::hideRsvpCount = " + hideRsvpCount);
 
     for (id in numYesRsvpsByEvent) {
       currRsvpCountForEvent = numYesRsvpsByEvent[id];
@@ -1574,6 +1585,7 @@
     var allRsvpsApiUrl = args.allRsvpsApiUrl;
     var allEventsApiUrl = args.allEventsApiUrl;
     var fetchAllRsvpsAtOnce = args.fetchAllRsvpsAtOnce;
+    var getPayStatus = args.getPayStatus;
 
     var retObj = null;
     var retAllEventsUrl = null;
@@ -1587,6 +1599,10 @@
       if (!(eventIdList && meetupKey)) {
         throw "Must pass eventIdList and meetupKey as args to buildApiUrls";
       }
+    }
+
+    if (typeof getPayStatus === 'undefined') {
+      getPayStatus = false;
     }
 
     if (fetchAllRsvpsAtOnce) {
@@ -1993,13 +2009,17 @@
     var allEventsApiUrl = settings.allEventsApiUrl;
     var useGeneralErrorMessage = settings.useGeneralErrorMessage;
     var fetchAllRsvpsAtOnce  = settings.fetchAllRsvpsAtOnce;
+    var getPayStatus = settings.getPayStatus;
 //    var fetchAllEventsAtOnce = settings.fetchAllEventsAtOnce
  
     var primaryEventId = null;
     var eventList = null;
 
-    globalArgs.getPayStatus = settings.getPayStatus;
+    globalArgs.getPayStatus = getPayStatus;
     globalArgs.useGeneralErrorMessage = useGeneralErrorMessage;
+
+    console.log("------=======-----%%%%$$$$@@@@@!!!!");
+    console.log("getPayStatus = " + getPayStatus);
 
     if (rsvpDisplayState === INVISIBLE_DISPLAY_STATE) {
       settings.displayYesRsvps = false;
@@ -2058,6 +2078,7 @@
                                 allRsvpsApiUrl: allRsvpsApiUrl,
                                 allEventsApiUrl: allEventsApiUrl,
                                 fetchAllRsvpsAtOnce: fetchAllRsvpsAtOnce,
+                                getPayStatus: getPayStatus
                               } );
      
     }
