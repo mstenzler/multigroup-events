@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150727180345) do
+ActiveRecord::Schema.define(version: 20150821030109) do
 
   create_table "authentications", force: :cascade do |t|
     t.integer  "user_id",       limit: 4
@@ -240,6 +240,7 @@ ActiveRecord::Schema.define(version: 20150727180345) do
     t.boolean  "set_remote_fee",                 limit: 1
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "all_rsvps_for_org_api_url",      limit: 65535
   end
 
   create_table "remote_groups", force: :cascade do |t|
