@@ -1,4 +1,6 @@
 class EventsController < ApplicationController
+  require 'ccmeetup'
+  
   before_filter(only: [:new, :edit, :create, :update, :reload_api]) { signed_in_auth_user Authentication::MEETUP_PROVIDER_NAME, { require_access_token: true} }
   before_filter :signed_in_user, only: [:destroy, :rsvp_print]
 #  before_filter :signed_in_user, :except => [:index, :index_tab, :show]
@@ -128,7 +130,10 @@ class EventsController < ApplicationController
 
   private
     def check_privileges!
-      authorize! :manage, @event, :message => "You are not authorized to perform this action!"
+      event = (@event ? @event : Event)
+#      logger.debug("**--**-==============================---------------")
+#      logger.debug("In check_previleges!. event = #{event.inspect}")
+      authorize! :manage, event, :message => "You are not authorized to perform this action!"
     end
 
     def check_privacy

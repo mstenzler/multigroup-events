@@ -311,7 +311,10 @@ class User < ActiveRecord::Base
   def auth_api_keys
     ret = nil
     if authentications
-      ret = authentications.map { |auth| { provider: auth.provider_name, key: auth.api_key } if auth.api_key.present? }
+      auth_sel = authentications.select { |auth| auth.api_key.present? }
+      if auth_sel.size > 0
+        ret = auth_sel.map { |auth| { provider: auth.provider_name, key: auth.api_key } if auth.api_key.present? }
+      end
     end
     ret
   end
