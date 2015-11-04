@@ -55,6 +55,8 @@ ActiveRecord::Schema.define(version: 20150821030109) do
     t.string   "title",                      limit: 255,                      null: false
     t.string   "slug",                       limit: 255,                      null: false
     t.string   "fee",                        limit: 124
+    t.string   "timezone",                   limit: 124
+    t.integer  "utc_offset",                 limit: 4
     t.text     "description",                limit: 65535
     t.string   "display_privacy",            limit: 255,   default: "public"
     t.boolean  "display_listing",            limit: 1,     default: true
@@ -69,8 +71,6 @@ ActiveRecord::Schema.define(version: 20150821030109) do
     t.string   "remote_event_api_id",        limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "timezone",                   limit: 124
-    t.integer  "utc_offset",                 limit: 4
     t.boolean  "featured",                   limit: 1,     default: false
     t.boolean  "show_home_page",             limit: 1,     default: true
     t.integer  "priority",                   limit: 4,     default: 0
@@ -87,7 +87,7 @@ ActiveRecord::Schema.define(version: 20150821030109) do
   create_table "excluded_remote_members", force: :cascade do |t|
     t.integer  "remote_member_id", limit: 4
     t.integer  "event_id",         limit: 4
-    t.string   "exclude_type",     limit: 255
+    t.string   "exclude_type",     limit: 16
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -211,7 +211,7 @@ ActiveRecord::Schema.define(version: 20150821030109) do
     t.string   "publish_status",      limit: 24
     t.string   "venue_visiblity",     limit: 24
     t.string   "visibilty",           limit: 24
-    t.integer  "yes_rsvp_count",      limit: 4
+    t.integer  "yes_rsvp_count",      limit: 4,     default: 0
     t.string   "fee_accepts",         limit: 16
     t.float    "fee_amount",          limit: 24
     t.string   "fee_currency",        limit: 16
@@ -296,8 +296,7 @@ ActiveRecord::Schema.define(version: 20150821030109) do
   end
 
   add_index "remote_members", ["geo_area_id"], name: "remote_members_geo_area_opt", using: :btree
-  add_index "remote_members", ["remote_member_id", "remote_source"], name: "remote_member_id", unique: true, using: :btree
-  add_index "remote_members", ["remote_member_id"], name: "remote_members_memid_opt", using: :btree
+  add_index "remote_members", ["remote_member_id", "remote_source"], name: "remote_members_memid_opt", unique: true, using: :btree
 
   create_table "remote_profiles", force: :cascade do |t|
     t.integer  "remote_member_id",    limit: 4
