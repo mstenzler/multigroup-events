@@ -145,12 +145,12 @@
 
   function addPayStatusToUrl(url) {
     //TO DO: Finsish implemetation of function
-    var has_blank_fields = url.match(/(\&fields\=\&/)
-    var exists = url.match(/(pay_status)/);
-    if (!exists) {
-      debug("**Adding pay status", 2);
-      url = "";
-    }
+ //   var has_blank_fields = url.match(/(\&fields\=\&/)
+ //   var exists = url.match(/(pay_status)/);
+ //   if (!exists) {
+ //     debug("**Adding pay status", 2);
+ //     url = "";
+ //   }
   }
 
   function addCallbackToUrl(url) {
