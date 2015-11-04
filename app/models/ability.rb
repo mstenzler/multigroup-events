@@ -7,6 +7,7 @@ class Ability
         can [:manage], User do |l_user|
             l_user.id == @user.id
         end
+        cannot :assign_roles, User
         @user.roles.each { |role| send(role.name) }
 
 #    can :assign_roles, User if user.admin?
