@@ -4,8 +4,8 @@ class Ability
     def initialize(user)
         Rails.logger.debug "***__** in Ability.initialize. user = #{user.inspect}"
         @user = user || User.new #for guest
-        can [:update, :edit], User do |l_user|
-            user.id == @user.id
+        can [:manage], User do |l_user|
+            l_user.id == @user.id
         end
         @user.roles.each { |role| send(role.name) }
 

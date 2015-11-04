@@ -4,8 +4,9 @@ class UsersController < ApplicationController
   #redirectif user is signed in
 	before_action :is_signed_in,   only: [:new, :create]
   before_action :load_user, :only => [:show, :edit, :update, :destroy]
-  load_and_authorize_resource
-  skip_authorize_resource :only => [:new, :create, :index]
+  before_action :check_privileges!, only: [:edit, :update, :destroy]
+#  load_and_authorize_resource
+#  skip_authorize_resource :only => [:new, :create, :index]
   #before_action :correct_user,   only: [:edit, :update]
   #before_action :admin_user,     only: :destroy
   #before_action :is_signed_in,   only: [:new, :create]
@@ -117,6 +118,16 @@ class UsersController < ApplicationController
 
     def load_user
       @user ||= User.fetch_user(params[:id])
+    end
+
+    def check_privileges!
+      @user || load_user
+      if @user 
+        logger.debug("Check_priveleges!. Got user = #{@user.inspect}")
+        authorize! :manage, @user, :message => "You are not authorized to perform this action!"
+      else
+        display_error("Could not retrieve user object for this page")
+      end
     end
 
     def load_new_user_info
