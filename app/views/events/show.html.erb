@@ -3,11 +3,13 @@
         <h1 id="pageTitle"></h1>
         <h2 id="errorMessage"></h2>
         <hr/>
+        <% if false %>
         event_display_state = <%= @event_display_state %><br/>
         rsvp_display_state = <%= @rsvp_display_state %><br/>
         rsvp_count_display_state = <%= @rsvp_count_display_state %><br/>
         rsvp_no_display_reason = <%= @rsvp_no_display_reason %> <br/>
         rsvp_count_no_display_reason = <%= @rsvp_count_no_display_reason %>
+        <% end %>
         <% if @event_display_state == Event::INVISIBLE_DISPLAY_STATE %>
           <div class="alert alert-danger" role="alert">
             <%= Event.get_no_display_alert_message(:event, @event_no_display_reason, "Access Denied!") %>
