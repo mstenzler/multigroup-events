@@ -1,10 +1,11 @@
 MultigroupEvents::Application.routes.draw do
   #Oauth signup via meetup requires exact referer domain
-  if Rails.env.production?
-    constraints(:host => /multigroupevents.com/i) do
-      get '/*path', :to => redirect {|params| "http://www.MultiGroupEvents.com/#{params[:path]}"}
-    end
-  end
+  #Remove as is causing infinite redirects
+#  if Rails.env.production?
+#    constraints(:host => /multigroupevents.com/i) do
+#      get '/*path', :to => redirect {|params| "http://www.MultiGroupEvents.com/#{params[:path]}"}
+#    end
+#  end
 
   match '/auth/:provider/callback', to: 'authentications#create', via: 'get'
 
