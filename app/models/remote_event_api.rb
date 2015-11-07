@@ -128,19 +128,23 @@ class RemoteEventApi < ActiveRecord::Base
       logger.debug("++ auth = #{auth.inspect}")
       if auth
         id_list = []
+        event_host_id_list = nil
         api = RemoteUserApiMeetup.new(auth)
         events = api.get_upcoming_events_rsvpd_to({ fields: "event_hosts"})
-        if (events && events.is_a?(Array) && events.size > 0)
+        if (events && events.size > 0)
           events.each do |event|
             event_hosts = event.event_hosts
-            if (event_hosts && event_hosts.is_a?(Array) && event_hosts.size > 0 && event_hosts.include?(cu_member_id))
-              id_list.push(event.id)
+            if (event_hosts && event_hosts.size > 0)
+              event_host_id_list = event_hosts.map { |eh| eh['member_id'].to_s }
+              if (event_host_id_list && event_host_id_list.size > 0 && event_host_id_list.include?(cu_member_id))
+                id_list.push(event.id.to_s)
+              end
             end
           end
         end
         if (id_list.size > 0)
           logger.debug("** Settiing event_host_ids to #{id_list.inspect}")
-          event_host_ids = id_list
+          self.event_host_ids = id_list
         else
           logger.debug("** NO EVENT_HOST_IDS!")
         end
