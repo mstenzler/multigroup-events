@@ -49,6 +49,9 @@ class Ability
     can :manage, Event do |event|
         (event.try(:user_id) == @user.id) || event.new_record?
     end
+    can :manage, Authentication do |auth|
+        (auth.try(:user_id) == @user.id) || auth.new_record?
+    end
   end
 
   def member
